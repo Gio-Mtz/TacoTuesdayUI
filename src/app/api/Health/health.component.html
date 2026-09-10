@@ -1,0 +1,10 @@
+<main>
+  <h1>Taco Tuesday Consulting</h1>
+  @if (ping(); as response) {
+    <p>{{ response.message }}</p>
+    <p>Module: {{ response.module }}</p>
+    <p>Server Time (UTC): {{ response.serverTimeUtc }}</p>
+  } @else {
+    <p>Talking to the API...</p>
+  }
+</main>
