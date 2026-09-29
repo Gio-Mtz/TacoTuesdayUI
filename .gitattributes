@@ -1,0 +1,41 @@
+# Line endings are decided HERE, not by whatever Git or editor each machine happens to have.
+#
+# Why this file exists. On 29-sep the repo showed 11 modified files with ZERO content
+# changes: `.editorconfig`, `.gitignore`, `.prettierrc`, `README.md`, `proxy.conf.json`,
+# `src/app/api/Health/*`, `src/main.ts` and the three `tsconfig*.json`. Every line was
+# deleted and re-added identically. Nobody had edited them — Visual Studio saves with CRLF,
+# the committed blobs are LF, and with no rule here Git calls that a rewrite of the file.
+#
+# It is not cosmetic. Phantom diffs hide the real change in review, and they turn into merge
+# conflicts on lines nobody touched.
+#
+# `* text=auto eol=lf` says: let Git detect what is text, store it LF in the repository, and
+# check it out LF on every platform. The companion half of the fix is `end_of_line = lf` in
+# .editorconfig — without it the editor simply writes the CRLF back and the churn returns.
+
+* text=auto eol=lf
+
+# Windows-only scripts are the exception: cmd.exe misparses an LF-only .bat.
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# Text that must stay LF even though the extension is unusual.
+*.svg  text eol=lf
+
+# Binary: never normalized, never diffed as text. Without these, a `text=auto` misdetection
+# corrupts a font or an image by "fixing" bytes that happen to look like newlines.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.avif  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.eot   binary
+*.pdf   binary
+*.zip   binary

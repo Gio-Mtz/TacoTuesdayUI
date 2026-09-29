@@ -3,6 +3,9 @@ root = true
 
 [*]
 charset = utf-8
+# LF everywhere, so the editor stops rewriting whole files as CRLF and Git stops
+# reporting them as changed. The other half of the fix is .gitattributes.
+end_of_line = lf
 indent_style = space
 indent_size = 2
 insert_final_newline = true
