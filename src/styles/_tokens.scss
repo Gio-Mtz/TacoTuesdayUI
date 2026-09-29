@@ -15,6 +15,11 @@
 //  el modo oscuro no lo va a poder cambiar nunca.
 // =============================================================================
 
+// Dart Sass 3 quita las funciones globales (map-get, map-merge, ...). El modulo
+// sass:map es el reemplazo y ya funciona en Dart Sass 1.x, asi que esto compila
+// igual hoy y deja de advertir.
+@use 'sass:map';
+
 // ---- Paleta cruda -----------------------------------------------------------
 $agave: (50:#ECF7F4, 100:#D0EDE6, 200:#A3DACE, 300:#6FC2B2, 400:#41A695,
          500:#22897A, 600:#176E63, 700:#12574F, 800:#0F453F, 900:#0C3833, 950:#06211E);
@@ -24,9 +29,9 @@ $barro: (0:#FFFFFF, 25:#FBFAF8, 50:#F6F4F1, 100:#EDEAE5, 200:#DDD8D0, 300:#C3BCB
          400:#A0968A, 500:#7E7468, 600:#625A50, 700:#4B443C, 800:#332E29,
          900:#211E1A, 950:#14120F);
 
-@function agave($s) { @return map-get($agave, $s); }
-@function maiz($s)  { @return map-get($maiz, $s); }
-@function barro($s) { @return map-get($barro, $s); }
+@function agave($s) { @return map.get($agave, $s); }
+@function maiz($s)  { @return map.get($maiz, $s); }
+@function barro($s) { @return map.get($barro, $s); }
 
 // ---- Tipografia -------------------------------------------------------------
 $font-display: 'Outfit', 'Segoe UI', system-ui, sans-serif;
@@ -35,17 +40,17 @@ $font-mono:    'JetBrains Mono', 'Cascadia Code', ui-monospace, monospace;
 
 $text: (xs:.75rem, sm:.875rem, base:1rem, lg:1.125rem, xl:1.25rem,
         2xl:1.5rem, 3xl:1.875rem, 4xl:2.25rem, 5xl:3rem);
-@function text($s) { @return map-get($text, $s); }
+@function text($s) { @return map.get($text, $s); }
 
 // ---- Espaciado --------------------------------------------------------------
 // Escala de 4 px. Un solo eje: si necesitas un valor que no esta aqui,
 // casi siempre el problema es el layout, no la escala.
 $space: (1:.25rem, 2:.5rem, 3:.75rem, 4:1rem, 5:1.5rem, 6:2rem, 7:3rem, 8:4rem, 9:6rem);
-@function space($s) { @return map-get($space, $s); }
+@function space($s) { @return map.get($space, $s); }
 
 // ---- Radios, sombras, movimiento -------------------------------------------
 $radius: (sm:4px, md:8px, lg:12px, xl:16px, full:999px);
-@function radius($s) { @return map-get($radius, $s); }
+@function radius($s) { @return map.get($radius, $s); }
 
 $motion-fast: 120ms;
 $motion-base: 200ms;
@@ -58,7 +63,7 @@ $bp: (sm:640px, md:768px, lg:1024px, xl:1280px);
 // Mobile-first a proposito: el estilo base es el del telefono y los
 // breakpoints solo AGREGAN. Al reves acabas peleando con especificidad.
 @mixin up($name) {
-  @media (min-width: map-get($bp, $name)) { @content; }
+  @media (min-width: map.get($bp, $name)) { @content; }
 }
 
 // ---- Utilidades -------------------------------------------------------------
