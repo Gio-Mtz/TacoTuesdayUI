@@ -1,0 +1,15 @@
+@use '../../../../styles/tokens' as tt;
+
+.candidates__title {
+  // The stakeholder's line is long. Capping the measure keeps it from running
+  // edge to edge on a wide screen, where a 90-character heading stops scanning.
+  max-width: 24ch;
+}
+
+.candidates__lede {
+  margin-bottom: tt.space(6);
+}
+
+.candidates__cards {
+  margin-top: tt.space(6);
+}

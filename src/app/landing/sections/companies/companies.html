@@ -1,0 +1,24 @@
+<section id="empresas" class="tt-section tt-section--alt" aria-labelledby="empresas-titulo">
+  <div class="tt-container">
+    <p class="tt-eyebrow">Para empresas</p>
+    <h2 id="empresas-titulo" class="tt-title">
+      Dejas de perder semanas en entrevistas que no filtran
+    </h2>
+    <p class="tt-lede companies__lede">
+      Contratar a un perfil técnico se te va en coordinar calendarios, leer currículums que no
+      dicen nada y justificar decisiones de memoria. Eso es lo que quitamos.
+    </p>
+
+    <ul class="tt-cards companies__cards">
+      @for (point of points; track point.title) {
+        <li class="tt-card">
+          <span class="tt-card__icon">
+            <ttco-icon [name]="point.icon" />
+          </span>
+          <h3 class="tt-card__title">{{ point.title }}</h3>
+          <p class="tt-card__body">{{ point.body }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

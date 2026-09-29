@@ -24,5 +24,39 @@
 @use './styles/tokens' as tt;
 @use './styles/fonts';
 
-// Nothing global yet beyond what theme.css already sets on html/body.
-// Layout and components land with the landing page in US-002.
+//    styles/_layout.scss  The handful of primitives every page shares:
+//                         container, section rhythm, button, card, skip link.
+//                         They are global because component styles are capped
+//                         at 8 kB each and because five sections restating the
+//                         same button is how a design system drifts. The file
+//                         header explains the rest.
+@use './styles/layout';
+
+// Border-box everywhere. This is not taste: `.tt-container` is `width: 100%`
+// plus a 1 rem gutter, and under the default content-box that adds up to
+// 392 px inside a 360 px phone — the whole page scrolled sideways until this
+// line existed. Caught with a scrollWidth check at 360 px, not by eye.
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+// The app shell owns the page frame: header, main, footer stacked so the footer
+// sits at the bottom even on a short page (a 404 or the privacy notice).
+html,
+body {
+  min-height: 100%;
+}
+
+// `hidden` loses to `display: flex/grid` on specificity alone, which silently
+// un-hides anything toggled with [hidden]. One line here, never debugged again.
+[hidden] {
+  display: none !important;
+}
+
+// Nobody should have to guess where an image would have been.
+img,
+svg {
+  max-width: 100%;
+}

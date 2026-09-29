@@ -1,0 +1,25 @@
+<section id="candidatos" class="tt-section" aria-labelledby="candidatos-titulo">
+  <div class="tt-container">
+    <p class="tt-eyebrow">Para candidatos</p>
+    <h2 id="candidatos-titulo" class="tt-title candidates__title">
+      ¿Odias que los reclutas te ghosteen? Deja que ellos te busquen
+    </h2>
+    <p class="tt-lede candidates__lede">
+      Aquí no mandas tu currículum a un buzón que nadie abre. Dejas tu perfil una vez y las
+      empresas que están contratando de verdad llegan a ti, con fecha y con un proceso que
+      termina en una respuesta.
+    </p>
+
+    <ul class="tt-cards candidates__cards">
+      @for (point of points; track point.title) {
+        <li class="tt-card">
+          <span class="tt-card__icon">
+            <ttco-icon [name]="point.icon" />
+          </span>
+          <h3 class="tt-card__title">{{ point.title }}</h3>
+          <p class="tt-card__body">{{ point.body }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

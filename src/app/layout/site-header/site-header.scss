@@ -1,0 +1,71 @@
+@use '../../../styles/tokens' as tt;
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  // Solid, not translucent. A backdrop-filter over the alternating section
+  // bands shifts colour as you scroll past a band edge, which reads as a bug.
+  background: var(--tt-bg-canvas);
+  border-bottom: 1px solid var(--tt-border);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: tt.space(4);
+  min-height: 4rem;
+}
+
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: tt.space(2);
+  color: var(--tt-text-primary);
+  font-family: tt.$font-display;
+  font-weight: 600;
+  font-size: var(--tt-text-lg);
+  text-decoration: none;
+
+  // Pushes everything after it to the right without a spacer element.
+  margin-right: auto;
+}
+
+.site-header__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--tt-radius-md);
+  background: var(--tt-brand);
+  color: var(--tt-on-brand);
+  font-family: tt.$font-mono;
+  font-size: var(--tt-text-sm);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.site-header__nav {
+  display: none;
+  gap: tt.space(5);
+
+  // The nav returns at md. See the component doc comment for why there is no
+  // mobile menu below it.
+  @include tt.up(md) {
+    display: flex;
+  }
+
+  a {
+    color: var(--tt-text-secondary);
+    font-size: var(--tt-text-sm);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color tt.$motion-fast tt.$ease;
+
+    &:hover {
+      color: var(--tt-brand-text);
+    }
+  }
+}

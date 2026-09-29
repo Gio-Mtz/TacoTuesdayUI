@@ -1,0 +1,9 @@
+@use '../../../../styles/tokens' as tt;
+
+.companies__lede {
+  margin-bottom: tt.space(6);
+}
+
+.companies__cards {
+  margin-top: tt.space(6);
+}

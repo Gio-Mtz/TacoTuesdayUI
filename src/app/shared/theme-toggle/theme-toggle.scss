@@ -1,0 +1,27 @@
+@use '../../../styles/tokens' as tt;
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  // Same 44 px target as .tt-btn. It is a control, not decoration.
+  width: 44px;
+  height: 44px;
+
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-full);
+  background: var(--tt-bg-surface);
+  color: var(--tt-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color tt.$motion-fast tt.$ease,
+    color tt.$motion-fast tt.$ease,
+    border-color tt.$motion-fast tt.$ease;
+
+  &:hover {
+    color: var(--tt-brand-text);
+    border-color: var(--tt-brand-border);
+    background: var(--tt-brand-subtle);
+  }
+}

@@ -1,0 +1,210 @@
+// =============================================================================
+//  Layout primitives — shared by every page
+//
+//  Why these are global instead of living inside each component:
+//
+//    * `anyComponentStyle` in angular.json errors at 8 kB. Five sections that
+//      each restated the container, the vertical rhythm and the button would
+//      blow past it — and, worse, drift apart. Three slightly different buttons
+//      is how a design system dies.
+//    * Angular's emulated encapsulation scopes a COMPONENT's styles to that
+//      component; it does not stop global CSS from reaching the component's
+//      DOM. So a global class is the cheapest way to share a primitive with no
+//      ::ng-deep tricks.
+//
+//  The split, same rule as everywhere else in this repo:
+//    * anything that changes with the theme  -> var(--tt-*)
+//    * anything fixed (space, breakpoints)   -> Sass, as `tt.`
+//
+//  Font sizes are read as var(--tt-text-*) on purpose: the Sass map keys are
+//  written `2xl`, `3xl`... which Sass parses as numbers-with-a-unit rather than
+//  plain identifiers. It works, but it is a trap for the next person. The
+//  custom property says the same thing and cannot be misread.
+// =============================================================================
+
+@use './tokens' as tt;
+
+// ---- Page skeleton ----------------------------------------------------------
+
+.tt-container {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: tt.space(4);
+
+  @include tt.up(md) {
+    padding-inline: tt.space(5);
+  }
+}
+
+.tt-section {
+  padding-block: tt.space(8);
+
+  // An in-page anchor scrolls the target to y=0, which is exactly where the
+  // sticky header is. Without this the heading lands underneath it.
+  scroll-margin-top: 5rem;
+
+  @include tt.up(md) {
+    padding-block: tt.space(9);
+  }
+}
+
+// Alternating bands are what give a one-page site its rhythm. `--tt-bg-subtle`
+// is one step off the canvas in both themes, so this never becomes a hard edge.
+.tt-section--alt {
+  background: var(--tt-bg-subtle);
+}
+
+// ---- Type ------------------------------------------------------------------
+
+.tt-eyebrow {
+  margin: 0 0 tt.space(2);
+  font-family: tt.$font-mono;
+  font-size: var(--tt-text-sm);
+  letter-spacing: var(--tt-tracking-wide);
+  text-transform: uppercase;
+  color: var(--tt-brand-text);
+}
+
+.tt-title {
+  margin: 0 0 tt.space(4);
+  font-size: var(--tt-text-3xl);
+
+  @include tt.up(md) {
+    font-size: var(--tt-text-4xl);
+  }
+}
+
+.tt-lede {
+  margin: 0;
+  max-width: 62ch;
+  font-size: var(--tt-text-lg);
+  line-height: var(--tt-leading-relaxed);
+  color: var(--tt-text-secondary);
+}
+
+// ---- Buttons ----------------------------------------------------------------
+
+.tt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: tt.space(2);
+
+  // 44 px is the WCAG 2.5.8 target size. It is also just what a thumb needs.
+  min-height: 44px;
+  padding: tt.space(3) tt.space(5);
+
+  border: 1px solid transparent;
+  border-radius: var(--tt-radius-full);
+  font-family: tt.$font-body;
+  font-size: var(--tt-text-base);
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color tt.$motion-base tt.$ease,
+    border-color tt.$motion-base tt.$ease,
+    color tt.$motion-base tt.$ease;
+}
+
+.tt-btn--primary {
+  background: var(--tt-brand);
+  color: var(--tt-on-brand);
+
+  &:hover {
+    background: var(--tt-brand-hover);
+  }
+
+  &:active {
+    background: var(--tt-brand-active);
+  }
+}
+
+.tt-btn--secondary {
+  background: transparent;
+  color: var(--tt-brand-text);
+  border-color: var(--tt-brand-border);
+
+  &:hover {
+    background: var(--tt-brand-subtle);
+  }
+}
+
+// ---- Cards ------------------------------------------------------------------
+
+.tt-cards {
+  display: grid;
+  gap: tt.space(4);
+  grid-template-columns: 1fr;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include tt.up(md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.tt-card {
+  background: var(--tt-bg-surface);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-lg);
+  padding: tt.space(5);
+  box-shadow: var(--tt-shadow-sm);
+}
+
+.tt-card__title {
+  margin: 0 0 tt.space(2);
+  font-size: var(--tt-text-lg);
+  line-height: var(--tt-leading-snug);
+}
+
+.tt-card__body {
+  margin: 0;
+  color: var(--tt-text-secondary);
+}
+
+// The icon chip on a card. Brand-subtle behind brand-coloured strokes clears AA
+// in both themes — see the ADR for the pairs that were checked.
+.tt-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: tt.space(4);
+  border-radius: var(--tt-radius-md);
+  background: var(--tt-brand-subtle);
+  color: var(--tt-brand-text);
+}
+
+// ---- Accessibility helpers ---------------------------------------------------
+
+.tt-sr-only {
+  @include tt.sr-only;
+}
+
+// Off-screen until focused. First thing in the tab order, so a keyboard visitor
+// can jump the header instead of tabbing through the nav on every page.
+.tt-skip-link {
+  position: fixed;
+  top: tt.space(3);
+  left: tt.space(3);
+  z-index: 100;
+  padding: tt.space(3) tt.space(4);
+  border-radius: var(--tt-radius-md);
+  background: var(--tt-brand);
+  color: var(--tt-on-brand);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--tt-shadow-md);
+  transform: translateY(-250%);
+  transition: transform tt.$motion-fast tt.$ease;
+
+  &:focus-visible {
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,30 @@
+@use '../../../styles/tokens' as tt;
+
+.privacy__inner {
+  // A legal notice is read, not scanned. 70 characters is where a line stops
+  // being comfortable, and this page has nothing else competing for the width.
+  max-width: 70ch;
+}
+
+.privacy__updated {
+  margin: 0 0 tt.space(6);
+  font-size: var(--tt-text-sm);
+  color: var(--tt-text-muted);
+}
+
+.privacy {
+  h2 {
+    margin-top: tt.space(6);
+    font-size: var(--tt-text-xl);
+  }
+
+  p {
+    margin: 0 0 tt.space(4);
+    color: var(--tt-text-secondary);
+    line-height: var(--tt-leading-relaxed);
+  }
+
+  a {
+    color: var(--tt-brand-text);
+  }
+}

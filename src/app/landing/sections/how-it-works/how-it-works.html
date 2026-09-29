@@ -1,0 +1,24 @@
+<section id="como-funciona" class="tt-section tt-section--alt" aria-labelledby="como-funciona-titulo">
+  <div class="tt-container">
+    <p class="tt-eyebrow">Cómo funciona</p>
+    <h2 id="como-funciona-titulo" class="tt-title">Tres pasos, sin letras chiquitas</h2>
+
+    <ol class="tt-cards steps">
+      @for (step of steps; track step.title; let i = $index) {
+        <li class="tt-card steps__item">
+          <div class="steps__head">
+            <span class="steps__number" aria-hidden="true">{{ i + 1 }}</span>
+            <span class="tt-card__icon steps__icon">
+              <ttco-icon [name]="step.icon" />
+            </span>
+          </div>
+          <h3 class="tt-card__title">
+            <span class="tt-sr-only">Paso {{ i + 1 }}:</span>
+            {{ step.title }}
+          </h3>
+          <p class="tt-card__body">{{ step.body }}</p>
+        </li>
+      }
+    </ol>
+  </div>
+</section>

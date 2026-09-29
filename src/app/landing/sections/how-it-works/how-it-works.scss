@@ -1,0 +1,38 @@
+@use '../../../../styles/tokens' as tt;
+
+.steps {
+  margin-top: tt.space(6);
+  counter-reset: none;
+}
+
+.steps__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: tt.space(3);
+}
+
+.steps__icon {
+  // The shared .tt-card__icon adds a bottom margin for the stacked card layout;
+  // here the icon sits on a row with the number, so the row owns the spacing.
+  margin-bottom: 0;
+}
+
+.steps__number {
+  font-family: tt.$font-display;
+  font-size: var(--tt-text-4xl);
+  font-weight: 700;
+  line-height: 1;
+
+  // Ghosted on purpose: it orders the cards without competing with the titles.
+  // Screen readers get "Paso 1:" from the heading instead — this one is hidden.
+  color: var(--tt-border-strong);
+}
+
+.steps__item {
+  margin-top: 0;
+}
+
+.steps__item .tt-card__title {
+  margin-top: tt.space(4);
+}

@@ -1,0 +1,16 @@
+<header class="site-header">
+  <div class="tt-container site-header__inner">
+    <a class="site-header__brand" routerLink="/">
+      <span class="site-header__mark" aria-hidden="true">TT</span>
+      <span class="site-header__name">{{ site.name }}</span>
+    </a>
+
+    <nav class="site-header__nav" aria-label="Secciones">
+      <a routerLink="/" fragment="empresas">Empresas</a>
+      <a routerLink="/" fragment="candidatos">Candidatos</a>
+      <a routerLink="/" fragment="como-funciona">Cómo funciona</a>
+    </nav>
+
+    <ttco-theme-toggle />
+  </div>
+</header>
