@@ -29,7 +29,10 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "src/styles/theme.css",
+              "src/styles.scss"
+            ]
           },
           "configurations": {
             "production": {

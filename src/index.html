@@ -2,10 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>TacoTuesdayUI</title>
+  <title>Taco Tuesday Consulting</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Tells the browser to paint its own UI (scrollbars, form controls) to match,
+       and keeps the address bar in step on mobile. -->
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#FBFAF8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14120F" media="(prefers-color-scheme: dark)">
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" href="favicon.ico" sizes="any">
+
+  <!-- Fonts are self-hosted and bundled from styles/_fonts.scss, so there is no
+       third-party stylesheet to preconnect to. See the ADR for why. -->
+
+  <!-- Anti-flash. theme.css already follows prefers-color-scheme on its own, so
+       this only matters for a visitor whose saved choice DISAGREES with their
+       OS: without it they would see one paint of the wrong theme before Angular
+       boots. It runs before first paint and does the same thing ThemeService
+       does, which is why the storage key is duplicated here — if you change
+       'tt-theme', change it in theme.service.ts too. Keep it in sync or the
+       page flashes again. -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('tt-theme');
+        if (saved === 'light' || saved === 'dark') {
+          document.documentElement.setAttribute('data-theme', saved);
+        }
+      } catch (e) {
+        /* Storage blocked (private mode, cookies off). The CSS default stands. */
+      }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

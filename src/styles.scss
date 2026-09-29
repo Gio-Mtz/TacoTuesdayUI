@@ -1,1 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+// =============================================================================
+//  Global styles — Taco Tuesday UI
+//
+//  The design system arrives in two pieces, on purpose:
+//
+//    styles/theme.css     Runtime. Custom properties (--tt-*) that change with
+//                         the theme. Loaded from angular.json BEFORE this file
+//                         so its :root block wins the cascade from the start.
+//                         Kept byte-identical to TacoTuesdayDesign/01-tokens so
+//                         it can be re-synced without a merge.
+//
+//    styles/_tokens.scss  Compile time. Measurements, breakpoints, the raw
+//                         palette, mixins. Available here as `tt.`.
+//
+//    styles/_fonts.scss   The three typefaces, self-hosted and declared under
+//                         the exact family names theme.css asks for.
+//
+//  Rule of thumb: anything that changes between light and dark reads a CSS
+//  custom property (var(--tt-text-primary)). Anything that does not can be a
+//  Sass token (tt.space(4)). Mixing them is the classic bug — a Sass colour is
+//  baked at build time, so dark mode can never move it.
+// =============================================================================
+
+@use './styles/tokens' as tt;
+@use './styles/fonts';
+
+// Nothing global yet beyond what theme.css already sets on html/body.
+// Layout and components land with the landing page in US-002.
