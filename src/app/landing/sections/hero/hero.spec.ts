@@ -35,10 +35,13 @@ describe('Hero', () => {
     expect(actions[1].textContent?.trim()).toBe('Busco trabajo');
   });
 
-  it('sends each door to its own section instead of a form that does not exist yet', () => {
+  it('sends both doors to the waitlist form now that it exists (US-003)', () => {
+    // They were pointed at #empresas and #candidatos while there was no form to
+    // send anyone to. The form's first question is which side you are on, so
+    // one anchor is enough and asking twice would be worse.
     const hrefs = Array.from(el().querySelectorAll('.hero__actions a')).map((a) =>
       a.getAttribute('href'),
     );
-    expect(hrefs).toEqual(['/#empresas', '/#candidatos']);
+    expect(hrefs).toEqual(['/#lista-de-espera', '/#lista-de-espera']);
   });
 });

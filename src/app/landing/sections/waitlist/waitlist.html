@@ -1,0 +1,234 @@
+<section
+  id="lista-de-espera"
+  class="tt-section waitlist"
+  aria-labelledby="lista-de-espera-titulo"
+>
+  <div class="tt-container waitlist__inner">
+    <p class="tt-eyebrow">Lista de espera</p>
+    <h2 id="lista-de-espera-titulo" class="tt-title">Déjanos tu correo</h2>
+    <p class="tt-lede waitlist__lede">
+      Te escribimos cuando abramos tu lado de la plataforma. Nada de boletines, nada de
+      recordatorios: un correo, cuando haya algo que contarte.
+    </p>
+
+    <!--
+      Always in the DOM, never conditional. A live region that is added to the
+      page at the same moment its text appears is announced by roughly half of
+      the screen readers out there and silently ignored by the rest — the region
+      has to exist first so the reader is already watching it.
+    -->
+    <p class="tt-sr-only" role="status" aria-live="polite">{{ liveMessage() }}</p>
+
+    <div class="waitlist__panel">
+      @if (status() === 'success') {
+        <div class="confirm">
+          <span class="confirm__icon" aria-hidden="true">
+            <ttco-icon name="check-circle" [size]="32" />
+          </span>
+
+          <!--
+            `tabindex="-1"` so focus can land here without putting the heading
+            in the tab order. The effect in the component is what moves it.
+          -->
+          <h3 #successHeading class="confirm__title" tabindex="-1">
+            @if (alreadyRegistered()) {
+              Ya estabas en la lista
+            } @else {
+              Listo, quedaste anotado
+            }
+          </h3>
+
+          <p class="confirm__body">
+            @if (alreadyRegistered()) {
+              Ese correo ya estaba registrado, así que no hicimos nada dos veces. Sigues en la
+              lista y te escribimos cuando abramos.
+            } @else {
+              Te escribimos a <strong>{{ form.controls.email.value }}</strong> cuando abramos.
+              Si no llega, revisa la carpeta de correo no deseado.
+            }
+          </p>
+
+          <button type="button" class="tt-btn tt-btn--secondary confirm__again" (click)="reset()">
+            Registrar a alguien más
+          </button>
+        </div>
+      } @else {
+        <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <!--
+            A radiogroup, not a <select> and not two buttons: it is two mutually
+            exclusive options that both have to be visible, and arrow keys
+            moving between them is behaviour we get for free and would otherwise
+            have to write.
+          -->
+          <fieldset class="form__variant">
+            <legend class="form__legend">¿De qué lado vienes?</legend>
+
+            <div class="variant">
+              <!--
+                `name` is written out by hand and is NOT redundant. Angular's
+                radio value accessor left it empty here, and an empty name means
+                the browser never forms a radio GROUP: both inputs became their
+                own tab stop, and arrow-key selection changed the DOM without
+                ever reaching the form control — the field below simply did not
+                swap. Measured in Chromium, not guessed. With the name present
+                the group is one tab stop and the arrows work, which was the
+                whole reason for using radios instead of two buttons.
+
+                It has to be spelled exactly like the formControlName: Angular
+                throws NG01202 when the two disagree. That check only runs in
+                dev mode, so `ng build` says nothing and only `ng test` catches
+                a mismatch — which is how this line got its value.
+              -->
+              <label class="variant__option">
+                <input type="radio" name="kind" formControlName="kind" value="company" />
+                <span class="variant__label">
+                  <span class="variant__icon" aria-hidden="true">
+                    <ttco-icon name="building" [size]="20" />
+                  </span>
+                  Estoy contratando
+                </span>
+              </label>
+
+              <label class="variant__option">
+                <input type="radio" name="kind" formControlName="kind" value="candidate" />
+                <span class="variant__label">
+                  <span class="variant__icon" aria-hidden="true">
+                    <ttco-icon name="user" [size]="20" />
+                  </span>
+                  Busco trabajo
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label class="field__label" for="waitlist-name">Nombre</label>
+            <input
+              id="waitlist-name"
+              class="field__input"
+              type="text"
+              formControlName="name"
+              autocomplete="name"
+              [attr.aria-invalid]="errors().name ? 'true' : null"
+              [attr.aria-describedby]="errors().name ? 'waitlist-name-error' : null"
+            />
+            @if (errors().name; as message) {
+              <p id="waitlist-name-error" class="field__error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="waitlist-email">Correo</label>
+            <input
+              id="waitlist-email"
+              class="field__input"
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              inputmode="email"
+              [attr.aria-invalid]="errors().email ? 'true' : null"
+              [attr.aria-describedby]="errors().email ? 'waitlist-email-error' : null"
+            />
+            @if (errors().email; as message) {
+              <p id="waitlist-email-error" class="field__error">{{ message }}</p>
+            }
+          </div>
+
+          @if (isCompany()) {
+            <div class="field">
+              <label class="field__label" for="waitlist-company">Empresa</label>
+              <input
+                id="waitlist-company"
+                class="field__input"
+                type="text"
+                formControlName="company"
+                autocomplete="organization"
+                [attr.aria-invalid]="errors().company ? 'true' : null"
+                [attr.aria-describedby]="errors().company ? 'waitlist-company-error' : null"
+              />
+              @if (errors().company; as message) {
+                <p id="waitlist-company-error" class="field__error">{{ message }}</p>
+              }
+            </div>
+          } @else {
+            <div class="field">
+              <label class="field__label" for="waitlist-role">
+                Rol o área
+                <span class="field__optional">(opcional)</span>
+              </label>
+              <input
+                id="waitlist-role"
+                class="field__input"
+                type="text"
+                formControlName="role"
+                autocomplete="organization-title"
+                placeholder="Backend .NET, QA, datos…"
+                [attr.aria-invalid]="errors().role ? 'true' : null"
+                [attr.aria-describedby]="errors().role ? 'waitlist-role-error' : null"
+              />
+              @if (errors().role; as message) {
+                <p id="waitlist-role-error" class="field__error">{{ message }}</p>
+              }
+            </div>
+          }
+
+          <!--
+            The honeypot. Hidden from sight AND from assistive tech, and out of
+            the tab order, so no human can fill it by accident; still a real
+            input in the DOM, which is the only thing a form-filling bot looks
+            at. `display: none` is avoided on purpose — the cheaper scrapers
+            skip those, which is exactly the population this catches.
+          -->
+          <div class="honeypot" aria-hidden="true">
+            <label for="waitlist-website">No llenes esto</label>
+            <input
+              id="waitlist-website"
+              type="text"
+              formControlName="website"
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </div>
+
+          @if (requestError(); as message) {
+            <!--
+              `role="alert"` is an assertive live region: it interrupts, which
+              is right here because the visitor pressed a button and is waiting
+              for the answer.
+            -->
+            <p class="form__failure" role="alert">
+              <span class="form__failure-icon" aria-hidden="true">
+                <ttco-icon name="alert-circle" [size]="20" />
+              </span>
+              {{ message }}
+            </p>
+          }
+
+          <div class="form__actions">
+            <!--
+              Never disabled on invalid — only while a request is in flight. See
+              the class comment and ADR 0003.
+            -->
+            <button
+              type="submit"
+              class="tt-btn tt-btn--primary form__submit"
+              [disabled]="status() === 'sending'"
+            >
+              @if (status() === 'sending') {
+                Enviando…
+              } @else {
+                Quiero entrar a la lista
+              }
+            </button>
+
+            <p class="form__legal">
+              Al enviar aceptas nuestro
+              <a routerLink="/privacidad">aviso de privacidad</a>. Puedes pedir que borremos tus
+              datos cuando quieras.
+            </p>
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+</section>

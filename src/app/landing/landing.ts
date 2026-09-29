@@ -4,6 +4,7 @@ import { Candidates } from './sections/candidates/candidates';
 import { Companies } from './sections/companies/companies';
 import { Hero } from './sections/hero/hero';
 import { HowItWorks } from './sections/how-it-works/how-it-works';
+import { Waitlist } from './sections/waitlist/waitlist';
 
 /**
  * The public landing page.
@@ -15,15 +16,18 @@ import { HowItWorks } from './sections/how-it-works/how-it-works';
  *
  * The order is the argument: what this is (hero) → why it matters to the side
  * that pays (empresas) → why it matters to the side that has to show up
- * (candidatos) → how little it costs to find out (cómo funciona).
+ * (candidatos) → how little it costs to find out (cómo funciona) → the ask
+ * (lista de espera).
  *
- * The waitlist form from US-003 goes after `ttco-how-it-works`, once someone
- * has read the reason to leave their email.
+ * The form is last on purpose. It is the only thing on the page that asks for
+ * something, and it comes after every reason to say yes has been given. The
+ * hero's two buttons jump straight down to it for the visitor who already
+ * knows.
  */
 @Component({
   selector: 'ttco-landing',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Hero, Companies, Candidates, HowItWorks],
+  imports: [Hero, Companies, Candidates, HowItWorks, Waitlist],
   templateUrl: './landing.html',
 })
 export class Landing {}
