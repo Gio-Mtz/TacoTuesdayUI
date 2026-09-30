@@ -16,13 +16,13 @@ describe('Companies', () => {
   }
 
   it('is the anchor the header and the hero link to', () => {
-    expect(el().querySelector('#empresas')).toBeTruthy();
+    expect(el().querySelector('#companies')).toBeTruthy();
   });
 
   it('names itself for assistive tech through its own heading', () => {
     const section = el().querySelector('section')!;
     const labelledBy = section.getAttribute('aria-labelledby');
-    expect(labelledBy).toBe('empresas-titulo');
+    expect(labelledBy).toBe('companies-title');
     expect(el().querySelector(`#${labelledBy}`)).toBeTruthy();
   });
 

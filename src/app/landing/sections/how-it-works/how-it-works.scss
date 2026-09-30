@@ -25,7 +25,15 @@
   line-height: 1;
 
   // Ghosted on purpose: it orders the cards without competing with the titles.
-  // Screen readers get "Paso 1:" from the heading instead — this one is hidden.
+  // Screen readers get "Step 1:" from the heading instead — this one is hidden.
+  //
+  // ⚠️ TD-008: `--tt-border-strong` is a BORDER token doing a text job, and
+  // rendered it measures 1.88:1 in light and 1.73:1 in dark against the card —
+  // under the 3:1 that 36 px bold text needs. It is decorative and duplicated
+  // for assistive tech, so it is not a blocker, but a sighted visitor with low
+  // vision cannot read the step numbers. Fixing it is a design call (which
+  // token, or a different treatment), not a find-and-replace, which is why it is
+  // its own card and not part of US-009. Pre-existing: US-009 changed no SCSS.
   color: var(--tt-border-strong);
 }
 

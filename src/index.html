@@ -1,10 +1,21 @@
 <!doctype html>
 <!--
-  The whole product is written in Spanish. With lang="en" a screen reader reads
-  it with English phonemes, which is the difference between understandable and
-  gibberish. es-MX and not plain es because the copy is Mexican Spanish.
+  `lang` is per ROUTE, not per site, since US-009: `/` is English (it speaks to
+  the company that pays) and `/privacidad` is Spanish (a Mexican aviso de
+  privacidad, in the language the law addresses). `PageHeadStrategy` rewrites
+  this attribute on every navigation — see `app/core/i18n/`.
+
+  What is hard-coded here is only the value a visitor sees BEFORE Angular boots,
+  and it matters because Static Web Apps serves this same file for every path. It
+  is "en" because `/` is the page that gets indexed and shared. The cost, written
+  down so nobody rediscovers it: a crawler that does not run JavaScript reads
+  `/privacidad` as English. Every real browser and every screen reader gets the
+  corrected value.
+
+  Do not "fix" this to es-MX. That trades a wrong lang on one legal page for a
+  wrong lang on the page the whole business depends on.
 -->
-<html lang="es-MX">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Taco Tuesday Consulting</title>

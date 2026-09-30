@@ -35,7 +35,7 @@ const MAX_EMAIL = 160;
  * Four decisions in here are load-bearing, and all four are argued in
  * `docs/adr/0003-waitlist-form.md`:
  *
- *  1. **Three fields, never more.** "Cómo funciona" promises out loud that this
+ *  1. **Three fields, never more.** "How it works" promises out loud that this
  *     takes under a minute and that we do not ask for anything else yet. A
  *     fourth field would make the section above the form a lie.
  *  2. **The submit button is never disabled.** A greyed-out button that will not
@@ -115,12 +115,12 @@ export class Waitlist {
    * The live region's text. Empty while idle, because an `aria-live` region
    * that announces on first paint talks over the page load.
    *
-   * It carries "enviando" and nothing else: the confirmation is announced by
+   * It carries "sending" and nothing else: the confirmation is announced by
    * moving focus into the panel (richer — the visitor hears the whole message
    * and can read on), and the failure is announced by `role="alert"`.
    */
   protected readonly liveMessage = computed(() =>
-    this.status() === 'sending' ? 'Enviando tu registro…' : '',
+    this.status() === 'sending' ? 'Sending your details…' : '',
   );
 
   /**
@@ -143,27 +143,27 @@ export class Waitlist {
     const { name, email, company, role } = this.form.controls;
 
     if (name.hasError('required')) {
-      messages.name = 'Escribe tu nombre.';
+      messages.name = 'Write your name.';
     } else if (name.hasError('maxlength')) {
-      messages.name = `Máximo ${MAX_SHORT} caracteres.`;
+      messages.name = `${MAX_SHORT} characters maximum.`;
     }
 
     if (email.hasError('required')) {
-      messages.email = 'Escribe tu correo.';
+      messages.email = 'Write your email.';
     } else if (email.hasError('email')) {
-      messages.email = 'Ese correo no se ve bien. Revisa que tenga @ y un dominio.';
+      messages.email = 'That email does not look right. Check it has an @ and a domain.';
     } else if (email.hasError('maxlength')) {
-      messages.email = `Máximo ${MAX_EMAIL} caracteres.`;
+      messages.email = `${MAX_EMAIL} characters maximum.`;
     }
 
     if (this.isCompany()) {
       if (company.hasError('required')) {
-        messages.company = 'Escribe el nombre de tu empresa.';
+        messages.company = 'Write your company name.';
       } else if (company.hasError('maxlength')) {
-        messages.company = `Máximo ${MAX_SHORT} caracteres.`;
+        messages.company = `${MAX_SHORT} characters maximum.`;
       }
     } else if (role.hasError('maxlength')) {
-      messages.role = `Máximo ${MAX_SHORT} caracteres.`;
+      messages.role = `${MAX_SHORT} characters maximum.`;
     }
 
     return messages;
@@ -172,7 +172,7 @@ export class Waitlist {
   constructor() {
     // Switching sides swaps which extra field exists, so the validators and the
     // value of the one that just disappeared have to go with it. Without the
-    // reset, typing "Acme" as an empresa and then switching to candidato posts
+    // reset, typing "Acme" as a company and then switching to engineer posts
     // "Acme" as the candidate's role.
     this.form.controls.kind.valueChanges
       .pipe(takeUntilDestroyed())
@@ -236,7 +236,7 @@ export class Waitlist {
     });
   }
 
-  /** Back to an empty form, for the "registrar a alguien más" link. */
+  /** Back to an empty form, for the "sign someone else up" button. */
   protected reset(): void {
     this.form.reset({ kind: this.form.controls.kind.value });
     this.applyKind(this.form.controls.kind.value);
@@ -289,20 +289,20 @@ export class Waitlist {
  */
 export function describeFailure(error: unknown): string {
   if (!(error instanceof HttpErrorResponse)) {
-    return 'Algo falló de nuestro lado. Inténtalo otra vez en un momento.';
+    return 'Something broke on our side. Try again in a moment.';
   }
 
   switch (error.status) {
     case 0:
       // Status 0 is the browser refusing to tell us why: offline, DNS, or a
       // CORS preflight that never came back. From here they look identical.
-      return 'No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.';
+      return 'We could not reach the server. Check your connection and try again.';
     case 400:
     case 422:
-      return 'Algún dato no pasó la validación del servidor. Revísalo e inténtalo de nuevo.';
+      return 'Some field did not pass the server validation. Check it and try again.';
     case 429:
-      return 'Demasiados intentos seguidos. Espera un minuto y vuelve a intentarlo.';
+      return 'Too many attempts in a row. Wait a minute and try again.';
     default:
-      return 'Algo falló de nuestro lado. Inténtalo otra vez en un momento.';
+      return 'Something broke on our side. Try again in a moment.';
   }
 }

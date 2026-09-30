@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 
+import { PageLangService } from '../../core/i18n/page-lang';
+import { SHELL_COPY } from '../../core/i18n/shell-copy';
 import { ThemeService } from '../../core/theme/theme.service';
 import { Icon } from '../icon/icon';
 
@@ -9,9 +11,16 @@ import { Icon } from '../icon/icon';
  *
  * Two accessibility notes worth keeping:
  *
- *  * The accessible name says what pressing it WILL do ("Cambiar a modo
- *    oscuro"), not what the current state is. A blind visitor cannot see the
- *    icon, so the state alone tells them nothing actionable.
+ *  * The accessible name says what pressing it WILL do ("Switch to dark mode"),
+ *    not what the current state is. A blind visitor cannot see the icon, so the
+ *    state alone tells them nothing actionable.
+ *  * ⚠️ It is the ONLY visitor-facing string in this button, it is invisible on
+ *    screen, and it therefore went untranslated through the whole of US-009's
+ *    first pass: the page read English and the button still announced "Cambiar a
+ *    modo oscuro". Nothing in the build or the tests could see it — it was found
+ *    by walking the tab order in a real browser and printing the accessible
+ *    name of each stop. That is why it now comes from `SHELL_COPY` like the rest
+ *    of the shell, and why there is a test below that asserts it per language.
  *  * The name is on `aria-label`, and the icon is `aria-hidden`. No `title`:
  *    a tooltip is not an accessible name and doubles up in some readers.
  *
@@ -32,9 +41,12 @@ export class ThemeToggle {
   /** What is on screen right now — drives which icon is shown. */
   protected readonly resolved = this.theme.resolved;
 
-  protected readonly label = computed(() =>
-    this.resolved() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro',
-  );
+  private readonly pageLang = inject(PageLangService);
+
+  protected readonly label = computed(() => {
+    const copy = SHELL_COPY[this.pageLang.lang()];
+    return this.resolved() === 'dark' ? copy.themeToLight : copy.themeToDark;
+  });
 
   /**
    * The icon shows the DESTINATION, never the current state, so that it says

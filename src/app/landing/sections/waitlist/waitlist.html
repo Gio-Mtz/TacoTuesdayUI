@@ -1,14 +1,14 @@
 <section
-  id="lista-de-espera"
+  id="waitlist"
   class="tt-section waitlist"
-  aria-labelledby="lista-de-espera-titulo"
+  aria-labelledby="waitlist-title"
 >
   <div class="tt-container waitlist__inner">
-    <p class="tt-eyebrow">Lista de espera</p>
-    <h2 id="lista-de-espera-titulo" class="tt-title">Déjanos tu correo</h2>
+    <p class="tt-eyebrow">Waitlist</p>
+    <h2 id="waitlist-title" class="tt-title">Leave us your email</h2>
     <p class="tt-lede waitlist__lede">
-      Te escribimos cuando abramos tu lado de la plataforma. Nada de boletines, nada de
-      recordatorios: un correo, cuando haya algo que contarte.
+      We write to you when your side of the platform opens. No newsletter, no reminders: one
+      email, when there is something to tell you.
     </p>
 
     <!--
@@ -32,24 +32,24 @@
           -->
           <h3 #successHeading class="confirm__title" tabindex="-1">
             @if (alreadyRegistered()) {
-              Ya estabas en la lista
+              You were already on the list
             } @else {
-              Listo, quedaste anotado
+              Done, you are on the list
             }
           </h3>
 
           <p class="confirm__body">
             @if (alreadyRegistered()) {
-              Ese correo ya estaba registrado, así que no hicimos nada dos veces. Sigues en la
-              lista y te escribimos cuando abramos.
+              That email was already registered, so we did not do anything twice. You are still on
+              the list and we write to you when we open.
             } @else {
-              Te escribimos a <strong>{{ form.controls.email.value }}</strong> cuando abramos.
-              Si no llega, revisa la carpeta de correo no deseado.
+              We write to <strong>{{ form.controls.email.value }}</strong> when we open. If it does
+              not arrive, check your spam folder.
             }
           </p>
 
           <button type="button" class="tt-btn tt-btn--secondary confirm__again" (click)="reset()">
-            Registrar a alguien más
+            Sign someone else up
           </button>
         </div>
       } @else {
@@ -61,7 +61,7 @@
             have to write.
           -->
           <fieldset class="form__variant">
-            <legend class="form__legend">¿De qué lado vienes?</legend>
+            <legend class="form__legend">Which side are you on?</legend>
 
             <div class="variant">
               <!--
@@ -85,7 +85,7 @@
                   <span class="variant__icon" aria-hidden="true">
                     <ttco-icon name="building" [size]="20" />
                   </span>
-                  Estoy contratando
+                  I'm hiring
                 </span>
               </label>
 
@@ -95,14 +95,14 @@
                   <span class="variant__icon" aria-hidden="true">
                     <ttco-icon name="user" [size]="20" />
                   </span>
-                  Busco trabajo
+                  I'm looking for work
                 </span>
               </label>
             </div>
           </fieldset>
 
           <div class="field">
-            <label class="field__label" for="waitlist-name">Nombre</label>
+            <label class="field__label" for="waitlist-name">Name</label>
             <input
               id="waitlist-name"
               class="field__input"
@@ -118,7 +118,7 @@
           </div>
 
           <div class="field">
-            <label class="field__label" for="waitlist-email">Correo</label>
+            <label class="field__label" for="waitlist-email">Email</label>
             <input
               id="waitlist-email"
               class="field__input"
@@ -136,7 +136,7 @@
 
           @if (isCompany()) {
             <div class="field">
-              <label class="field__label" for="waitlist-company">Empresa</label>
+              <label class="field__label" for="waitlist-company">Company</label>
               <input
                 id="waitlist-company"
                 class="field__input"
@@ -153,8 +153,8 @@
           } @else {
             <div class="field">
               <label class="field__label" for="waitlist-role">
-                Rol o área
-                <span class="field__optional">(opcional)</span>
+                Role or area
+                <span class="field__optional">(optional)</span>
               </label>
               <input
                 id="waitlist-role"
@@ -162,7 +162,7 @@
                 type="text"
                 formControlName="role"
                 autocomplete="organization-title"
-                placeholder="Backend .NET, QA, datos…"
+                placeholder="Backend .NET, QA, data…"
                 [attr.aria-invalid]="errors().role ? 'true' : null"
                 [attr.aria-describedby]="errors().role ? 'waitlist-role-error' : null"
               />
@@ -180,7 +180,7 @@
             skip those, which is exactly the population this catches.
           -->
           <div class="honeypot" aria-hidden="true">
-            <label for="waitlist-website">No llenes esto</label>
+            <label for="waitlist-website">Do not fill this in</label>
             <input
               id="waitlist-website"
               type="text"
@@ -215,16 +215,23 @@
               [disabled]="status() === 'sending'"
             >
               @if (status() === 'sending') {
-                Enviando…
+                Sending…
               } @else {
-                Quiero entrar a la lista
+                Put me on the list
               }
             </button>
 
+            <!--
+              `hreflang` and not a "(in Spanish)" label: the notice is a Mexican
+              aviso de privacidad and stays in Spanish (LFPDPPP), so the link
+              really does change language. `hreflang` is the attribute that says
+              so to a browser and a screen reader without spending a word of the
+              form's copy on it. See `PageHeadStrategy` for the `lang` side.
+            -->
             <p class="form__legal">
-              Al enviar aceptas nuestro
-              <a routerLink="/privacidad">aviso de privacidad</a>. Puedes pedir que borremos tus
-              datos cuando quieras.
+              By submitting you accept our
+              <a routerLink="/privacidad" hreflang="es-MX">privacy notice</a>. You can ask us to
+              delete your data whenever you want.
             </p>
           </div>
         </form>

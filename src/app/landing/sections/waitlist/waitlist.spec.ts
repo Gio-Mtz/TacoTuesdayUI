@@ -127,9 +127,9 @@ describe('Waitlist', () => {
   it('shows required errors on submit and sends nothing', async () => {
     await submit();
 
-    expect(text()).toContain('Escribe tu nombre.');
-    expect(text()).toContain('Escribe tu correo.');
-    expect(text()).toContain('Escribe el nombre de tu empresa.');
+    expect(text()).toContain('Write your name.');
+    expect(text()).toContain('Write your email.');
+    expect(text()).toContain('Write your company name.');
     http.expectNone(LEADS_URL);
   });
 
@@ -153,7 +153,7 @@ describe('Waitlist', () => {
     await type('waitlist-company', 'Taco Tuesday');
     await submit();
 
-    expect(text()).toContain('Ese correo no se ve bien');
+    expect(text()).toContain('That email does not look right');
     http.expectNone(LEADS_URL);
   });
 
@@ -161,10 +161,10 @@ describe('Waitlist', () => {
     // The whole point of the `formValue` signal: zoneless + OnPush means
     // nothing repaints these messages unless something signals.
     await submit();
-    expect(text()).toContain('Escribe tu nombre.');
+    expect(text()).toContain('Write your name.');
 
     await type('waitlist-name', 'Gio');
-    expect(text()).not.toContain('Escribe tu nombre.');
+    expect(text()).not.toContain('Write your name.');
   });
 
   // ---- variants -------------------------------------------------------------
@@ -194,7 +194,7 @@ describe('Waitlist', () => {
 
     expect(el('#waitlist-company')).toBeNull();
     expect(el('#waitlist-role')).toBeTruthy();
-    expect(text()).toContain('(opcional)');
+    expect(text()).toContain('(optional)');
   });
 
   it('does not require anything extra from a candidate', async () => {
@@ -294,7 +294,7 @@ describe('Waitlist', () => {
     // No request at all — `http.verify()` in afterEach is the real assertion.
     http.expectNone(LEADS_URL);
     // And the bot is told it worked, so it has no signal to adapt to.
-    expect(text()).toContain('Listo, quedaste anotado');
+    expect(text()).toContain('Done, you are on the list');
   });
 
   // ---- sending --------------------------------------------------------------
@@ -305,7 +305,7 @@ describe('Waitlist', () => {
 
     const request = http.expectOne(LEADS_URL);
     expect(el<HTMLButtonElement>('.form__submit')?.disabled).toBe(true);
-    expect(el('[role="status"]')?.textContent).toContain('Enviando');
+    expect(el('[role="status"]')?.textContent).toContain('Sending');
 
     request.flush(OK);
   });
@@ -329,7 +329,7 @@ describe('Waitlist', () => {
     await fixture.whenStable();
 
     expect(el('form')).toBeNull();
-    expect(text()).toContain('Listo, quedaste anotado');
+    expect(text()).toContain('Done, you are on the list');
     expect(text()).toContain('gio@empresa.mx');
     expect(document.activeElement).toBe(el('.confirm__title'));
   });
@@ -340,8 +340,8 @@ describe('Waitlist', () => {
     http.expectOne(LEADS_URL).flush({ id: 'lead-1', alreadyRegistered: true });
     await fixture.whenStable();
 
-    expect(text()).toContain('Ya estabas en la lista');
-    expect(text()).not.toContain('Listo, quedaste anotado');
+    expect(text()).toContain('You were already on the list');
+    expect(text()).not.toContain('Done, you are on the list');
   });
 
   it('goes back to an empty form for the next person', async () => {
@@ -372,7 +372,7 @@ describe('Waitlist', () => {
 
     expect(el('form')).toBeTruthy();
     expect(el('[role="alert"]')).toBeTruthy();
-    expect(text()).toContain('Algo falló de nuestro lado');
+    expect(text()).toContain('Something broke on our side');
     // What they typed is still there — retrying must not mean retyping.
     expect(el<HTMLInputElement>('#waitlist-name')?.value).toBe('Gio Martínez');
   });
@@ -387,7 +387,7 @@ describe('Waitlist', () => {
     http.expectOne(LEADS_URL).flush(OK);
     await fixture.whenStable();
 
-    expect(text()).toContain('Listo, quedaste anotado');
+    expect(text()).toContain('Done, you are on the list');
     expect(el('[role="alert"]')).toBeNull();
   });
 });
@@ -397,25 +397,25 @@ describe('describeFailure', () => {
     new HttpErrorResponse({ status, statusText: 'x', url: '/api/leads' });
 
   it('blames the connection when the browser will not say why', () => {
-    expect(describeFailure(asHttp(0))).toContain('No pudimos conectar');
+    expect(describeFailure(asHttp(0))).toContain('We could not reach the server');
   });
 
   it('points at the data on a 400 and a 422', () => {
-    expect(describeFailure(asHttp(400))).toContain('validación del servidor');
-    expect(describeFailure(asHttp(422))).toContain('validación del servidor');
+    expect(describeFailure(asHttp(400))).toContain('server validation');
+    expect(describeFailure(asHttp(422))).toContain('server validation');
   });
 
   it('asks for patience on a 429', () => {
-    expect(describeFailure(asHttp(429))).toContain('Espera un minuto');
+    expect(describeFailure(asHttp(429))).toContain('Wait a minute');
   });
 
   it('takes the blame on a 500', () => {
-    expect(describeFailure(asHttp(500))).toContain('de nuestro lado');
+    expect(describeFailure(asHttp(500))).toContain('on our side');
   });
 
   it('takes the blame for anything that is not an HTTP error at all', () => {
     expect(describeFailure(new TypeError('undefined is not a function'))).toContain(
-      'de nuestro lado',
+      'on our side',
     );
   });
 });

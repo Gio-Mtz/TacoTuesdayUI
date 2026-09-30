@@ -5,10 +5,10 @@
       <span class="site-header__name">{{ site.name }}</span>
     </a>
 
-    <nav class="site-header__nav" aria-label="Secciones">
-      <a routerLink="/" fragment="empresas">Empresas</a>
-      <a routerLink="/" fragment="candidatos">Candidatos</a>
-      <a routerLink="/" fragment="como-funciona">Cómo funciona</a>
+    <nav class="site-header__nav" [attr.aria-label]="copy().navLabel">
+      <a routerLink="/" fragment="companies">{{ copy().navCompanies }}</a>
+      <a routerLink="/" fragment="engineers">{{ copy().navEngineers }}</a>
+      <a routerLink="/" fragment="how-it-works">{{ copy().navHowItWorks }}</a>
     </nav>
 
     <ttco-theme-toggle />

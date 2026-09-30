@@ -1,7 +1,7 @@
-<section id="como-funciona" class="tt-section tt-section--alt" aria-labelledby="como-funciona-titulo">
+<section id="how-it-works" class="tt-section tt-section--alt" aria-labelledby="how-it-works-title">
   <div class="tt-container">
-    <p class="tt-eyebrow">Cómo funciona</p>
-    <h2 id="como-funciona-titulo" class="tt-title">Tres pasos, sin letras chiquitas</h2>
+    <p class="tt-eyebrow">How it works</p>
+    <h2 id="how-it-works-title" class="tt-title">Three steps, no fine print</h2>
 
     <ol class="tt-cards steps">
       @for (step of steps; track step.title; let i = $index) {
@@ -13,7 +13,7 @@
             </span>
           </div>
           <h3 class="tt-card__title">
-            <span class="tt-sr-only">Paso {{ i + 1 }}:</span>
+            <span class="tt-sr-only">Step {{ i + 1 }}:</span>
             {{ step.title }}
           </h3>
           <p class="tt-card__body">{{ step.body }}</p>

@@ -10,11 +10,17 @@ export interface CompanyValuePoint {
 }
 
 /**
- * The Empresas section: the problem this solves for the side that pays.
+ * The "For companies" section: the problem this solves for the side that pays.
  *
- * Written as pain first, feature second, on purpose. "Agenda integrada" means
- * nothing to someone who has not yet admitted that scheduling is eating their
- * week; "dejas de perseguir horarios por correo" does.
+ * Written as pain first, feature second, on purpose. "Integrated scheduling"
+ * means nothing to someone who has not yet admitted that coordinating calendars
+ * is eating their week; "stop chasing calendars" does.
+ *
+ * ⚠️ `brand.md` asks for numbers over adjectives, and there are none here on
+ * purpose: nothing has shipped yet, so every number would be invented. What
+ * replaces them is *checkable commitments* ("written feedback", "from your real
+ * availability") — a promise a client can hold us to, not a metric we made up.
+ * The day there are real numbers, they belong in these three bodies.
  */
 @Component({
   selector: 'ttco-companies',
@@ -27,18 +33,18 @@ export class Companies {
   protected readonly points: readonly CompanyValuePoint[] = [
     {
       icon: 'calendar',
-      title: 'Se acabó perseguir horarios',
-      body: 'El candidato elige de tu disponibilidad real. Ni un correo más de "¿te late el jueves?".',
+      title: 'No more chasing calendars',
+      body: 'Candidates book from your real availability. Not one more email asking whether Thursday works.',
     },
     {
       icon: 'filter',
-      title: 'Señal, no currículums bonitos',
-      body: 'Cada perfil llega con lo que la persona ya construyó y con su stack, no con tres páginas de adjetivos.',
+      title: 'Signal, not a pretty résumé',
+      body: 'Every profile arrives with what the person has actually shipped and the stack they shipped it in, not three pages of adjectives.',
     },
     {
       icon: 'check-circle',
-      title: 'Cada entrevista deja evidencia',
-      body: 'Feedback escrito y comparable entre candidatos. Cuando alguien pregunte por qué ese sí y ese no, la respuesta está escrita.',
+      title: 'Every interview leaves a record',
+      body: 'Written feedback you can compare across candidates. When someone asks why that yes and that no, the answer is already written down.',
     },
   ];
 }

@@ -27,14 +27,14 @@ describe('Landing', () => {
 
   it('keeps the order of the argument: what it is, who pays, who shows up, how, the ask', () => {
     const ids = Array.from(el().querySelectorAll('section')).map((s) => s.id);
-    expect(ids).toEqual(['', 'empresas', 'candidatos', 'como-funciona', 'lista-de-espera']);
+    expect(ids).toEqual(['', 'companies', 'engineers', 'how-it-works', 'waitlist']);
   });
 
   it('puts the only thing that asks for something last', () => {
     // US-003 added the form deliberately at the end, after every reason to say
     // yes. If this ever moves up, the change was not an accident of ordering.
     const sections = Array.from(el().querySelectorAll('section'));
-    expect(sections[sections.length - 1].id).toBe('lista-de-espera');
+    expect(sections[sections.length - 1].id).toBe('waitlist');
   });
 
   it('has exactly one <h1> so the heading outline is valid', () => {

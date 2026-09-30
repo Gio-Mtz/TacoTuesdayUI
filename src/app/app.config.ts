@@ -4,18 +4,19 @@ import {
   provideBrowserGlobalErrorListeners,
   inject,
 } from '@angular/core';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { TitleStrategy, provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import { apiBaseUrlInterceptor } from './api/api-base-url.interceptor';
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { PageHeadStrategy } from './core/i18n/page-head-strategy';
 import { ThemeService } from './core/theme/theme.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     // `anchorScrolling` is what makes routerLink + fragment actually scroll:
-    // without it the header's "Empresas" link navigates and the page sits
+    // without it the header's "Companies" link navigates and the page sits
     // still. `scrollPositionRestoration` puts the visitor back where they were
     // when they hit Back instead of at the top of the landing.
     provideRouter(
@@ -31,6 +32,12 @@ export const appConfig: ApplicationConfig = {
     // asserting on relative URLs and why adding this changed none of them.
     // See `api/api-base-url.interceptor.ts` and ADR 0004.
     provideHttpClient(withFetch(), withInterceptors([apiBaseUrlInterceptor])),
+    // Replaces the router's default title strategy so that `<html lang>` is set
+    // from the same route snapshot, on the same navigation hook, as the title.
+    // US-009 made this necessary rather than nice: `/` is English and
+    // `/privacidad` is Spanish, so a single `lang` in index.html is a lie on one
+    // of them. See `core/i18n/page-head-strategy.ts`.
+    { provide: TitleStrategy, useExisting: PageHeadStrategy },
     // Injected for its constructor: reading storage and writing `data-theme` is
     // what the service does on creation, and nothing else would create it.
     // Done at bootstrap rather than in a component so the theme is settled

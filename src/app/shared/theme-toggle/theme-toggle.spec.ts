@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ThemeService } from '../../core/theme/theme.service';
 import { ThemeToggle } from './theme-toggle';
+import { PageLangService } from '../../core/i18n/page-lang';
 
 /**
  * jsdom has no matchMedia, which ThemeService already handles by falling back
@@ -34,7 +35,7 @@ describe('ThemeToggle', () => {
   }
 
   it('names the action it will perform, not the state it is in', () => {
-    expect(button().getAttribute('aria-label')).toBe('Cambiar a modo oscuro');
+    expect(button().getAttribute('aria-label')).toBe('Switch to dark mode');
   });
 
   it('switches the document to dark when pressed', async () => {
@@ -49,7 +50,7 @@ describe('ThemeToggle', () => {
     button().click();
     await fixture.whenStable();
 
-    expect(button().getAttribute('aria-label')).toBe('Cambiar a modo claro');
+    expect(button().getAttribute('aria-label')).toBe('Switch to light mode');
   });
 
   // TD-004. Before this the button showed `tt-star` / `tt-eye`: the aria-label
@@ -60,7 +61,7 @@ describe('ThemeToggle', () => {
   // current state makes the button contradict itself, and nothing else catches
   // that: `ng build` is happy either way.
   it('shows the moon while light, the theme pressing it will give you', () => {
-    expect(button().getAttribute('aria-label')).toBe('Cambiar a modo oscuro');
+    expect(button().getAttribute('aria-label')).toBe('Switch to dark mode');
     expect(iconHref()).toBe('/icons.svg#tt-moon');
   });
 
@@ -68,7 +69,7 @@ describe('ThemeToggle', () => {
     button().click();
     await fixture.whenStable();
 
-    expect(button().getAttribute('aria-label')).toBe('Cambiar a modo claro');
+    expect(button().getAttribute('aria-label')).toBe('Switch to light mode');
     expect(iconHref()).toBe('/icons.svg#tt-sun');
   });
 
@@ -89,5 +90,14 @@ describe('ThemeToggle', () => {
   it('renders an icon that is hidden from assistive tech', () => {
     const icon = (fixture.nativeElement as HTMLElement).querySelector('svg')!;
     expect(icon.getAttribute('aria-hidden')).toBe('true');
+  });
+  it('announces the destination in the language of the page it is on', async () => {
+    // Invisible copy. It read Spanish on an English page through all of US-009's
+    // first pass and neither the build nor any test could see it; it was caught
+    // by printing the accessible name of every tab stop in a real browser. This
+    // assertion is what makes that impossible to repeat silently.
+    TestBed.inject(PageLangService).set('es-MX');
+    await fixture.whenStable();
+    expect(button().getAttribute('aria-label')).toBe('Cambiar a modo oscuro');
   });
 });

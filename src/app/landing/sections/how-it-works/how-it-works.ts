@@ -10,7 +10,7 @@ export interface HowItWorksStep {
 }
 
 /**
- * Cómo funciona, in three steps.
+ * How it works, in three steps.
  *
  * Three because the point is to make the process feel short. Every extra step
  * on this list is one more reason for a visitor to decide it is a whole thing
@@ -30,18 +30,18 @@ export class HowItWorks {
   protected readonly steps: readonly HowItWorksStep[] = [
     {
       icon: 'mail',
-      title: 'Dejas tu correo',
-      body: 'Nos dices si vienes como empresa o como candidato. Toma menos de un minuto y no pedimos nada más todavía.',
+      title: 'Leave your email',
+      body: 'Tell us whether you are coming as a company or as an engineer. It takes under a minute and we do not ask for anything else yet.',
     },
     {
       icon: 'search',
-      title: 'Te emparejamos',
-      body: 'Cruzamos lo que la empresa necesita con lo que la persona sabe hacer. Si no hay match, no te hacemos perder el tiempo.',
+      title: 'We match you',
+      body: 'We line up what the company needs against what the person can actually do. No match, no waste of your time.',
     },
     {
       icon: 'thumbs-up',
-      title: 'Entrevista y respuesta',
-      body: 'Una fecha acordada, una entrevista y feedback escrito al final. Para las dos partes.',
+      title: 'Interview and answer',
+      body: 'An agreed date, an interview and written feedback at the end. For both sides.',
     },
   ];
 }

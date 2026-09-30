@@ -2,19 +2,22 @@
   <div class="tt-container site-footer__inner">
     <div class="site-footer__block">
       <p class="site-footer__name">{{ site.legalName }}</p>
-      <p class="site-footer__tagline">
-        Entrevistas con fecha, con feedback y sin silencios.
-      </p>
+      <p class="site-footer__tagline">{{ copy().footerTagline }}</p>
     </div>
 
-    <nav class="site-footer__block" aria-label="Contacto y avisos">
-      <h2 class="site-footer__heading">Contacto</h2>
+    <nav class="site-footer__block" [attr.aria-label]="copy().footerNavLabel">
+      <h2 class="site-footer__heading">{{ copy().footerContact }}</h2>
       <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a>
-      <a routerLink="/privacidad">Aviso de privacidad</a>
+      <!--
+        `hreflang` is static because the TARGET is always Spanish: the notice is a
+        Mexican aviso de privacidad. On the English page it warns of a change of
+        language; on the Spanish one it is simply true.
+      -->
+      <a routerLink="/privacidad" hreflang="es-MX">{{ copy().footerPrivacy }}</a>
     </nav>
   </div>
 
   <div class="tt-container">
-    <p class="site-footer__legal">© {{ year }} {{ site.legalName }}. Hecho en México.</p>
+    <p class="site-footer__legal">© {{ year }} {{ site.legalName }}. {{ copy().footerMadeIn }}</p>
   </div>
 </footer>

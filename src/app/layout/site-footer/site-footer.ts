@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { PageLangService } from '../../core/i18n/page-lang';
+import { SHELL_COPY } from '../../core/i18n/shell-copy';
 import { SITE_INFO } from '../../core/site/site-info';
 
 /**
@@ -20,7 +22,12 @@ import { SITE_INFO } from '../../core/site/site-info';
   styleUrl: './site-footer.scss',
 })
 export class SiteFooter {
+  private readonly pageLang = inject(PageLangService);
+
   protected readonly site = SITE_INFO;
+
+  /** Shell copy for the language of the page on screen. See `shell-copy.ts`. */
+  protected readonly copy = computed(() => SHELL_COPY[this.pageLang.lang()]);
 
   /**
    * Read once at construction. A footer that renders "2026" for someone whose
