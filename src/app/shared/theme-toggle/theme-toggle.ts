@@ -36,8 +36,17 @@ export class ThemeToggle {
     this.resolved() === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro',
   );
 
-  /** `eye` for "lights on", `star` for night. Both exist in the sprite. */
-  protected readonly iconName = computed(() => (this.resolved() === 'dark' ? 'eye' : 'star'));
+  /**
+   * The icon shows the DESTINATION, never the current state, so that it says
+   * the same thing as `label()` above: dark right now means pressing gives you
+   * light, so the button shows a sun.
+   *
+   * Showing the current state instead is the more common choice and it is a
+   * trap here — the label would promise light while the icon showed a moon, and
+   * a sighted visitor and a screen-reader visitor would read the same button
+   * two opposite ways. If this ever flips, flip `label()` in the same commit.
+   */
+  protected readonly iconName = computed(() => (this.resolved() === 'dark' ? 'sun' : 'moon'));
 
   protected toggle(): void {
     this.theme.toggle();
