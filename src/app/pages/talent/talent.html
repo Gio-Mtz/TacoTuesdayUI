@@ -1,0 +1,84 @@
+<section id="para-devs" class="tt-section talent-hero" aria-labelledby="talent-title">
+  <div class="tt-container talent-hero__inner">
+    <p class="tt-eyebrow">Para devs</p>
+
+    <!--
+      The stakeholder's own sentence, verbatim, and the one string on this site
+      that is not up for editing. `brand.md` calls it "the brand". See the class
+      docblock for why `/` carries a translated version of it and this does not.
+    -->
+    <h1 id="talent-title" class="talent-hero__title">
+      ¿Odias que los reclutas te ghosteen?<br class="talent-hero__break" />
+      Deja que ellos te busquen
+    </h1>
+
+    <p class="tt-lede talent-hero__lede">
+      No estás mandando tu CV a un buzón que nadie abre. Dejas tu perfil una vez y las empresas que
+      de verdad están contratando llegan a ti — con fecha, y con un proceso que termina en una
+      respuesta.
+    </p>
+
+    <div class="talent-hero__actions">
+      <a class="tt-btn tt-btn--primary" routerLink="/talento" fragment="lista-de-espera">
+        Apúntame a la lista
+      </a>
+    </div>
+
+    <p class="talent-hero__note">Lista de espera abierta. Para devs siempre es gratis.</p>
+  </div>
+</section>
+
+<section class="tt-section" aria-labelledby="talent-value-title">
+  <div class="tt-container">
+    <p class="tt-eyebrow">Qué cambia para ti</p>
+    <h2 id="talent-value-title" class="tt-title">Tres cosas, y las tres se notan</h2>
+
+    <ul class="tt-cards talent__cards">
+      @for (point of points; track point.title) {
+        <li class="tt-card">
+          <span class="tt-card__icon">
+            <ttco-icon [name]="point.icon" />
+          </span>
+          <h3 class="tt-card__title">{{ point.title }}</h3>
+          <p class="tt-card__body">{{ point.body }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<section
+  id="como-funciona"
+  class="tt-section tt-section--alt"
+  aria-labelledby="talent-steps-title"
+>
+  <div class="tt-container">
+    <p class="tt-eyebrow">Cómo funciona</p>
+    <h2 id="talent-steps-title" class="tt-title">Tres pasos, sin letras chiquitas</h2>
+
+    <!--
+      `<ol>` and not `<ul>`: the order is the meaning. The number lives inside the
+      heading as real text — see the class docblock — so there is nothing marked
+      `aria-hidden` here and nothing duplicated for screen readers.
+    -->
+    <ol class="tt-cards talent__cards">
+      @for (step of steps; track step.title; let i = $index) {
+        <li class="tt-card">
+          <span class="tt-card__icon">
+            <ttco-icon [name]="step.icon" />
+          </span>
+          <h3 class="tt-card__title">{{ i + 1 }}. {{ step.title }}</h3>
+          <p class="tt-card__body">{{ step.body }}</p>
+        </li>
+      }
+    </ol>
+  </div>
+</section>
+
+<!--
+  The same component `/` uses, pinned to the engineer's side and speaking Spanish
+  because the route declared `lang: 'es-MX'`. The chooser is gone: a visitor who
+  read three sections addressed to them should not be asked which side they are
+  on at the bottom of the page.
+-->
+<ttco-waitlist lockedKind="candidate" sectionId="lista-de-espera" />

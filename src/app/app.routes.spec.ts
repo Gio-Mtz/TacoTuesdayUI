@@ -52,6 +52,15 @@ describe('routes', () => {
     expect(privacy?.data?.['lang']).toBe('es-MX');
   });
 
+  it('keeps /talento in Spanish — the whole point of the page', () => {
+    // US-010. If this ever flips to 'en', the brand line in its <h1> is being
+    // read aloud with English phonemes and the page has stopped being the page
+    // devs get sent to.
+    const talent = pages.find((route) => route.path === 'talento');
+    expect(talent).toBeDefined();
+    expect(talent?.data?.['lang']).toBe('es-MX');
+  });
+
   it('keeps the landing in English — the side that pays reads English', () => {
     const landing = pages.find((route) => route.path === '');
     expect(landing?.data?.['lang']).toBe('en');

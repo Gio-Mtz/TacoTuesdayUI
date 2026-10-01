@@ -14,6 +14,18 @@
         language; on the Spanish one it is simply true.
       -->
       <a routerLink="/privacidad" hreflang="es-MX">{{ copy().footerPrivacy }}</a>
+
+      <!--
+        The other audience's page, and the one link on the site that is meant to
+        change language. `hreflang` comes from the data rather than being written
+        here because which language is "the other one" depends on which page you
+        are standing on. US-010.
+      -->
+      <a
+        [routerLink]="copy().crossLanguage.path"
+        [attr.hreflang]="copy().crossLanguage.hreflang ?? null"
+        >{{ copy().crossLanguage.label }}</a
+      >
     </nav>
   </div>
 
