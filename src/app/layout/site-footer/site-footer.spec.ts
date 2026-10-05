@@ -58,6 +58,31 @@ describe('SiteFooter', () => {
     );
   });
 
+  it('carries the door to the other audience, labelled in its own language', () => {
+    // US-010. The footer and not the nav: `/talento` is not a section of what you
+    // are reading, it is the other half of the business, and whoever wants it is
+    // looking for it rather than scanning for it.
+    const cross = el().querySelector('a[href="/talento"]')!;
+    expect(cross).toBeTruthy();
+    expect(cross.textContent?.trim()).toBe('Para devs');
+    // The label is already Spanish; `hreflang` is what tells a machine.
+    expect(cross.getAttribute('hreflang')).toBe('es-MX');
+  });
+
+  it('points the Spanish footer back at the English landing instead', async () => {
+    // Which language is "the other one" depends on the page the footer is on, so
+    // the link is data. On `/talento` and `/privacidad` the door goes the other
+    // way, and a second `/talento` link there would point at the page you are on.
+    TestBed.inject(PageLangService).set('es-MX');
+    await fixture.whenStable();
+
+    expect(el().querySelector('a[href="/talento"]')).toBeNull();
+
+    const cross = el().querySelector('nav a[hreflang="en"]')!;
+    expect(cross.getAttribute('href')).toBe('/');
+    expect(cross.textContent?.trim()).toBe('For companies');
+  });
+
   it('says where it was made in both languages, because that is the brand', () => {
     // `brand.md`: the origin is the differentiator, not something to erase for
     // an English-speaking buyer.

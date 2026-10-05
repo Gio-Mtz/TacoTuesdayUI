@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  OnInit,
   computed,
   effect,
   inject,
+  input,
   signal,
   viewChild,
 } from '@angular/core';
@@ -15,7 +17,9 @@ import { RouterLink } from '@angular/router';
 
 import { ILeadRequest, LeadKind } from '../../../api/Leads/ILead';
 import { LeadsService } from '../../../api/Leads/leads.service';
+import { PageLangService } from '../../../core/i18n/page-lang';
 import { Icon } from '../../../shared/icon/icon';
+import { WAITLIST_COPY, WaitlistFailureCopy } from './waitlist-copy';
 
 /** Where the section is in its one and only cycle. */
 export type WaitlistStatus = 'idle' | 'sending' | 'success' | 'error';
@@ -30,7 +34,7 @@ const MAX_SHORT = 80;
 const MAX_EMAIL = 160;
 
 /**
- * The waitlist form — the only place on this page where a visitor can act.
+ * The waitlist form — the only place on a page where a visitor can act.
  *
  * Four decisions in here are load-bearing, and all four are argued in
  * `docs/adr/0003-waitlist-form.md`:
@@ -49,6 +53,12 @@ const MAX_EMAIL = 160;
  *  4. **The form is replaced by the confirmation, and focus moves to it.** A
  *     success message appended below a still-filled form leaves a keyboard or
  *     screen-reader visitor with no idea anything happened.
+ *
+ * **Since US-010 it is on two pages in two languages**, and that is why its words
+ * come from `waitlist-copy.ts` instead of the template: `/` asks the company in
+ * English, `/talento` asks the engineer in Spanish, and both are the same three
+ * fields posting to the same endpoint. A second component would mean the focus
+ * handling, the honeypot and the double-send guard all have to be fixed twice.
  */
 @Component({
   selector: 'ttco-waitlist',
@@ -57,10 +67,37 @@ const MAX_EMAIL = 160;
   templateUrl: './waitlist.html',
   styleUrl: './waitlist.scss',
 })
-export class Waitlist {
+export class Waitlist implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly leads = inject(LeadsService);
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+  private readonly pageLang = inject(PageLangService);
+
+  /**
+   * Pins the form to one side of the marketplace and hides the chooser.
+   *
+   * `/talento` is a page written end to end for the engineer: by the time the
+   * form is on screen the visitor has read three sections addressed to them, and
+   * asking "which side are you on?" at the bottom of it is the page admitting it
+   * was not sure. On `/` the question is real, so the default is `null` and the
+   * radiogroup stays.
+   *
+   * It is a pin and not a hint: the control is set to this value, so the POST
+   * carries it even though nothing on screen can change it.
+   */
+  readonly lockedKind = input<LeadKind | null>(null);
+
+  /**
+   * The `id` the page's anchors jump to.
+   *
+   * Configurable because the fragment shows up in the address bar and in links
+   * people paste into WhatsApp, so a Spanish page should not hand out
+   * `/talento#waitlist`. Default keeps `/` exactly as US-003 left it.
+   */
+  readonly sectionId = input<string>('waitlist');
+
+  /** Every word this section says, in the language the route declared. */
+  protected readonly copy = computed(() => WAITLIST_COPY[this.pageLang.lang()]);
 
   protected readonly form = this.fb.nonNullable.group({
     kind: this.fb.nonNullable.control<LeadKind>('company'),
@@ -120,7 +157,7 @@ export class Waitlist {
    * and can read on), and the failure is announced by `role="alert"`.
    */
   protected readonly liveMessage = computed(() =>
-    this.status() === 'sending' ? 'Sending your details…' : '',
+    this.status() === 'sending' ? this.copy().sending : '',
   );
 
   /**
@@ -141,29 +178,30 @@ export class Waitlist {
 
     const messages: Partial<Record<FieldName, string>> = {};
     const { name, email, company, role } = this.form.controls;
+    const words = this.copy().errors;
 
     if (name.hasError('required')) {
-      messages.name = 'Write your name.';
+      messages.name = words.nameRequired;
     } else if (name.hasError('maxlength')) {
-      messages.name = `${MAX_SHORT} characters maximum.`;
+      messages.name = words.maxChars(MAX_SHORT);
     }
 
     if (email.hasError('required')) {
-      messages.email = 'Write your email.';
+      messages.email = words.emailRequired;
     } else if (email.hasError('email')) {
-      messages.email = 'That email does not look right. Check it has an @ and a domain.';
+      messages.email = words.emailInvalid;
     } else if (email.hasError('maxlength')) {
-      messages.email = `${MAX_EMAIL} characters maximum.`;
+      messages.email = words.maxChars(MAX_EMAIL);
     }
 
     if (this.isCompany()) {
       if (company.hasError('required')) {
-        messages.company = 'Write your company name.';
+        messages.company = words.companyRequired;
       } else if (company.hasError('maxlength')) {
-        messages.company = `${MAX_SHORT} characters maximum.`;
+        messages.company = words.maxChars(MAX_SHORT);
       }
     } else if (role.hasError('maxlength')) {
-      messages.role = `${MAX_SHORT} characters maximum.`;
+      messages.role = words.maxChars(MAX_SHORT);
     }
 
     return messages;
@@ -184,6 +222,26 @@ export class Waitlist {
     effect(() => {
       this.successHeading()?.nativeElement.focus();
     });
+  }
+
+  /**
+   * Applies `lockedKind`.
+   *
+   * In `ngOnInit` and not in the constructor, and not in an `effect`: a signal
+   * input does not hold its bound value yet while the constructor runs, and an
+   * effect that writes to a form control runs during change detection, which is
+   * how a value lands one tick after the first render. `ngOnInit` is the first
+   * moment the input is real and still before anything is painted.
+   */
+  ngOnInit(): void {
+    const locked = this.lockedKind();
+
+    if (locked) {
+      // Not `setValue(..., { emitEvent: false })`: the emit is the point. It is
+      // what runs `applyKind` and swaps the validators, so a pinned candidate
+      // form does not keep `company` required and refuse to submit.
+      this.form.controls.kind.setValue(locked);
+    }
   }
 
   protected submit(): void {
@@ -230,7 +288,7 @@ export class Waitlist {
         this.status.set('success');
       },
       error: (error: unknown) => {
-        this.requestError.set(describeFailure(error));
+        this.requestError.set(describeFailure(error, this.copy().failures));
         this.status.set('error');
       },
     });
@@ -286,23 +344,28 @@ export class Waitlist {
  *
  * Exported for the spec: the mapping is the interesting part, and testing it
  * through four rendered components is slower and says less.
+ *
+ * The wording arrives as an argument rather than being written here, so this
+ * function keeps owning the one thing it is good at — deciding WHICH of the four
+ * outcomes an HTTP failure is — and the two languages stay in one file where
+ * they can be compared side by side.
  */
-export function describeFailure(error: unknown): string {
+export function describeFailure(error: unknown, copy: WaitlistFailureCopy): string {
   if (!(error instanceof HttpErrorResponse)) {
-    return 'Something broke on our side. Try again in a moment.';
+    return copy.generic;
   }
 
   switch (error.status) {
     case 0:
       // Status 0 is the browser refusing to tell us why: offline, DNS, or a
       // CORS preflight that never came back. From here they look identical.
-      return 'We could not reach the server. Check your connection and try again.';
+      return copy.offline;
     case 400:
     case 422:
-      return 'Some field did not pass the server validation. Check it and try again.';
+      return copy.validation;
     case 429:
-      return 'Too many attempts in a row. Wait a minute and try again.';
+      return copy.rateLimited;
     default:
-      return 'Something broke on our side. Try again in a moment.';
+      return copy.generic;
   }
 }

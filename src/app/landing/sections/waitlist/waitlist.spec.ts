@@ -4,6 +4,8 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideRouter } from '@angular/router';
 
 import { ILeadRequest, ILeadResponse } from '../../../api/Leads/ILead';
+import { PageLangService } from '../../../core/i18n/page-lang';
+import { WAITLIST_COPY } from './waitlist-copy';
 import { Waitlist, describeFailure } from './waitlist';
 
 /**
@@ -396,26 +398,167 @@ describe('describeFailure', () => {
   const asHttp = (status: number): HttpErrorResponse =>
     new HttpErrorResponse({ status, statusText: 'x', url: '/api/leads' });
 
+  /**
+   * The wording is an argument since US-010, so these assert the MAPPING — which
+   * of the four outcomes a status code is — and read the sentence out of the copy
+   * record instead of repeating it. A literal here would pass just as happily if
+   * the function started returning the rate-limit sentence for a 500.
+   */
+  const en = WAITLIST_COPY.en.failures;
+  const es = WAITLIST_COPY['es-MX'].failures;
+
   it('blames the connection when the browser will not say why', () => {
-    expect(describeFailure(asHttp(0))).toContain('We could not reach the server');
+    expect(describeFailure(asHttp(0), en)).toBe(en.offline);
   });
 
   it('points at the data on a 400 and a 422', () => {
-    expect(describeFailure(asHttp(400))).toContain('server validation');
-    expect(describeFailure(asHttp(422))).toContain('server validation');
+    expect(describeFailure(asHttp(400), en)).toBe(en.validation);
+    expect(describeFailure(asHttp(422), en)).toBe(en.validation);
   });
 
   it('asks for patience on a 429', () => {
-    expect(describeFailure(asHttp(429))).toContain('Wait a minute');
+    expect(describeFailure(asHttp(429), en)).toBe(en.rateLimited);
   });
 
   it('takes the blame on a 500', () => {
-    expect(describeFailure(asHttp(500))).toContain('on our side');
+    expect(describeFailure(asHttp(500), en)).toBe(en.generic);
   });
 
   it('takes the blame for anything that is not an HTTP error at all', () => {
-    expect(describeFailure(new TypeError('undefined is not a function'))).toContain(
-      'on our side',
-    );
+    expect(describeFailure(new TypeError('undefined is not a function'), en)).toBe(en.generic);
+  });
+
+  it('answers in whichever language it was handed', () => {
+    // The point of the parameter. Before US-010 a Spanish page would have shown
+    // an English failure message and nothing would have failed.
+    expect(describeFailure(asHttp(429), es)).toBe(es.rateLimited);
+    expect(describeFailure(asHttp(0), es)).toBe(es.offline);
+  });
+});
+
+/**
+ * The two things US-010 added to this component: it speaks the language of the
+ * page it is on, and a page can pin which side of the marketplace it is for.
+ *
+ * Driven through the DOM like the rest of the file, and for the same reason — the
+ * failure modes are a binding that was missed and a validator that did not swap,
+ * neither of which a test of the class would see.
+ */
+describe('Waitlist on a Spanish page, pinned to the engineer', () => {
+  let fixture: ComponentFixture<Waitlist>;
+  let http: HttpTestingController;
+
+  const es = WAITLIST_COPY['es-MX'];
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Waitlist],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    }).compileComponents();
+
+    http = TestBed.inject(HttpTestingController);
+
+    // What the router does on `/talento`: `PageHeadStrategy` reads `data.lang`
+    // and writes it here. Setting it before the first render is the realistic
+    // order — the strategy runs before the component is shown.
+    TestBed.inject(PageLangService).set('es-MX');
+
+    fixture = TestBed.createComponent(Waitlist);
+    fixture.componentRef.setInput('lockedKind', 'candidate');
+    fixture.componentRef.setInput('sectionId', 'lista-de-espera');
+    await fixture.whenStable();
+  });
+
+  afterEach(() => http.verify());
+
+  const host = (): HTMLElement => fixture.nativeElement as HTMLElement;
+  const text = (): string => host().textContent ?? '';
+
+  it('renders its own words, not the English ones', () => {
+    expect(text()).toContain(es.title);
+    expect(text()).toContain(es.labelEmail);
+    expect(text()).toContain(es.submit);
+    expect(text()).not.toContain(WAITLIST_COPY.en.title);
+    expect(text()).not.toContain(WAITLIST_COPY.en.submit);
+  });
+
+  it('takes the id the page gave it, so the anchor is in Spanish too', () => {
+    // `/talento#lista-de-espera`, not `/talento#waitlist`. The fragment is in the
+    // address bar and in whatever gets pasted into WhatsApp.
+    expect(host().querySelector('section')?.id).toBe('lista-de-espera');
+  });
+
+  it('drops the chooser entirely rather than hiding it', () => {
+    // Removed from the DOM, not `hidden`: a hidden fieldset is still a radiogroup
+    // that assistive tech can be told about, and this page has no question.
+    expect(host().querySelector('fieldset')).toBeNull();
+    expect(host().querySelectorAll('input[type="radio"]').length).toBe(0);
+  });
+
+  it('shows the engineer their field and not the company one', () => {
+    expect(host().querySelector('#waitlist-role')).toBeTruthy();
+    expect(host().querySelector('#waitlist-company')).toBeNull();
+    expect(text()).toContain(es.roleOptional);
+  });
+
+  it('posts kind=candidate with no company, and submits with role left empty', async () => {
+    // The regression this guards: pinning the kind by setting the control is only
+    // correct if the change EMITS, because the emit is what clears `company`'s
+    // required validator. Without it the form is invalid forever and the button
+    // does nothing — on a page with no way to see or fix the offending field.
+    const fill = async (id: string, value: string): Promise<void> => {
+      const input = host().querySelector<HTMLInputElement>(`#${id}`)!;
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+      await fixture.whenStable();
+    };
+
+    await fill('waitlist-name', 'Gio');
+    await fill('waitlist-email', 'gio@dev.mx');
+
+    host().querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
+    await fixture.whenStable();
+
+    const request = http.expectOne('/api/leads');
+    const body = request.request.body as Record<string, unknown>;
+
+    expect(body['kind']).toBe('candidate');
+    expect(body['company']).toBeNull();
+    expect(body['role']).toBeNull();
+
+    request.flush({ id: 'lead-9', alreadyRegistered: false });
+    await fixture.whenStable();
+
+    expect(text()).toContain(es.successTitle);
+  });
+
+  it('reports a failure in Spanish', async () => {
+    const fill = async (id: string, value: string): Promise<void> => {
+      const input = host().querySelector<HTMLInputElement>(`#${id}`)!;
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+      await fixture.whenStable();
+    };
+
+    await fill('waitlist-name', 'Gio');
+    await fill('waitlist-email', 'gio@dev.mx');
+
+    host().querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
+    await fixture.whenStable();
+
+    http.expectOne('/api/leads').flush('too many', { status: 429, statusText: 'Too Many' });
+    await fixture.whenStable();
+
+    expect(host().querySelector('[role="alert"]')?.textContent).toContain(es.failures.rateLimited);
+  });
+
+  it('writes its validation messages in Spanish', async () => {
+    host().querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
+    await fixture.whenStable();
+
+    expect(text()).toContain(es.errors.nameRequired);
+    expect(text()).toContain(es.errors.emailRequired);
+    // Pinned to the engineer, so the company field is not there to complain.
+    expect(text()).not.toContain(es.errors.companyRequired);
   });
 });

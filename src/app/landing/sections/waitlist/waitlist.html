@@ -1,15 +1,12 @@
 <section
-  id="waitlist"
+  [id]="sectionId()"
   class="tt-section waitlist"
   aria-labelledby="waitlist-title"
 >
   <div class="tt-container waitlist__inner">
-    <p class="tt-eyebrow">Waitlist</p>
-    <h2 id="waitlist-title" class="tt-title">Leave us your email</h2>
-    <p class="tt-lede waitlist__lede">
-      We write to you when your side of the platform opens. No newsletter, no reminders: one
-      email, when there is something to tell you.
-    </p>
+    <p class="tt-eyebrow">{{ copy().eyebrow }}</p>
+    <h2 id="waitlist-title" class="tt-title">{{ copy().title }}</h2>
+    <p class="tt-lede waitlist__lede">{{ copy().lede }}</p>
 
     <!--
       Always in the DOM, never conditional. A live region that is added to the
@@ -32,24 +29,24 @@
           -->
           <h3 #successHeading class="confirm__title" tabindex="-1">
             @if (alreadyRegistered()) {
-              You were already on the list
+              {{ copy().alreadyTitle }}
             } @else {
-              Done, you are on the list
+              {{ copy().successTitle }}
             }
           </h3>
 
           <p class="confirm__body">
             @if (alreadyRegistered()) {
-              That email was already registered, so we did not do anything twice. You are still on
-              the list and we write to you when we open.
+              {{ copy().alreadyBody }}
             } @else {
-              We write to <strong>{{ form.controls.email.value }}</strong> when we open. If it does
-              not arrive, check your spam folder.
+              {{ copy().successBodyBefore }}
+              <strong>{{ form.controls.email.value }}</strong>
+              {{ copy().successBodyAfter }}
             }
           </p>
 
           <button type="button" class="tt-btn tt-btn--secondary confirm__again" (click)="reset()">
-            Sign someone else up
+            {{ copy().again }}
           </button>
         </div>
       } @else {
@@ -59,50 +56,57 @@
             exclusive options that both have to be visible, and arrow keys
             moving between them is behaviour we get for free and would otherwise
             have to write.
+
+            Gone entirely when the page pinned a side (`lockedKind`, US-010).
+            Not merely hidden: a `hidden` fieldset is still a radiogroup a screen
+            reader can be told about, and `/talento` has no question to ask. The
+            control still carries the value — see `ngOnInit`.
           -->
-          <fieldset class="form__variant">
-            <legend class="form__legend">Which side are you on?</legend>
+          @if (!lockedKind()) {
+            <fieldset class="form__variant">
+              <legend class="form__legend">{{ copy().variantLegend }}</legend>
 
-            <div class="variant">
-              <!--
-                `name` is written out by hand and is NOT redundant. Angular's
-                radio value accessor left it empty here, and an empty name means
-                the browser never forms a radio GROUP: both inputs became their
-                own tab stop, and arrow-key selection changed the DOM without
-                ever reaching the form control — the field below simply did not
-                swap. Measured in Chromium, not guessed. With the name present
-                the group is one tab stop and the arrows work, which was the
-                whole reason for using radios instead of two buttons.
+              <div class="variant">
+                <!--
+                  `name` is written out by hand and is NOT redundant. Angular's
+                  radio value accessor left it empty here, and an empty name means
+                  the browser never forms a radio GROUP: both inputs became their
+                  own tab stop, and arrow-key selection changed the DOM without
+                  ever reaching the form control — the field below simply did not
+                  swap. Measured in Chromium, not guessed. With the name present
+                  the group is one tab stop and the arrows work, which was the
+                  whole reason for using radios instead of two buttons.
 
-                It has to be spelled exactly like the formControlName: Angular
-                throws NG01202 when the two disagree. That check only runs in
-                dev mode, so `ng build` says nothing and only `ng test` catches
-                a mismatch — which is how this line got its value.
-              -->
-              <label class="variant__option">
-                <input type="radio" name="kind" formControlName="kind" value="company" />
-                <span class="variant__label">
-                  <span class="variant__icon" aria-hidden="true">
-                    <ttco-icon name="building" [size]="20" />
+                  It has to be spelled exactly like the formControlName: Angular
+                  throws NG01202 when the two disagree. That check only runs in
+                  dev mode, so `ng build` says nothing and only `ng test` catches
+                  a mismatch — which is how this line got its value.
+                -->
+                <label class="variant__option">
+                  <input type="radio" name="kind" formControlName="kind" value="company" />
+                  <span class="variant__label">
+                    <span class="variant__icon" aria-hidden="true">
+                      <ttco-icon name="building" [size]="20" />
+                    </span>
+                    {{ copy().variantCompany }}
                   </span>
-                  I'm hiring
-                </span>
-              </label>
+                </label>
 
-              <label class="variant__option">
-                <input type="radio" name="kind" formControlName="kind" value="candidate" />
-                <span class="variant__label">
-                  <span class="variant__icon" aria-hidden="true">
-                    <ttco-icon name="user" [size]="20" />
+                <label class="variant__option">
+                  <input type="radio" name="kind" formControlName="kind" value="candidate" />
+                  <span class="variant__label">
+                    <span class="variant__icon" aria-hidden="true">
+                      <ttco-icon name="user" [size]="20" />
+                    </span>
+                    {{ copy().variantCandidate }}
                   </span>
-                  I'm looking for work
-                </span>
-              </label>
-            </div>
-          </fieldset>
+                </label>
+              </div>
+            </fieldset>
+          }
 
           <div class="field">
-            <label class="field__label" for="waitlist-name">Name</label>
+            <label class="field__label" for="waitlist-name">{{ copy().labelName }}</label>
             <input
               id="waitlist-name"
               class="field__input"
@@ -118,7 +122,7 @@
           </div>
 
           <div class="field">
-            <label class="field__label" for="waitlist-email">Email</label>
+            <label class="field__label" for="waitlist-email">{{ copy().labelEmail }}</label>
             <input
               id="waitlist-email"
               class="field__input"
@@ -136,7 +140,7 @@
 
           @if (isCompany()) {
             <div class="field">
-              <label class="field__label" for="waitlist-company">Company</label>
+              <label class="field__label" for="waitlist-company">{{ copy().labelCompany }}</label>
               <input
                 id="waitlist-company"
                 class="field__input"
@@ -153,8 +157,8 @@
           } @else {
             <div class="field">
               <label class="field__label" for="waitlist-role">
-                Role or area
-                <span class="field__optional">(optional)</span>
+                {{ copy().labelRole }}
+                <span class="field__optional">{{ copy().roleOptional }}</span>
               </label>
               <input
                 id="waitlist-role"
@@ -162,7 +166,7 @@
                 type="text"
                 formControlName="role"
                 autocomplete="organization-title"
-                placeholder="Backend .NET, QA, data…"
+                [placeholder]="copy().rolePlaceholder"
                 [attr.aria-invalid]="errors().role ? 'true' : null"
                 [attr.aria-describedby]="errors().role ? 'waitlist-role-error' : null"
               />
@@ -180,7 +184,7 @@
             skip those, which is exactly the population this catches.
           -->
           <div class="honeypot" aria-hidden="true">
-            <label for="waitlist-website">Do not fill this in</label>
+            <label for="waitlist-website">{{ copy().honeypotLabel }}</label>
             <input
               id="waitlist-website"
               type="text"
@@ -215,23 +219,25 @@
               [disabled]="status() === 'sending'"
             >
               @if (status() === 'sending') {
-                Sending…
+                {{ copy().submitting }}
               } @else {
-                Put me on the list
+                {{ copy().submit }}
               }
             </button>
 
             <!--
               `hreflang` and not a "(in Spanish)" label: the notice is a Mexican
-              aviso de privacidad and stays in Spanish (LFPDPPP), so the link
-              really does change language. `hreflang` is the attribute that says
-              so to a browser and a screen reader without spending a word of the
-              form's copy on it. See `PageHeadStrategy` for the `lang` side.
+              aviso de privacidad and stays in Spanish (LFPDPPP), so from the
+              English page the link really does change language. `hreflang` is the
+              attribute that says so to a browser and a screen reader without
+              spending a word of the form's copy on it. From `/talento` it is
+              simply true and costs nothing. See `PageHeadStrategy` for the
+              `lang` side.
             -->
             <p class="form__legal">
-              By submitting you accept our
-              <a routerLink="/privacidad" hreflang="es-MX">privacy notice</a>. You can ask us to
-              delete your data whenever you want.
+              {{ copy().legalBefore }}
+              <a routerLink="/privacidad" hreflang="es-MX">{{ copy().legalLink }}</a
+              >{{ copy().legalAfter }}
             </p>
           </div>
         </form>
