@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, TitleStrategy, provideRouter } from '@angular/router';
 
-import { PageHeadStrategy, resolveLang } from './page-head-strategy';
+import { SOCIAL_CARDS, absoluteUrl } from '../seo/page-social';
+import { PageHeadStrategy, resolveCard, resolveLang } from './page-head-strategy';
 import { DEFAULT_PAGE_LANG, PageLangService } from './page-lang';
 
 @Component({ template: 'x' })
@@ -30,8 +31,13 @@ describe('PageHeadStrategy', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([
-          { path: '', title: 'Home', data: { lang: 'en' }, component: Dummy },
-          { path: 'aviso', title: 'Aviso', data: { lang: 'es-MX' }, component: Dummy },
+          { path: '', title: 'Home', data: { lang: 'en', card: 'home' }, component: Dummy },
+          {
+            path: 'aviso',
+            title: 'Aviso',
+            data: { lang: 'es-MX', card: 'talento' },
+            component: Dummy,
+          },
           { path: 'sin-lang', title: 'No lang', component: Dummy },
           {
             path: 'padre',
@@ -77,6 +83,64 @@ describe('PageHeadStrategy', () => {
   it('lets the deepest route win over its parent', async () => {
     await navigate('/padre/hijo');
     expect(document.documentElement.lang).toBe('es-MX');
+  });
+
+  /**
+   * US-007. The social card rides the same hook as `lang` for the same reason,
+   * so these assertions are about the WIRING — that navigating really writes
+   * them — and not about the tags themselves, which `page-social.spec.ts` owns.
+   */
+  describe('the social card', () => {
+    it('is written on navigation', async () => {
+      await navigate('/aviso');
+
+      expect(
+        document.head.querySelector('meta[property="og:title"]')?.getAttribute('content'),
+      ).toBe(SOCIAL_CARDS.talento.title);
+    });
+
+    it('follows the next navigation instead of sticking to the first page', async () => {
+      await navigate('/aviso');
+      await navigate('/');
+
+      expect(
+        document.head.querySelector('meta[property="og:url"]')?.getAttribute('content'),
+      ).toBe(absoluteUrl('/'));
+    });
+
+    it('leaves the head alone for a route that declares no card', async () => {
+      await navigate('/');
+      await navigate('/sin-lang');
+
+      // Still the previous page's card rather than an empty one: a half-written
+      // card is a worse preview than a stale but consistent one.
+      expect(
+        document.head.querySelector('meta[property="og:url"]')?.getAttribute('content'),
+      ).toBe(absoluteUrl('/'));
+    });
+  });
+});
+
+describe('resolveCard', () => {
+  function chain(...cards: readonly (string | undefined)[]) {
+    const nodes = cards.map((card) => ({
+      data: card ? { card } : {},
+      firstChild: null as unknown,
+    }));
+    nodes.forEach((node, i) => (node.firstChild = nodes[i + 1] ?? null));
+    return nodes[0] as never;
+  }
+
+  it('returns null when nothing declares a card', () => {
+    expect(resolveCard(chain(undefined, undefined))).toBeNull();
+  });
+
+  it('keeps a parent card when the child does not declare one', () => {
+    expect(resolveCard(chain('home', undefined))).toBe('home');
+  });
+
+  it('lets the deepest declaration win', () => {
+    expect(resolveCard(chain('home', 'talento'))).toBe('talento');
   });
 });
 

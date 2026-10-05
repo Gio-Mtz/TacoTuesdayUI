@@ -1,3 +1,5 @@
+import SOCIAL from '../app/core/seo/social-cards.json';
+
 /**
  * Production configuration. Replaces `environment.ts` in the `production`
  * build configuration via `fileReplacements` in `angular.json`.
@@ -29,4 +31,22 @@ export const environment = {
    */
   apiBaseUrl:
     'https://tacotuesday-api.delightfultree-708c7167.southcentralus.azurecontainerapps.io',
+
+  /**
+   * Where this site is served from. `og:url`, `og:image` and
+   * `<link rel="canonical">` must be absolute, so a social card cannot be built
+   * without it.
+   *
+   * ⚠️ **Read from `social-cards.json` on purpose, not typed here.** The same
+   * origin is needed by `tools/emit-route-cards.mjs`, a Node script with no
+   * TypeScript, so the manifest is the one place it lives. Writing it twice is
+   * how `canonical` ends up pointing at a host the sitemap disagrees with.
+   *
+   * 🔜 **This is the single line that changes the day `tacotuesdayco.com` is
+   * pointed at the Static Web App** — in the manifest, and everything that
+   * quotes it follows: canonical, og:url, the sitemap, the static per-route
+   * HTML. Until then it is the generated `*.azurestaticapps.net` host, which is
+   * the host that actually answers.
+   */
+  siteBaseUrl: SOCIAL.siteBaseUrl,
 } as const;

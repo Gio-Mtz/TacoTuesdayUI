@@ -1,0 +1,66 @@
+{
+  "siteName": "Taco Tuesday",
+  "siteBaseUrl": "https://kind-coast-0c494471e.3.azurestaticapps.net",
+  "image": {
+    "width": 1200,
+    "height": 630
+  },
+  "cards": {
+    "home": {
+      "route": "/",
+      "dir": null,
+      "lang": "en",
+      "locale": "en_US",
+      "title": "Interviews with a date, feedback in writing, and nobody left on read.",
+      "description": "Taco Tuesday connects teams that are actually hiring with engineers who can already do the work. A short process, dates agreed on day one, and a written answer at the end — even when the answer is no.",
+      "documentTitle": "Taco Tuesday — Interviews with a date, feedback in writing, and nobody left on read",
+      "image": "/og/home.png",
+      "imageAlt": "Taco Tuesday. Interviews with a date, feedback in writing, and nobody left on read.",
+      "indexable": true,
+      "alternate": "talento",
+      "imageEyebrow": "For teams hiring engineers"
+    },
+    "talento": {
+      "route": "/talento",
+      "dir": "talento",
+      "lang": "es-MX",
+      "locale": "es_MX",
+      "title": "¿Odias que los reclutas te ghosteen? Deja que ellos te busquen",
+      "description": "No estás mandando tu CV a un buzón que nadie abre. Dejas tu perfil una vez y las empresas que de verdad están contratando llegan a ti — con fecha, y con un proceso que termina en una respuesta.",
+      "documentTitle": "Para devs — Taco Tuesday",
+      "image": "/og/talento.png",
+      "imageAlt": "Taco Tuesday. ¿Odias que los reclutas te ghosteen? Deja que ellos te busquen.",
+      "indexable": true,
+      "alternate": "home",
+      "imageEyebrow": "Para devs"
+    },
+    "privacidad": {
+      "route": "/privacidad",
+      "dir": "privacidad",
+      "lang": "es-MX",
+      "locale": "es_MX",
+      "title": "Aviso de privacidad — Taco Tuesday",
+      "description": "Cómo Taco Tuesday trata tus datos personales: qué se guarda, para qué, y cómo pedir que se borren.",
+      "documentTitle": "Aviso de privacidad — Taco Tuesday",
+      "image": "/og/home.png",
+      "imageAlt": "Taco Tuesday. Interviews with a date, feedback in writing, and nobody left on read.",
+      "indexable": true,
+      "alternate": null,
+      "imageEyebrow": "For teams hiring engineers"
+    },
+    "health": {
+      "route": "/health",
+      "dir": null,
+      "lang": "en",
+      "locale": "en_US",
+      "title": "API status — Taco Tuesday",
+      "description": "Internal status screen. Not part of the public site.",
+      "documentTitle": "API status — Taco Tuesday",
+      "image": "/og/home.png",
+      "imageAlt": "Taco Tuesday.",
+      "indexable": false,
+      "alternate": null,
+      "imageEyebrow": "For teams hiring engineers"
+    }
+  }
+}

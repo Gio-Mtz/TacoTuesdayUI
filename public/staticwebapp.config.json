@@ -1,9 +1,24 @@
 {
   "$schema": "https://json.schemastore.org/staticwebapp.config.json",
 
+  "routes": [
+    {
+      "route": "/talento",
+      "rewrite": "/talento/index.html"
+    },
+    {
+      "route": "/privacidad",
+      "rewrite": "/privacidad/index.html"
+    }
+  ],
+
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "*.{css,js,map,png,jpg,jpeg,svg,ico,webp,woff,woff2,txt,xml,webmanifest}"]
+    "exclude": [
+      "/assets/*",
+      "/og/*",
+      "*.{css,js,map,png,jpg,jpeg,svg,ico,webp,woff,woff2,txt,xml,webmanifest}"
+    ]
   },
 
   "globalHeaders": {

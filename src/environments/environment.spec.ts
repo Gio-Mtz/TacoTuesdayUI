@@ -24,6 +24,12 @@ describe('environments', () => {
     it('is not flagged as production', () => {
       expect(local.production).toBe(false);
     });
+
+    it('points canonical at the dev server, not at the live site', () => {
+      // A local page claiming the production URL as canonical is how a draft
+      // tells a crawler "the real one is over there" while you are looking at it.
+      expect(local.siteBaseUrl).toContain('localhost');
+    });
   });
 
   describe('production', () => {
@@ -42,6 +48,13 @@ describe('environments', () => {
 
     it('has no trailing slash, so the interceptor cannot produce //api', () => {
       expect(production.apiBaseUrl.endsWith('/')).toBe(false);
+    });
+
+    it('has an absolute https siteBaseUrl with no trailing slash', () => {
+      // `og:url`, `og:image` and `canonical` are built by concatenation. A
+      // trailing slash makes `https://host//talento`, and a relative value
+      // makes a card every crawler silently discards.
+      expect(production.siteBaseUrl).toMatch(/^https:\/\/[^/]+$/);
     });
 
     it('is not the Central US host that OPS-5 destroyed', () => {

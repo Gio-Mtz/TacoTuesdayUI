@@ -2,6 +2,7 @@ import { Route } from '@angular/router';
 
 import { SHELL_COPY } from './core/i18n/shell-copy';
 import { routes } from './app.routes';
+import { SOCIAL_CARDS, SocialCard, SocialCardKey } from './core/seo/page-social';
 
 /**
  * A trip wire, not a behaviour test.
@@ -64,5 +65,76 @@ describe('routes', () => {
   it('keeps the landing in English — the side that pays reads English', () => {
     const landing = pages.find((route) => route.path === '');
     expect(landing?.data?.['lang']).toBe('en');
+  });
+});
+
+/**
+ * The route table and `social-cards.json` describe the same pages twice — once
+ * for the browser, once for the static HTML a crawler receives — and nothing in
+ * the compiler makes them agree. This block is that agreement.
+ *
+ * It is worth its length because the failure is invisible: rename a page and
+ * forget the manifest, and the site keeps working while WhatsApp shows the old
+ * headline for the rest of the year. US-007.
+ */
+describe('routes and the social card manifest', () => {
+  const declared = routes.filter(
+    (route): route is Route & { path: string } =>
+      typeof route.path === 'string' && route.redirectTo === undefined,
+  );
+
+  function pathOf(route: Route & { path: string }): string {
+    return route.path === '' ? '/' : `/${route.path}`;
+  }
+
+  function cardOf(route: Route & { path: string }): SocialCard {
+    return SOCIAL_CARDS[route.data!['card'] as SocialCardKey];
+  }
+
+  it('gives every page a card', () => {
+    const missing = declared.filter((route) => !route.data?.['card']).map(pathOf);
+    expect(missing).toEqual([]);
+  });
+
+  it('matches each card to the route it claims to describe', () => {
+    for (const route of declared) {
+      expect(cardOf(route), `unknown card key on "${pathOf(route)}"`).toBeDefined();
+      expect(cardOf(route).route).toBe(pathOf(route));
+    }
+  });
+
+  it('keeps the card language and the route language identical', () => {
+    // Two spellings of one fact. If they disagree, the static file a crawler
+    // reads and the page a browser renders claim different languages for one URL.
+    for (const route of declared) {
+      expect(cardOf(route).lang).toBe(route.data!['lang']);
+    }
+  });
+
+  it('keeps the route title byte-for-byte equal to the card documentTitle', () => {
+    // The browser takes `<title>` from this table; the crawler takes it from the
+    // manifest, baked in by `tools/emit-route-cards.mjs`. One page, one title —
+    // or a search result and a browser tab that disagree about the same URL.
+    for (const route of declared) {
+      expect(cardOf(route).documentTitle).toBe(route.title);
+    }
+  });
+
+  it('leaves no card describing a route that no longer exists', () => {
+    const paths = new Set(declared.map(pathOf));
+    for (const card of Object.values(SOCIAL_CARDS) as SocialCard[]) {
+      expect(paths.has(card.route), `card for "${card.route}" has no route`).toBe(true);
+    }
+  });
+
+  it('emits a static file for every indexable route except the root', () => {
+    // The root IS `index.html`. Everything else needs its own file or Static Web
+    // Apps answers it with the root's card — which is the whole bug US-007 fixes.
+    for (const card of Object.values(SOCIAL_CARDS) as SocialCard[]) {
+      if (!card.indexable) {
+        continue;
+      }
+      expect(card.dir).toBe(card.route === '/' ? null : card.route.slice(1));
+    }
   });
 });

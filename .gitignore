@@ -46,3 +46,6 @@ Thumbs.db
 /.claude
 /.vscode/*
 /.vs
+
+# Scratch renders and ad-hoc verification harnesses next to the OG card template.
+tools/og/.*

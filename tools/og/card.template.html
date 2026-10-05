@@ -1,0 +1,106 @@
+<!doctype html>
+<!--
+  Source of `public/og/*.png`, the 1200x630 image a link preview shows.
+
+  It is HTML and not SVG for one reason: text wrapping. An SVG `<text>` does not
+  wrap, so a headline would have to be split into `<tspan>`s by hand and
+  re-split every time the copy changes — and the copy here is read from
+  `social-cards.json`, which is exactly the thing that changes.
+
+  ⚠️ The drawing is NOT copied in here. The isotype is `public/favicon.svg`,
+  referenced by path — the same file the browser tab uses. TD-007 was about the
+  same agave being written in five places; this template is not going to be the
+  sixth. The wordmark is set as TEXT in the brand's display face, which is also
+  not a copy of a drawing.
+
+  Rendered by `tools/make-og-images.mjs` at exactly 1200x630 with a headless
+  Chromium. Regenerating is a design chore, not a build step: the PNGs are
+  committed and nothing in `ng build` or in CI needs a browser.
+-->
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: 'Outfit';
+    src: url('../../node_modules/@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2') format('woff2');
+    font-weight: 100 900;
+  }
+  @font-face {
+    font-family: 'Inter';
+    src: url('../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2');
+    font-weight: 100 900;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    /* agave-900 / maiz-500: the brand's own tokens, not a new palette. */
+    background: #0C3833;
+    color: #FBFAF8;
+    font-family: 'Inter', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 72px 80px;
+    position: relative;
+  }
+
+  /* The accent is a shape and not a border so the card reads as branded at
+     thumbnail size, which is the only size most people see it at. */
+  body::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 14px;
+    background: linear-gradient(90deg, #176E63 0%, #41A695 45%, #EEB74E 100%);
+  }
+
+  .brand { display: flex; align-items: center; gap: 20px; }
+  .brand img { width: 72px; height: 72px; display: block; }
+  .wordmark {
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 34px;
+    letter-spacing: 0.06em;
+  }
+  .wordmark .tuesday { color: #6FC2B2; }
+
+  .eyebrow {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #EEB74E;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 62px;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    max-width: 17ch;
+    /* Long headlines shrink instead of overflowing. 1200x630 is fixed and a
+       clipped headline is the one failure that makes the whole card useless. */
+    max-height: 290px;
+  }
+  h1.long { font-size: 52px; max-width: 21ch; }
+</style>
+</head>
+<body>
+  <div class="brand">
+    <img src="../../public/favicon.svg" alt="">
+    <span class="wordmark">TACO <span class="tuesday">TUESDAY</span></span>
+  </div>
+  <div>
+    <p class="eyebrow">{{eyebrow}}</p>
+    <h1 class="{{headlineClass}}">{{headline}}</h1>
+  </div>
+</body>
+</html>
