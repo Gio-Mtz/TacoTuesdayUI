@@ -1,30 +1,4 @@
-// =============================================================================
-//  Layout primitives — shared by every page
-//
-//  Why these are global instead of living inside each component:
-//
-//    * `anyComponentStyle` in angular.json errors at 8 kB. Five sections that
-//      each restated the container, the vertical rhythm and the button would
-//      blow past it — and, worse, drift apart. Three slightly different buttons
-//      is how a design system dies.
-//    * Angular's emulated encapsulation scopes a COMPONENT's styles to that
-//      component; it does not stop global CSS from reaching the component's
-//      DOM. So a global class is the cheapest way to share a primitive with no
-//      ::ng-deep tricks.
-//
-//  The split, same rule as everywhere else in this repo:
-//    * anything that changes with the theme  -> var(--tt-*)
-//    * anything fixed (space, breakpoints)   -> Sass, as `tt.`
-//
-//  Font sizes are read as var(--tt-text-*) on purpose: the Sass map keys are
-//  written `2xl`, `3xl`... which Sass parses as numbers-with-a-unit rather than
-//  plain identifiers. It works, but it is a trap for the next person. The
-//  custom property says the same thing and cannot be misread.
-// =============================================================================
-
 @use './tokens' as tt;
-
-// ---- Page skeleton ----------------------------------------------------------
 
 .tt-container {
   width: 100%;
@@ -40,8 +14,6 @@
 .tt-section {
   padding-block: tt.space(8);
 
-  // An in-page anchor scrolls the target to y=0, which is exactly where the
-  // sticky header is. Without this the heading lands underneath it.
   scroll-margin-top: 5rem;
 
   @include tt.up(md) {
@@ -49,13 +21,9 @@
   }
 }
 
-// Alternating bands are what give a one-page site its rhythm. `--tt-bg-subtle`
-// is one step off the canvas in both themes, so this never becomes a hard edge.
 .tt-section--alt {
   background: var(--tt-bg-subtle);
 }
-
-// ---- Type ------------------------------------------------------------------
 
 .tt-eyebrow {
   margin: 0 0 tt.space(2);
@@ -83,15 +51,12 @@
   color: var(--tt-text-secondary);
 }
 
-// ---- Buttons ----------------------------------------------------------------
-
 .tt-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: tt.space(2);
 
-  // 44 px is the WCAG 2.5.8 target size. It is also just what a thumb needs.
   min-height: 44px;
   padding: tt.space(3) tt.space(5);
 
@@ -133,8 +98,6 @@
   }
 }
 
-// ---- Cards ------------------------------------------------------------------
-
 .tt-cards {
   display: grid;
   gap: tt.space(4);
@@ -167,8 +130,6 @@
   color: var(--tt-text-secondary);
 }
 
-// The icon chip on a card. Brand-subtle behind brand-coloured strokes clears AA
-// in both themes — see the ADR for the pairs that were checked.
 .tt-card__icon {
   display: inline-flex;
   align-items: center;
@@ -181,14 +142,10 @@
   color: var(--tt-brand-text);
 }
 
-// ---- Accessibility helpers ---------------------------------------------------
-
 .tt-sr-only {
   @include tt.sr-only;
 }
 
-// Off-screen until focused. First thing in the tab order, so a keyboard visitor
-// can jump the header instead of tabbing through the nav on every page.
 .tt-skip-link {
   position: fixed;
   top: tt.space(3);

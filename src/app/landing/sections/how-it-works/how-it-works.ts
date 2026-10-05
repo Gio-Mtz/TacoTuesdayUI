@@ -2,23 +2,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Icon } from '../../../shared/icon/icon';
 
-/** A numbered step. The number comes from the position, never from the data. */
 export interface HowItWorksStep {
   readonly icon: string;
   readonly title: string;
   readonly body: string;
 }
 
-/**
- * How it works, in three steps.
- *
- * Three because the point is to make the process feel short. Every extra step
- * on this list is one more reason for a visitor to decide it is a whole thing
- * and close the tab.
- *
- * The step number is rendered from the loop index rather than typed into the
- * copy, so reordering the array can never leave a "3." above the second card.
- */
 @Component({
   selector: 'ttco-how-it-works',
   changeDetection: ChangeDetectionStrategy.OnPush,

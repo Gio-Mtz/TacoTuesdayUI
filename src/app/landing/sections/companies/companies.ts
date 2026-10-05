@@ -2,26 +2,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { Icon } from '../../../shared/icon/icon';
 
-/** One pain, named the way a hiring manager would name it, and the answer. */
 export interface CompanyValuePoint {
   readonly icon: string;
   readonly title: string;
   readonly body: string;
 }
 
-/**
- * The "For companies" section: the problem this solves for the side that pays.
- *
- * Written as pain first, feature second, on purpose. "Integrated scheduling"
- * means nothing to someone who has not yet admitted that coordinating calendars
- * is eating their week; "stop chasing calendars" does.
- *
- * ⚠️ `brand.md` asks for numbers over adjectives, and there are none here on
- * purpose: nothing has shipped yet, so every number would be invented. What
- * replaces them is *checkable commitments* ("written feedback", "from your real
- * availability") — a promise a client can hold us to, not a metric we made up.
- * The day there are real numbers, they belong in these three bodies.
- */
 @Component({
   selector: 'ttco-companies',
   changeDetection: ChangeDetectionStrategy.OnPush,

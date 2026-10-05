@@ -1,33 +1,10 @@
 import { PageLang } from '../../../core/i18n/page-lang';
 
-/**
- * Every word the waitlist form says, in both languages.
- *
- * **Why this file exists.** Until US-010 the form lived on exactly one page, so
- * its copy could be typed into the template. US-010 gives the engineer their own
- * Spanish page at `/talento`, and the form is the one thing on that page that is
- * genuinely the SAME form — three fields, one POST, one contract with
- * `/api/leads`. Duplicating the component to translate eleven labels would mean
- * every future fix to the focus handling, the honeypot or the error mapping has
- * to be remembered twice, which is the failure TD-007 spent a whole card on.
- *
- * So the component is shared and the words are data, keyed by the language the
- * route declares. Same shape as `core/i18n/shell-copy.ts`, same reasoning: a
- * translation of thirty strings is a typed record, not a dependency.
- *
- * ⚠️ **This is a translation, and the rest of the site deliberately is not.**
- * `/` and `/talento` are different arguments to different audiences, not two
- * renderings of one text. The form is the exception because a form field cannot
- * mean something different per audience — `Email` is `Correo` and there is no
- * editorial choice to make. If a string in here ever starts wanting to differ in
- * substance rather than in language, it does not belong in this file.
- */
 export interface WaitlistCopy {
   readonly eyebrow: string;
   readonly title: string;
   readonly lede: string;
 
-  /** The `aria-live` text while the request is in flight. */
   readonly sending: string;
 
   readonly variantLegend: string;
@@ -41,21 +18,11 @@ export interface WaitlistCopy {
   readonly roleOptional: string;
   readonly rolePlaceholder: string;
 
-  /**
-   * The honeypot's label. Never seen and never read aloud — but it is real text
-   * in the DOM, and a bot that reads it is the population this field catches, so
-   * it is written in the page's language like everything else.
-   */
   readonly honeypotLabel: string;
 
   readonly submit: string;
   readonly submitting: string;
 
-  /**
-   * The legal line, in three pieces, because the privacy notice is a link in the
-   * MIDDLE of the sentence. One string with markup in it would mean putting
-   * `innerHTML` on the one line of this form that mentions a legal obligation.
-   */
   readonly legalBefore: string;
   readonly legalLink: string;
   readonly legalAfter: string;
@@ -71,27 +38,15 @@ export interface WaitlistCopy {
   readonly failures: WaitlistFailureCopy;
 }
 
-/** One message per way a field can be wrong. Mirrors `CreateLeadHandler`. */
 export interface WaitlistErrorCopy {
   readonly nameRequired: string;
   readonly emailRequired: string;
   readonly emailInvalid: string;
   readonly companyRequired: string;
 
-  /**
-   * A function and not four strings: `maxlength` is the same sentence with a
-   * different number four times over, and four near-identical strings per
-   * language is four places for the two languages to drift apart.
-   */
   readonly maxChars: (max: number) => string;
 }
 
-/**
- * What the visitor is told when the API said no.
- *
- * The keys are outcomes, not status codes, so `describeFailure` keeps owning the
- * mapping from HTTP to meaning and this file only owns the wording.
- */
 export interface WaitlistFailureCopy {
   readonly offline: string;
   readonly validation: string;

@@ -1,14 +1,6 @@
-<!--
-  A plain href, not routerLink + fragment: a skip link has to move FOCUS, not
-  just the scroll position, and the browser's own same-document jump is the only
-  thing that does both. `tabindex="-1"` on <main> is what lets focus land there.
--->
 <a class="tt-skip-link" href="#contenido">{{ copy().skipToContent }}</a>
-
 <ttco-site-header />
-
 <main id="contenido" class="app__main" tabindex="-1">
   <router-outlet />
 </main>
-
 <ttco-site-footer />

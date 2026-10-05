@@ -1,9 +1,5 @@
 @use '../../../styles/tokens' as tt;
 
-// Mirrors `.hero` on the landing: the same wash of brand behind the first screen
-// so the two pages read as one site. Not shared as a class because the landing's
-// hero styles are component-scoped to it, and lifting them into the global sheet
-// to be used twice would make every future tweak a cross-page change.
 .talent-hero {
   background:
     radial-gradient(ellipse 80% 60% at 50% -10%, var(--tt-brand-subtle), transparent 70%);
@@ -23,8 +19,7 @@
 
 .talent-hero__title {
   margin: 0 0 tt.space(4);
-  // Narrower than the English hero on purpose: the Spanish line is longer and at
-  // 18ch it broke after "¿Odias" on a phone, which put the question mark alone.
+
   max-width: 22ch;
   font-size: var(--tt-text-4xl);
 
@@ -34,8 +29,6 @@
   }
 }
 
-// The break is for wide screens only: on a phone the title already wraps and an
-// extra break leaves an orphan.
 .talent-hero__break {
   display: none;
 
@@ -52,10 +45,6 @@
   margin: tt.space(5) 0 0;
   font-size: var(--tt-text-sm);
 
-  // `--tt-text-secondary`, not `--tt-text-muted`, and the landing's `.hero__note`
-  // is why: muted on the canvas measures 4.39:1 in the light theme, which misses
-  // AA for 14 px text by a hair. Measured on 29-sep for the English hero; the
-  // same two tokens on the same background behave the same here.
   color: var(--tt-text-secondary);
 }
 

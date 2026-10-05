@@ -1,8 +1,6 @@
 @use '../../../styles/tokens' as tt;
 
 .privacy__inner {
-  // A legal notice is read, not scanned. 70 characters is where a line stops
-  // being comfortable, and this page has nothing else competing for the width.
   max-width: 70ch;
 }
 

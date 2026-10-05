@@ -7,26 +7,13 @@
     <p class="tt-eyebrow">{{ copy().eyebrow }}</p>
     <h2 id="waitlist-title" class="tt-title">{{ copy().title }}</h2>
     <p class="tt-lede waitlist__lede">{{ copy().lede }}</p>
-
-    <!--
-      Always in the DOM, never conditional. A live region that is added to the
-      page at the same moment its text appears is announced by roughly half of
-      the screen readers out there and silently ignored by the rest — the region
-      has to exist first so the reader is already watching it.
-    -->
     <p class="tt-sr-only" role="status" aria-live="polite">{{ liveMessage() }}</p>
-
     <div class="waitlist__panel">
       @if (status() === 'success') {
         <div class="confirm">
           <span class="confirm__icon" aria-hidden="true">
             <ttco-icon name="check-circle" [size]="32" />
           </span>
-
-          <!--
-            `tabindex="-1"` so focus can land here without putting the heading
-            in the tab order. The effect in the component is what moves it.
-          -->
           <h3 #successHeading class="confirm__title" tabindex="-1">
             @if (alreadyRegistered()) {
               {{ copy().alreadyTitle }}
@@ -34,7 +21,6 @@
               {{ copy().successTitle }}
             }
           </h3>
-
           <p class="confirm__body">
             @if (alreadyRegistered()) {
               {{ copy().alreadyBody }}
@@ -44,44 +30,16 @@
               {{ copy().successBodyAfter }}
             }
           </p>
-
           <button type="button" class="tt-btn tt-btn--secondary confirm__again" (click)="reset()">
             {{ copy().again }}
           </button>
         </div>
       } @else {
         <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-          <!--
-            A radiogroup, not a <select> and not two buttons: it is two mutually
-            exclusive options that both have to be visible, and arrow keys
-            moving between them is behaviour we get for free and would otherwise
-            have to write.
-
-            Gone entirely when the page pinned a side (`lockedKind`, US-010).
-            Not merely hidden: a `hidden` fieldset is still a radiogroup a screen
-            reader can be told about, and `/talento` has no question to ask. The
-            control still carries the value — see `ngOnInit`.
-          -->
           @if (!lockedKind()) {
             <fieldset class="form__variant">
               <legend class="form__legend">{{ copy().variantLegend }}</legend>
-
               <div class="variant">
-                <!--
-                  `name` is written out by hand and is NOT redundant. Angular's
-                  radio value accessor left it empty here, and an empty name means
-                  the browser never forms a radio GROUP: both inputs became their
-                  own tab stop, and arrow-key selection changed the DOM without
-                  ever reaching the form control — the field below simply did not
-                  swap. Measured in Chromium, not guessed. With the name present
-                  the group is one tab stop and the arrows work, which was the
-                  whole reason for using radios instead of two buttons.
-
-                  It has to be spelled exactly like the formControlName: Angular
-                  throws NG01202 when the two disagree. That check only runs in
-                  dev mode, so `ng build` says nothing and only `ng test` catches
-                  a mismatch — which is how this line got its value.
-                -->
                 <label class="variant__option">
                   <input type="radio" name="kind" formControlName="kind" value="company" />
                   <span class="variant__label">
@@ -91,7 +49,6 @@
                     {{ copy().variantCompany }}
                   </span>
                 </label>
-
                 <label class="variant__option">
                   <input type="radio" name="kind" formControlName="kind" value="candidate" />
                   <span class="variant__label">
@@ -120,7 +77,6 @@
               <p id="waitlist-name-error" class="field__error">{{ message }}</p>
             }
           </div>
-
           <div class="field">
             <label class="field__label" for="waitlist-email">{{ copy().labelEmail }}</label>
             <input
@@ -137,7 +93,6 @@
               <p id="waitlist-email-error" class="field__error">{{ message }}</p>
             }
           </div>
-
           @if (isCompany()) {
             <div class="field">
               <label class="field__label" for="waitlist-company">{{ copy().labelCompany }}</label>
@@ -176,13 +131,6 @@
             </div>
           }
 
-          <!--
-            The honeypot. Hidden from sight AND from assistive tech, and out of
-            the tab order, so no human can fill it by accident; still a real
-            input in the DOM, which is the only thing a form-filling bot looks
-            at. `display: none` is avoided on purpose — the cheaper scrapers
-            skip those, which is exactly the population this catches.
-          -->
           <div class="honeypot" aria-hidden="true">
             <label for="waitlist-website">{{ copy().honeypotLabel }}</label>
             <input
@@ -193,13 +141,7 @@
               autocomplete="off"
             />
           </div>
-
           @if (requestError(); as message) {
-            <!--
-              `role="alert"` is an assertive live region: it interrupts, which
-              is right here because the visitor pressed a button and is waiting
-              for the answer.
-            -->
             <p class="form__failure" role="alert">
               <span class="form__failure-icon" aria-hidden="true">
                 <ttco-icon name="alert-circle" [size]="20" />
@@ -209,10 +151,6 @@
           }
 
           <div class="form__actions">
-            <!--
-              Never disabled on invalid — only while a request is in flight. See
-              the class comment and ADR 0003.
-            -->
             <button
               type="submit"
               class="tt-btn tt-btn--primary form__submit"
@@ -224,16 +162,6 @@
                 {{ copy().submit }}
               }
             </button>
-
-            <!--
-              `hreflang` and not a "(in Spanish)" label: the notice is a Mexican
-              aviso de privacidad and stays in Spanish (LFPDPPP), so from the
-              English page the link really does change language. `hreflang` is the
-              attribute that says so to a browser and a screen reader without
-              spending a word of the form's copy on it. From `/talento` it is
-              simply true and costs nothing. See `PageHeadStrategy` for the
-              `lang` side.
-            -->
             <p class="form__legal">
               {{ copy().legalBefore }}
               <a routerLink="/privacidad" hreflang="es-MX">{{ copy().legalLink }}</a

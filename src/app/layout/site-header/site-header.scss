@@ -5,8 +5,6 @@
   top: 0;
   z-index: 50;
 
-  // Solid, not translucent. A backdrop-filter over the alternating section
-  // bands shifts colour as you scroll past a band edge, which reads as a bug.
   background: var(--tt-bg-canvas);
   border-bottom: 1px solid var(--tt-border);
 }
@@ -28,7 +26,6 @@
   font-size: var(--tt-text-lg);
   text-decoration: none;
 
-  // Pushes everything after it to the right without a spacer element.
   margin-right: auto;
 }
 
@@ -51,8 +48,6 @@
   display: none;
   gap: tt.space(5);
 
-  // The nav returns at md. See the component doc comment for why there is no
-  // mobile menu below it.
   @include tt.up(md) {
     display: flex;
   }

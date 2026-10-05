@@ -1,36 +1,8 @@
-// =============================================================================
-//  Fonts — self-hosted, declared under the names the design system already uses
-//
-//  Why self-hosted instead of a <link> to fonts.googleapis.com:
-//
-//    * One less third-party origin on the critical path. The Google Fonts
-//      stylesheet is render-blocking and has to resolve DNS + TLS to a second
-//      host before a single glyph is requested. That is the single biggest
-//      easy win available for the Lighthouse target in US-007.
-//    * No visitor data leaves for a third party to load a typeface.
-//    * The build works offline, which is also why CI never depends on Google
-//      being up.
-//
-//  Why the @font-face blocks are hand-written instead of importing
-//  @fontsource-variable/inter directly: those packages register the family as
-//  'Inter Variable'. theme.css asks for 'Inter'. theme.css is kept
-//  byte-identical to TacoTuesdayDesign so it can be re-synced with a copy
-//  rather than a merge, so the app bends, not the design system. Declaring the
-//  family ourselves under the design system's name is what makes
-//  --tt-font-body work with no edit on either side.
-//
-//  These are variable fonts: one file covers weights 100–900, so asking for
-//  600 in a heading costs no extra request. Only the latin and latin-ext
-//  subsets are shipped — enough for Spanish and English, and about a third of
-//  the bytes of the full set.
-// =============================================================================
-
 @each $family, $file in (
   'Inter': 'inter',
   'Outfit': 'outfit',
   'JetBrains Mono': 'jetbrains-mono'
 ) {
-  // latin — the common case, so it goes first.
   @font-face {
     font-family: '#{$family}';
     font-style: normal;
@@ -43,7 +15,6 @@
       U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
   }
 
-  // latin-ext — fetched only if a glyph in this range is actually rendered.
   @font-face {
     font-family: '#{$family}';
     font-style: normal;

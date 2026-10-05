@@ -11,5 +11,5 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class HealthComponent {
   private readonly healthService = inject(HealthService);
   protected readonly error = signal<string | null>(null);
-  protected readonly ping = toSignal(this.healthService.ping('Gio'), { initialValue: null }); // toSignal se subscribe, expone el ulltimo valir como signaly se desuscribe cuando el cmponente muere
+  protected readonly ping = toSignal(this.healthService.ping('Gio'), { initialValue: null });
 }

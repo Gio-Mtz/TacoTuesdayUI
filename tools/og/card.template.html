@@ -1,22 +1,4 @@
 <!doctype html>
-<!--
-  Source of `public/og/*.png`, the 1200x630 image a link preview shows.
-
-  It is HTML and not SVG for one reason: text wrapping. An SVG `<text>` does not
-  wrap, so a headline would have to be split into `<tspan>`s by hand and
-  re-split every time the copy changes — and the copy here is read from
-  `social-cards.json`, which is exactly the thing that changes.
-
-  ⚠️ The drawing is NOT copied in here. The isotype is `public/favicon.svg`,
-  referenced by path — the same file the browser tab uses. TD-007 was about the
-  same agave being written in five places; this template is not going to be the
-  sixth. The wordmark is set as TEXT in the brand's display face, which is also
-  not a copy of a drawing.
-
-  Rendered by `tools/make-og-images.mjs` at exactly 1200x630 with a headless
-  Chromium. Regenerating is a design chore, not a build step: the PNGs are
-  committed and nothing in `ng build` or in CI needs a browser.
--->
 <html lang="{{lang}}">
 <head>
 <meta charset="utf-8">
@@ -38,7 +20,7 @@
     width: 1200px;
     height: 630px;
     overflow: hidden;
-    /* agave-900 / maiz-500: the brand's own tokens, not a new palette. */
+
     background: #0C3833;
     color: #FBFAF8;
     font-family: 'Inter', system-ui, sans-serif;
@@ -49,8 +31,6 @@
     position: relative;
   }
 
-  /* The accent is a shape and not a border so the card reads as branded at
-     thumbnail size, which is the only size most people see it at. */
   body::after {
     content: '';
     position: absolute;
@@ -86,8 +66,7 @@
     line-height: 1.1;
     letter-spacing: -0.015em;
     max-width: 17ch;
-    /* Long headlines shrink instead of overflowing. 1200x630 is fixed and a
-       clipped headline is the one failure that makes the whole card useless. */
+
     max-height: 290px;
   }
   h1.long { font-size: 52px; max-width: 21ch; }

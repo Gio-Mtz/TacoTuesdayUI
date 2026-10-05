@@ -4,12 +4,6 @@
       <span class="site-header__mark" aria-hidden="true">TT</span>
       <span class="site-header__name">{{ site.name }}</span>
     </a>
-
-    <!--
-      Looped since US-010, because the LIST itself changes with the language: the
-      Spanish shell points at `/talento`, the English one at sections of `/`.
-      Three hardcoded anchors could only ever point at one page's sections.
-    -->
     <nav class="site-header__nav" [attr.aria-label]="copy().navLabel">
       @for (link of copy().nav; track link.path + link.fragment) {
         <a
@@ -20,7 +14,6 @@
         >
       }
     </nav>
-
     <ttco-theme-toggle />
   </div>
 </header>

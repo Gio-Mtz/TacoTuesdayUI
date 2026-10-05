@@ -1,55 +1,13 @@
 <!doctype html>
-<!--
-  `lang` is per ROUTE, not per site, since US-009: `/` is English (it speaks to
-  the company that pays) and `/privacidad` is Spanish (a Mexican aviso de
-  privacidad, in the language the law addresses). `PageHeadStrategy` rewrites
-  this attribute on every navigation — see `app/core/i18n/`.
-
-  What is hard-coded here is only the value a visitor sees BEFORE Angular boots,
-  and it matters because Static Web Apps serves this same file for every path. It
-  is "en" because `/` is the page that gets indexed and shared. The cost, written
-  down so nobody rediscovers it: a crawler that does not run JavaScript reads
-  `/privacidad` as English. Every real browser and every screen reader gets the
-  corrected value.
-
-  Do not "fix" this to es-MX. That trades a wrong lang on one legal page for a
-  wrong lang on the page the whole business depends on.
--->
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <!-- Rewritten per route by the emitter, and by PageHeadStrategy at runtime.
-       The value here is the `/` card's, which is what a crawler gets. -->
   <title>Taco Tuesday — Interviews with a date, feedback in writing, and nobody left on read</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Tells the browser to paint its own UI (scrollbars, form controls) to match,
-       and keeps the address bar in step on mobile. -->
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#FBFAF8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#14120F" media="(prefers-color-scheme: dark)">
-
-
-  <!--
-    SOCIAL CARD — what a link to this page looks like pasted into WhatsApp,
-    LinkedIn or Slack.
-
-    ⚠️ **Everything between the two markers below is GENERATED.** `npm run
-    build` runs `tools/emit-route-cards.mjs` afterwards, which rewrites this
-    block from `src/app/core/seo/social-cards.json` and writes a copy of this
-    file per route (`/talento/index.html`, `/privacidad/index.html`) with that
-    route's card and its own `lang`. Edit the manifest, not this.
-
-    What is checked in here is the `/` card, so that the file is already correct
-    before the script runs and a developer reading `src/index.html` sees the real
-    thing. If the two ever disagree, the script wins.
-
-    **Why any of this is static at all:** every crawler that draws a link
-    preview reads the HTML without executing JavaScript. The tags
-    `PageSocialMetaService` writes at runtime are correct for a browser and
-    invisible to the crawler that actually makes the picture.
-  -->
   <!-- tt:social-card:start -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Taco Tuesday">
@@ -73,20 +31,8 @@
   <link rel="alternate" hreflang="es-MX" href="https://kind-coast-0c494471e.3.azurestaticapps.net/talento">
   <link rel="alternate" hreflang="x-default" href="https://kind-coast-0c494471e.3.azurestaticapps.net/">
   <!-- tt:social-card:end -->
-
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="alternate icon" href="favicon.ico" sizes="any">
-
-  <!-- Fonts are self-hosted and bundled from styles/_fonts.scss, so there is no
-       third-party stylesheet to preconnect to. See the ADR for why. -->
-
-  <!-- Anti-flash. theme.css already follows prefers-color-scheme on its own, so
-       this only matters for a visitor whose saved choice DISAGREES with their
-       OS: without it they would see one paint of the wrong theme before Angular
-       boots. It runs before first paint and does the same thing ThemeService
-       does, which is why the storage key is duplicated here — if you change
-       'tt-theme', change it in theme.service.ts too. Keep it in sync or the
-       page flashes again. -->
   <script>
     (function () {
       try {
@@ -95,7 +41,6 @@
           document.documentElement.setAttribute('data-theme', saved);
         }
       } catch (e) {
-        /* Storage blocked (private mode, cookies off). The CSS default stands. */
       }
     })();
   </script>

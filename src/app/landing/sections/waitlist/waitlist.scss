@@ -1,17 +1,6 @@
-// =============================================================================
-//  Waitlist — the conversion point of the page.
-//
-//  Everything shared (container, section rhythm, button, card) comes from
-//  `styles/_layout.scss`. What lives here is only what this section uses once:
-//  the form controls, the segmented variant picker and the confirmation panel.
-//  `anyComponentStyle` errors at 8 kB, so this file stays honest about that.
-// =============================================================================
-
 @use '../../../../styles/tokens' as tt;
 
 .waitlist__inner {
-  // The eye should not have to travel the full 1120 px of the container to read
-  // a label and then find its input. A form reads best in one narrow column.
   max-width: 34rem;
 }
 
@@ -31,8 +20,6 @@
   }
 }
 
-// ---- Form ------------------------------------------------------------------
-
 .form {
   display: grid;
   gap: tt.space(5);
@@ -51,8 +38,6 @@
   color: var(--tt-text-primary);
 }
 
-// ---- Variant picker ---------------------------------------------------------
-
 .variant {
   display: grid;
   gap: tt.space(3);
@@ -69,11 +54,6 @@
   cursor: pointer;
 }
 
-// The native radio is moved out of sight rather than hidden: `display: none`
-// and `visibility: hidden` both take it out of the tab order, which would break
-// arrow-key navigation inside the group — the reason a radiogroup was used at
-// all. It stays focusable, and `:focus-visible` below draws the ring on the
-// label the visitor can actually see.
 .variant__option input {
   position: absolute;
   width: 1px;
@@ -109,9 +89,6 @@
   border-color: var(--tt-border-strong);
 }
 
-// Selected state. Colour alone never carries meaning here: the border also
-// thickens via `box-shadow` (no layout shift) and the icon takes the brand
-// colour, so this still reads in greyscale and for a colour-blind visitor.
 .variant__option input:checked + .variant__label {
   border-color: var(--tt-brand-border);
   background: var(--tt-brand-subtle);
@@ -126,8 +103,6 @@
   @include tt.focus-ring;
 }
 
-// ---- Fields -----------------------------------------------------------------
-
 .field {
   display: grid;
   gap: tt.space(2);
@@ -141,8 +116,7 @@
 .field__optional {
   margin-left: tt.space(1);
   font-weight: 400;
-  // `--tt-text-secondary`, not `--tt-text-muted`: muted measures 4.39:1 on the
-  // canvas in light mode and misses AA. US-002 found this the hard way.
+
   color: var(--tt-text-secondary);
 }
 
@@ -166,7 +140,6 @@
     @include tt.focus-ring;
   }
 
-  // The red border is the second signal, never the first: the message below is.
   &[aria-invalid='true'] {
     border-color: var(--tt-danger);
   }
@@ -179,11 +152,6 @@
   line-height: var(--tt-leading-snug);
 }
 
-// ---- Honeypot ---------------------------------------------------------------
-
-// Off-screen, zero-sized, and clipped. Deliberately not `display: none` and not
-// `visibility: hidden`: the simplest bots skip both, and skipping the trap is
-// the one thing it must not allow.
 .honeypot {
   position: absolute;
   left: -9999px;
@@ -191,8 +159,6 @@
   height: 1px;
   overflow: hidden;
 }
-
-// ---- Failure ----------------------------------------------------------------
 
 .form__failure {
   display: flex;
@@ -203,9 +169,7 @@
   border: 1px solid var(--tt-danger);
   border-radius: var(--tt-radius-md);
   background: var(--tt-danger-subtle);
-  // On `--tt-danger-subtle` the plain text colour keeps its contrast; the red
-  // is spent on the border and the icon, where it is decoration and not the
-  // thing being read.
+
   color: var(--tt-text-primary);
   font-size: var(--tt-text-sm);
   line-height: var(--tt-leading-snug);
@@ -216,8 +180,6 @@
   flex-shrink: 0;
   color: var(--tt-danger);
 }
-
-// ---- Actions ----------------------------------------------------------------
 
 .form__actions {
   display: grid;
@@ -249,8 +211,6 @@
   }
 }
 
-// ---- Confirmation -----------------------------------------------------------
-
 .confirm {
   display: grid;
   justify-items: start;
@@ -273,8 +233,6 @@
   font-size: var(--tt-text-xl);
   line-height: var(--tt-leading-snug);
 
-  // It receives focus programmatically, so it needs a ring like anything else
-  // that can be focused — but only when the visitor is driving from a keyboard.
   &:focus-visible {
     @include tt.focus-ring;
   }

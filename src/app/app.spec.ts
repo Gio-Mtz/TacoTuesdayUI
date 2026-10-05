@@ -10,8 +10,7 @@ describe('App', () => {
 
     await TestBed.configureTestingModule({
       imports: [App],
-      // App renders a <router-outlet>, so the router has to exist in the
-      // testing module or the component cannot be created.
+
       providers: [provideRouter(routes)],
     }).compileComponents();
   });
@@ -48,7 +47,7 @@ describe('App', () => {
     const main = (fixture.nativeElement as HTMLElement).querySelector('main')!;
 
     expect(main.id).toBe('contenido');
-    // -1 keeps it out of the tab order but lets the skip link land focus on it.
+
     expect(main.getAttribute('tabindex')).toBe('-1');
     expect(main.querySelector('router-outlet')).toBeTruthy();
   });
