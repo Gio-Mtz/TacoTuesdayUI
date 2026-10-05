@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { PageLangData } from './core/i18n/page-lang';
+import { PageSocialData } from './core/seo/page-social';
 
 /**
  * `data.lang` is not decoration: `PageHeadStrategy` reads it to set
@@ -10,12 +11,19 @@ import { PageLangData } from './core/i18n/page-lang';
  *
  * `title` and `lang` have to agree. A route whose title is in English and whose
  * `lang` says `es-MX` is not half-right, it is wrong twice.
+ *
+ * US-007 added `data.card`, the key of this route's social card in
+ * `core/seo/social-cards.json`. It is the third thing that has to agree with
+ * the other two, and `app.routes.spec.ts` asserts that it does — including that
+ * the `title` here is byte-for-byte the card's `documentTitle`, because the
+ * static HTML a crawler receives is built from the manifest and the title a
+ * browser shows is built from this file.
  */
 export const routes: Routes = [
   {
     path: '',
     title: 'Taco Tuesday — Interviews with a date, feedback in writing, and nobody left on read',
-    data: { lang: 'en' } satisfies PageLangData,
+    data: { lang: 'en', card: 'home' } satisfies PageLangData & PageSocialData,
     loadComponent: () => import('./landing/landing').then((m) => m.Landing),
   },
   {
@@ -25,7 +33,7 @@ export const routes: Routes = [
     // component's docblock and ADR 0007.
     path: 'talento',
     title: 'Para devs — Taco Tuesday',
-    data: { lang: 'es-MX' } satisfies PageLangData,
+    data: { lang: 'es-MX', card: 'talento' } satisfies PageLangData & PageSocialData,
     loadComponent: () => import('./pages/talent/talent').then((m) => m.Talent),
   },
   {
@@ -35,7 +43,7 @@ export const routes: Routes = [
     // carries `hreflang="es-MX"` so the change of language is announced.
     path: 'privacidad',
     title: 'Aviso de privacidad — Taco Tuesday',
-    data: { lang: 'es-MX' } satisfies PageLangData,
+    data: { lang: 'es-MX', card: 'privacidad' } satisfies PageLangData & PageSocialData,
     loadComponent: () => import('./pages/privacy/privacy').then((m) => m.Privacy),
   },
   {
@@ -44,7 +52,7 @@ export const routes: Routes = [
     // the landing instead. Its own copy has always been English.
     path: 'health',
     title: 'API status — Taco Tuesday',
-    data: { lang: 'en' } satisfies PageLangData,
+    data: { lang: 'en', card: 'health' } satisfies PageLangData & PageSocialData,
     loadComponent: () => import('./api/Health/health.component').then((m) => m.HealthComponent),
   },
   { path: '**', redirectTo: '' },

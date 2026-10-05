@@ -33,4 +33,13 @@ export const environment = {
    * never enters the picture while developing.
    */
   apiBaseUrl: '',
+
+  /**
+   * Origin used to build absolute `og:url` / `canonical` values while
+   * developing. It is the dev server's own origin, which keeps the tags
+   * inspectable in devtools without pointing a local page at production — a
+   * `canonical` that says "the real page is over there" is exactly what you do
+   * NOT want while you are looking at a draft.
+   */
+  siteBaseUrl: 'http://localhost:4200',
 } as const;
