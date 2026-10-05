@@ -38,14 +38,11 @@ describe('SiteHeader', () => {
 
   it('links to every section of the landing, from any route', () => {
     const hrefs = Array.from(el().querySelectorAll('nav a')).map((a) => a.getAttribute('href'));
-    // Full paths, not bare hashes: the same link has to work from /privacidad.
+
     expect(hrefs).toEqual(['/#companies', '/#engineers', '/#how-it-works']);
   });
 
   it('says nothing about language while the link and the page agree', () => {
-    // `hreflang` is only set when the target's language DIFFERS. An English nav
-    // on an English page that announced "en" on every link would be three extra
-    // things for a screen reader to read and nothing learned.
     const flags = Array.from(el().querySelectorAll('nav a')).map((a) =>
       a.getAttribute('hreflang'),
     );
@@ -60,10 +57,6 @@ describe('SiteHeader', () => {
     expect(el().querySelector('.site-header__brand')!.getAttribute('href')).toBe('/');
   });
   it('speaks the language of the page it is framing', async () => {
-    // The shell is shared by `/` (English) and `/privacidad` (Spanish, because
-    // it is a Mexican aviso de privacidad). Before US-009 this could not be
-    // wrong, because there was one language; now an English header around
-    // Spanish legal text is one forgotten signal read away.
     TestBed.inject(PageLangService).set('es-MX');
     await fixture.whenStable();
 
@@ -73,13 +66,6 @@ describe('SiteHeader', () => {
   });
 
   it('sends the Spanish shell to the Spanish page — US-010 reversed this', async () => {
-    // ⚠️ This test used to assert the OPPOSITE: "keeps the same destinations when
-    // the language changes", on the reasoning that fragments are ids of sections
-    // on the English landing. That was correct while `/` was the only page with
-    // sections, and it was also the wrinkle `shell-copy.ts` wrote down: a visitor
-    // on `/privacidad` read `Candidatos` and landed in English. `/talento` is the
-    // Spanish destination that lets the labels and the hrefs agree, so the rule
-    // is now "every destination is in the shell's own language".
     TestBed.inject(PageLangService).set('es-MX');
     await fixture.whenStable();
 

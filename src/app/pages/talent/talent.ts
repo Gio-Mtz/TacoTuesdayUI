@@ -4,57 +4,18 @@ import { RouterLink } from '@angular/router';
 import { Waitlist } from '../../landing/sections/waitlist/waitlist';
 import { Icon } from '../../shared/icon/icon';
 
-/** One promise to the engineer, in the terms they already complain in. */
 export interface TalentValuePoint {
   readonly icon: string;
   readonly title: string;
   readonly body: string;
 }
 
-/** A numbered step. The number is rendered from the position, never typed. */
 export interface TalentStep {
   readonly icon: string;
   readonly title: string;
   readonly body: string;
 }
 
-/**
- * `/talento` — the page the engineer is actually sent to.
- *
- * **Why a page and not a section of `/`.** This is the link that goes into
- * WhatsApp groups, community Slacks and LinkedIn posts, and that channel — not
- * the home page — is how devs arrive. A section of `/` would mean either giving
- * the first screen to the audience that does not pay, or sending a dev to a page
- * written for a hiring manager and asking them to scroll past it. A whole page
- * costs one route and lets both audiences be addressed properly.
- *
- * **Why Spanish, when `/` is English.** US-009 put `/` in English because the
- * company that pays reads English. This audience does not: a Mexican dev reads
- * Spanish, and the stakeholder's own line — the one `brand.md` calls "the brand"
- * — only works in Spanish. It is rendered here **verbatim**, in the `<h1>`:
- *
- *   «¿Odias que los reclutas te ghosteen? Deja que ellos te busquen»
- *
- * On `/` the same sentence is translated to "Tired of recruiters ghosting you?
- * Let them come to you", which is a downgrade we accepted there and do not accept
- * here. `ghosteen` is a word a Mexican dev has said out loud; `ghosting you` is
- * merely correct.
- *
- * **These two pages are not translations of each other.** `/` argues to a buyer,
- * this argues to a candidate, and the day one of them changes the other does not
- * have to. The only shared text on the page is the FORM — three fields and one
- * POST, which cannot mean something different per audience — and that is why
- * `waitlist-copy.ts` exists and the form component is reused rather than copied.
- *
- * **The step numbers are visible text here, not a ghosted decoration.** On `/`
- * they are a large `--tt-border-strong` number marked `aria-hidden` with the
- * count repeated for screen readers, and TD-008 measured that at 1.88:1 — below
- * the 3:1 that size of bold text needs. Rather than reproduce a known contrast
- * defect on a new page while the fix waits on a design decision, the number is
- * part of the heading and inherits the title colour, which US-009 measured at
- * 4.58:1 or better. One element instead of two, and nothing to hide from
- * assistive tech.
- */
 @Component({
   selector: 'ttco-talent',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,20 +1,4 @@
-/* =============================================================================
-   Taco Tuesday Consulting — theme.css
-   Concept: "Agave & Maiz". Import this ONCE, globally.
-
-   How it works: every colour in the product reads a semantic variable
-   (--tt-brand, --tt-text-primary), never a palette value (--tt-agave-600).
-   Switching light/dark then means redefining ~20 variables in one place
-   instead of hunting hex codes across the app.
-
-   Theme resolution, in order:
-     1. [data-theme="dark"] / [data-theme="light"]  -> explicit user choice
-     2. prefers-color-scheme                        -> the OS setting
-     3. :root                                       -> light, the default
-   ========================================================================== */
-
 :root {
-  /* ---- Palette (raw). Do not use these directly in components. ---------- */
   --tt-agave-50:#ECF7F4; --tt-agave-100:#D0EDE6; --tt-agave-200:#A3DACE;
   --tt-agave-300:#6FC2B2; --tt-agave-400:#41A695; --tt-agave-500:#22897A;
   --tt-agave-600:#176E63; --tt-agave-700:#12574F; --tt-agave-800:#0F453F;
@@ -31,7 +15,6 @@
   --tt-barro-700:#4B443C;--tt-barro-800:#332E29;--tt-barro-900:#211E1A;
   --tt-barro-950:#14120F;
 
-  /* ---- Typography ------------------------------------------------------- */
   --tt-font-display:'Outfit','Segoe UI',system-ui,sans-serif;
   --tt-font-body:'Inter','Segoe UI',system-ui,sans-serif;
   --tt-font-mono:'JetBrains Mono','Cascadia Code',ui-monospace,monospace;
@@ -44,7 +27,6 @@
   --tt-leading-normal:1.55; --tt-leading-relaxed:1.7;
   --tt-tracking-tight:-.02em; --tt-tracking-wide:.04em;
 
-  /* ---- Space, radius, motion -------------------------------------------- */
   --tt-space-1:.25rem; --tt-space-2:.5rem;  --tt-space-3:.75rem;
   --tt-space-4:1rem;   --tt-space-5:1.5rem; --tt-space-6:2rem;
   --tt-space-7:3rem;   --tt-space-8:4rem;   --tt-space-9:6rem;
@@ -55,7 +37,6 @@
   --tt-motion-fast:120ms; --tt-motion-base:200ms; --tt-motion-slow:320ms;
   --tt-ease:cubic-bezier(.2,0,.15,1);
 
-  /* ---- SEMANTIC: light theme (the default) ------------------------------ */
   --tt-bg-canvas:var(--tt-barro-25);
   --tt-bg-surface:var(--tt-barro-0);
   --tt-bg-subtle:var(--tt-barro-50);
@@ -97,13 +78,6 @@
   color-scheme: light;
 }
 
-/* ---- SEMANTIC: dark theme --------------------------------------------------
-   Only the semantic layer is redefined. The palette above never changes —
-   dark mode is not "different colours", it is the same colours used in a
-   different role. That is why the brand goes from agave-600 to agave-300:
-   on a near-black canvas the dark teal would fail contrast, the light one
-   reaches ~9:1.
-   -------------------------------------------------------------------------- */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --tt-bg-canvas:var(--tt-barro-950);
@@ -190,7 +164,6 @@
   color-scheme: dark;
 }
 
-/* ---- Base ---------------------------------------------------------------- */
 html { color-scheme: light dark; }
 
 body {
@@ -212,7 +185,6 @@ h1,h2,h3,h4 {
 
 code, pre, kbd { font-family: var(--tt-font-mono); }
 
-/* One focus ring for the whole product. Never remove it without replacing it. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--tt-focus);
   outline-offset: 2px;

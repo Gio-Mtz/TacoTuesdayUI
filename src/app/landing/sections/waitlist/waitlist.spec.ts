@@ -8,21 +8,10 @@ import { PageLangService } from '../../../core/i18n/page-lang';
 import { WAITLIST_COPY } from './waitlist-copy';
 import { Waitlist, describeFailure } from './waitlist';
 
-/**
- * These tests drive the component through the DOM — typing in inputs, clicking
- * radios, submitting the form — rather than by poking at the `FormGroup`.
- *
- * That is deliberate and it is not purism: the two things most likely to break
- * this section are the template bindings and the zoneless change detection, and
- * a test that calls `form.setValue()` exercises neither. Every assertion below
- * would still hold if the class were rewritten, and would fail if the label
- * stopped being tied to its input.
- */
 describe('Waitlist', () => {
   let fixture: ComponentFixture<Waitlist>;
   let http: HttpTestingController;
 
-  /** The endpoint US-004 will implement. */
   const LEADS_URL = '/api/leads';
 
   const OK: ILeadResponse = { id: 'lead-1', alreadyRegistered: false };
@@ -32,10 +21,9 @@ describe('Waitlist', () => {
       imports: [Waitlist],
       providers: [
         provideHttpClient(),
-        // Swaps the real backend for one this test drives. Without it the
-        // component fires an actual request and dies with "0 Unknown Error".
+
         provideHttpClientTesting(),
-        // The legal line under the button carries a routerLink.
+
         provideRouter([]),
       ],
     }).compileComponents();
@@ -46,12 +34,8 @@ describe('Waitlist', () => {
   });
 
   afterEach(() => {
-    // Fails the test if the component fired a request nobody asserted on —
-    // which is exactly how a regression in the honeypot would show up.
     http.verify();
   });
-
-  // ---- helpers --------------------------------------------------------------
 
   const el = <T extends HTMLElement>(selector: string): T | null =>
     (fixture.nativeElement as HTMLElement).querySelector<T>(selector);
@@ -84,14 +68,11 @@ describe('Waitlist', () => {
     await fixture.whenStable();
   }
 
-  /** Fills the company variant with values that pass every validator. */
   async function fillValidCompany(): Promise<void> {
     await type('waitlist-name', 'Gio Martínez');
     await type('waitlist-email', 'gio@empresa.mx');
     await type('waitlist-company', 'Taco Tuesday');
   }
-
-  // ---- render ---------------------------------------------------------------
 
   it('renders the form with no errors before anything is submitted', () => {
     expect(el('form')).toBeTruthy();
@@ -119,12 +100,8 @@ describe('Waitlist', () => {
   });
 
   it('never disables the submit button for an invalid form', () => {
-    // A greyed-out button that will not say why is the failure mode this form
-    // was designed around. If this test starts failing, read ADR 0003 first.
     expect(el<HTMLButtonElement>('.form__submit')?.disabled).toBe(false);
   });
-
-  // ---- validation -----------------------------------------------------------
 
   it('shows required errors on submit and sends nothing', async () => {
     await submit();
@@ -160,8 +137,6 @@ describe('Waitlist', () => {
   });
 
   it('clears the error as soon as the field is fixed', async () => {
-    // The whole point of the `formValue` signal: zoneless + OnPush means
-    // nothing repaints these messages unless something signals.
     await submit();
     expect(text()).toContain('Write your name.');
 
@@ -169,15 +144,7 @@ describe('Waitlist', () => {
     expect(text()).not.toContain('Write your name.');
   });
 
-  // ---- variants -------------------------------------------------------------
-
   it('keeps both radios in one named group', async () => {
-    // Regression guard. Angular's radio value accessor left `name` EMPTY here,
-    // and an empty name means the browser never forms a radio group: each input
-    // became its own tab stop and arrow-key selection updated the DOM without
-    // reaching the form control, so the field below never swapped. Caught by
-    // rendering the page in Chromium, not by any assertion that existed before
-    // this one. If `name` ever disappears from the template again, this fails.
     const radios = Array.from(
       (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLInputElement>(
         'input[type="radio"]',
@@ -221,8 +188,6 @@ describe('Waitlist', () => {
     expect(body.company).toBeNull();
     http.expectNone(LEADS_URL);
   });
-
-  // ---- payload --------------------------------------------------------------
 
   it('posts the company payload to /api/leads', async () => {
     await fillValidCompany();
@@ -279,8 +244,6 @@ describe('Waitlist', () => {
     request.flush(OK);
   });
 
-  // ---- honeypot -------------------------------------------------------------
-
   it('keeps the honeypot out of sight and out of the tab order', () => {
     const trap = el<HTMLInputElement>('#waitlist-website');
     expect(trap).toBeTruthy();
@@ -293,13 +256,10 @@ describe('Waitlist', () => {
     await type('waitlist-website', 'https://spam.example');
     await submit();
 
-    // No request at all — `http.verify()` in afterEach is the real assertion.
     http.expectNone(LEADS_URL);
-    // And the bot is told it worked, so it has no signal to adapt to.
+
     expect(text()).toContain('Done, you are on the list');
   });
-
-  // ---- sending --------------------------------------------------------------
 
   it('disables the button and announces while the request is in flight', async () => {
     await fillValidCompany();
@@ -318,11 +278,8 @@ describe('Waitlist', () => {
     await submit();
     await submit();
 
-    // expectOne throws if there is more than one match, which is the assertion.
     http.expectOne(LEADS_URL).flush(OK);
   });
-
-  // ---- success --------------------------------------------------------------
 
   it('replaces the form with a confirmation and focuses it', async () => {
     await fillValidCompany();
@@ -357,11 +314,9 @@ describe('Waitlist', () => {
 
     expect(el('form')).toBeTruthy();
     expect(el<HTMLInputElement>('#waitlist-name')?.value).toBe('');
-    // A fresh form has not been submitted, so it shows no errors yet.
+
     expect(el('.field__error')).toBeNull();
   });
-
-  // ---- failure --------------------------------------------------------------
 
   it('keeps the form and raises an alert when the API fails', async () => {
     await fillValidCompany();
@@ -375,7 +330,7 @@ describe('Waitlist', () => {
     expect(el('form')).toBeTruthy();
     expect(el('[role="alert"]')).toBeTruthy();
     expect(text()).toContain('Something broke on our side');
-    // What they typed is still there — retrying must not mean retyping.
+
     expect(el<HTMLInputElement>('#waitlist-name')?.value).toBe('Gio Martínez');
   });
 
@@ -398,12 +353,6 @@ describe('describeFailure', () => {
   const asHttp = (status: number): HttpErrorResponse =>
     new HttpErrorResponse({ status, statusText: 'x', url: '/api/leads' });
 
-  /**
-   * The wording is an argument since US-010, so these assert the MAPPING — which
-   * of the four outcomes a status code is — and read the sentence out of the copy
-   * record instead of repeating it. A literal here would pass just as happily if
-   * the function started returning the rate-limit sentence for a 500.
-   */
   const en = WAITLIST_COPY.en.failures;
   const es = WAITLIST_COPY['es-MX'].failures;
 
@@ -429,21 +378,11 @@ describe('describeFailure', () => {
   });
 
   it('answers in whichever language it was handed', () => {
-    // The point of the parameter. Before US-010 a Spanish page would have shown
-    // an English failure message and nothing would have failed.
     expect(describeFailure(asHttp(429), es)).toBe(es.rateLimited);
     expect(describeFailure(asHttp(0), es)).toBe(es.offline);
   });
 });
 
-/**
- * The two things US-010 added to this component: it speaks the language of the
- * page it is on, and a page can pin which side of the marketplace it is for.
- *
- * Driven through the DOM like the rest of the file, and for the same reason — the
- * failure modes are a binding that was missed and a validator that did not swap,
- * neither of which a test of the class would see.
- */
 describe('Waitlist on a Spanish page, pinned to the engineer', () => {
   let fixture: ComponentFixture<Waitlist>;
   let http: HttpTestingController;
@@ -458,9 +397,6 @@ describe('Waitlist on a Spanish page, pinned to the engineer', () => {
 
     http = TestBed.inject(HttpTestingController);
 
-    // What the router does on `/talento`: `PageHeadStrategy` reads `data.lang`
-    // and writes it here. Setting it before the first render is the realistic
-    // order — the strategy runs before the component is shown.
     TestBed.inject(PageLangService).set('es-MX');
 
     fixture = TestBed.createComponent(Waitlist);
@@ -483,14 +419,10 @@ describe('Waitlist on a Spanish page, pinned to the engineer', () => {
   });
 
   it('takes the id the page gave it, so the anchor is in Spanish too', () => {
-    // `/talento#lista-de-espera`, not `/talento#waitlist`. The fragment is in the
-    // address bar and in whatever gets pasted into WhatsApp.
     expect(host().querySelector('section')?.id).toBe('lista-de-espera');
   });
 
   it('drops the chooser entirely rather than hiding it', () => {
-    // Removed from the DOM, not `hidden`: a hidden fieldset is still a radiogroup
-    // that assistive tech can be told about, and this page has no question.
     expect(host().querySelector('fieldset')).toBeNull();
     expect(host().querySelectorAll('input[type="radio"]').length).toBe(0);
   });
@@ -502,10 +434,6 @@ describe('Waitlist on a Spanish page, pinned to the engineer', () => {
   });
 
   it('posts kind=candidate with no company, and submits with role left empty', async () => {
-    // The regression this guards: pinning the kind by setting the control is only
-    // correct if the change EMITS, because the emit is what clears `company`'s
-    // required validator. Without it the form is invalid forever and the button
-    // does nothing — on a page with no way to see or fix the offending field.
     const fill = async (id: string, value: string): Promise<void> => {
       const input = host().querySelector<HTMLInputElement>(`#${id}`)!;
       input.value = value;
@@ -558,7 +486,7 @@ describe('Waitlist on a Spanish page, pinned to the engineer', () => {
 
     expect(text()).toContain(es.errors.nameRequired);
     expect(text()).toContain(es.errors.emailRequired);
-    // Pinned to the engineer, so the company field is not there to complain.
+
     expect(text()).not.toContain(es.errors.companyRequired);
   });
 });

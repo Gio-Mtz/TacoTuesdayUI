@@ -8,15 +8,6 @@ import { PageLangService } from '../../core/i18n/page-lang';
 import { WAITLIST_COPY } from '../../landing/sections/waitlist/waitlist-copy';
 import { Talent } from './talent';
 
-/**
- * `/talento` — the Spanish page for the engineer.
- *
- * The assertions worth having here are not "the text is on the page": they are
- * the three things that would silently stop being true. The brand line is the
- * stakeholder's own sentence and must survive verbatim. The anchors the header
- * links to have to exist, or three nav links scroll to nothing. And the shared
- * form has to arrive pinned and in Spanish, which is wiring, not copy.
- */
 describe('Talent', () => {
   let fixture: ComponentFixture<Talent>;
   let http: HttpTestingController;
@@ -26,8 +17,7 @@ describe('Talent', () => {
       imports: [Talent],
       providers: [
         provideHttpClient(),
-        // The page embeds the waitlist form, which has a real HttpClient
-        // dependency. Without this the child fires a request at the backend.
+
         provideHttpClientTesting(),
         provideRouter(routes),
       ],
@@ -35,8 +25,6 @@ describe('Talent', () => {
 
     http = TestBed.inject(HttpTestingController);
 
-    // What `PageHeadStrategy` does when the router resolves this route. The page
-    // declares `lang: 'es-MX'`; `app.routes.spec.ts` guards that it still does.
     TestBed.inject(PageLangService).set('es-MX');
 
     fixture = TestBed.createComponent(Talent);
@@ -49,10 +37,6 @@ describe('Talent', () => {
   const text = (): string => host().textContent ?? '';
 
   it("carries the stakeholder's line verbatim, in the h1", () => {
-    // ⚠️ Not paraphrasable. `brand.md` calls this "the brand", and `/` already
-    // ships a translated version of it, which is the loss this page exists to
-    // undo. Whitespace is collapsed because the template wraps it over two lines
-    // with a <br> in the middle; the words are compared exactly.
     const heading = host().querySelector('h1')!;
     const line = heading.textContent!.replace(/\s+/g, ' ').trim();
 
@@ -64,11 +48,6 @@ describe('Talent', () => {
   });
 
   it('provides every anchor the Spanish header nav points at', () => {
-    // The three fragments in `SHELL_COPY['es-MX'].nav`. A rename on either side
-    // leaves a nav link that navigates and sits still — and nothing else in the
-    // build can see that.
-    // Collected and compared as a list rather than asserted in a loop, so a
-    // failure names the missing id instead of saying "expected null to be truthy".
     const wanted = ['para-devs', 'como-funciona', 'lista-de-espera'];
     const missing = wanted.filter((id) => !host().querySelector(`#${id}`));
 
@@ -84,10 +63,6 @@ describe('Talent', () => {
   });
 
   it('numbers the steps as real text, not as a hidden decoration', () => {
-    // Deliberately different from `/`, where the number is a large ghosted span
-    // marked aria-hidden with "Step N:" repeated for screen readers — TD-008
-    // measured that at 1.88:1. Here the number is inside the heading, so it
-    // inherits the title colour and there is nothing to hide.
     const steps = Array.from(host().querySelectorAll('#como-funciona .tt-card__title'));
 
     expect(steps.length).toBe(3);
@@ -109,15 +84,11 @@ describe('Talent', () => {
   });
 
   it('sends its own call to action to its own form', () => {
-    // Not `/#waitlist`: a Spanish page whose only button leaves for the English
-    // landing is the bug a cross-page fragment makes easy.
     const cta = host().querySelector('.talent-hero__actions a')!;
     expect(cta.getAttribute('href')).toBe('/talento#lista-de-espera');
   });
 
   it('says nothing in English anywhere a visitor can read it', () => {
-    // The page is one audience in one language. A leftover English string would
-    // most likely come from the shared form falling back to `en`.
     const english = [
       WAITLIST_COPY.en.title,
       WAITLIST_COPY.en.submit,

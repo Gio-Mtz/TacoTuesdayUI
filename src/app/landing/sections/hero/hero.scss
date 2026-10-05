@@ -1,9 +1,6 @@
 @use '../../../../styles/tokens' as tt;
 
 .hero {
-  // A wash of brand behind the first screen, fading into the canvas so the
-  // section below it does not start with a hard line. `--tt-brand-subtle` is
-  // defined in both themes, so this follows the theme with no extra rule.
   background:
     radial-gradient(ellipse 80% 60% at 50% -10%, var(--tt-brand-subtle), transparent 70%);
   padding-block: tt.space(8) tt.space(9);
@@ -31,8 +28,6 @@
   }
 }
 
-// The line break is a typographic nicety for wide screens. On a phone the
-// title already wraps on its own and an extra break leaves an orphan line.
 .hero__break {
   display: none;
 
@@ -50,8 +45,6 @@
   flex-wrap: wrap;
   gap: tt.space(3);
 
-  // At 360 px two pill buttons do not fit side by side; letting them stretch is
-  // better than a half-width button with a wrapped label.
   > * {
     flex: 1 1 14rem;
   }
@@ -67,9 +60,5 @@
   margin: tt.space(5) 0 0;
   font-size: var(--tt-text-sm);
 
-  // `--tt-text-muted` on `--tt-bg-canvas` measures 4.39:1 in the light theme —
-  // it misses AA for 14 px text by a hair. `--tt-text-secondary` is the next
-  // step up and clears it. Measured, not guessed; the numbers are in the work
-  // log for 29-sep.
   color: var(--tt-text-secondary);
 }

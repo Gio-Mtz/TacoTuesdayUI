@@ -1,11 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { THEME_STORAGE_KEY, ThemeService } from './theme.service';
 
-/**
- * jsdom does not implement matchMedia, so every test that cares about the OS
- * setting installs this. It also lets a test fire a 'change' event to simulate
- * the visitor flipping their system theme with the tab open.
- */
 function stubMatchMedia(prefersDark: boolean) {
   const listeners = new Set<(event: MediaQueryListEvent) => void>();
   const mql = {
@@ -60,8 +55,6 @@ describe('ThemeService', () => {
       stubMatchMedia(true);
       const service = create();
 
-      // This is the heart of the design: the page IS dark, because theme.css
-      // follows prefers-color-scheme. No attribute was needed to make it so.
       expect(service.resolved()).toBe('dark');
       expect(document.documentElement.hasAttribute('data-theme')).toBe(false);
     });
@@ -188,7 +181,7 @@ describe('ThemeService', () => {
 
       try {
         expect(() => service.setPreference('dark')).not.toThrow();
-        // The visit still gets the theme it asked for; only the memory is lost.
+
         expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
       } finally {
         Storage.prototype.setItem = setItem;

@@ -8,15 +8,6 @@ import {
   absoluteUrl,
 } from './page-social';
 
-/**
- * The tag this suite exists for is `<meta property="og:title">`.
- *
- * Open Graph is read off the `property` attribute; Twitter's tags off `name`.
- * Writing `name="og:title"` produces something that looks right in devtools,
- * validates as HTML, and is ignored by every Open Graph consumer there is — and
- * a test that greps the document for the string `og:title` passes on the broken
- * version. So every assertion below names the ATTRIBUTE, not the string.
- */
 describe('PageSocialMetaService', () => {
   let service: PageSocialMetaService;
 
@@ -88,8 +79,6 @@ describe('PageSocialMetaService', () => {
   });
 
   it('announces no translation for a page that has none', () => {
-    // `/privacidad` is a Mexican aviso de privacidad with no English twin.
-    // An `hreflang` pointing at a page that does not exist is worse than silence.
     service.apply(SOCIAL_CARDS.privacidad);
 
     expect(document.head.querySelectorAll('link[rel="alternate"][hreflang]').length).toBe(0);
@@ -136,9 +125,6 @@ describe('the social card manifest', () => {
   });
 
   it('keeps og:title inside what a preview will actually show', () => {
-    // Facebook and LinkedIn cut the title near 70 characters and the
-    // description near 200. Past that the card ends in an ellipsis mid-word,
-    // which is the one failure nobody notices until it is already shared.
     for (const card of cards) {
       expect(card.title.length).toBeLessThanOrEqual(70);
       expect(card.description.length).toBeLessThanOrEqual(200);
@@ -157,7 +143,6 @@ describe('the social card manifest', () => {
   });
 
   it('uses the underscore locale form, which is not the lang form', () => {
-    // `og:locale` is `es_MX`; `<html lang>` is `es-MX`. Swapping them is silent.
     for (const card of cards) {
       expect(card.locale).toMatch(/^[a-z]{2}_[A-Z]{2}$/);
       expect(card.locale.replace('_', '-')).toBe(

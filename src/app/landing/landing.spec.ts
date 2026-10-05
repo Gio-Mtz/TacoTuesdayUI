@@ -31,8 +31,6 @@ describe('Landing', () => {
   });
 
   it('puts the only thing that asks for something last', () => {
-    // US-003 added the form deliberately at the end, after every reason to say
-    // yes. If this ever moves up, the change was not an accident of ordering.
     const sections = Array.from(el().querySelectorAll('section'));
     expect(sections[sections.length - 1].id).toBe('waitlist');
   });

@@ -1,6 +1,3 @@
-// The shell is the only place that owns the page frame. `100dvh` rather than
-// `100vh` so the mobile address bar collapsing does not leave a gap under the
-// footer on a short page.
 :host {
   display: flex;
   flex-direction: column;
@@ -10,8 +7,6 @@
 .app__main {
   flex: 1 0 auto;
 
-  // It is focusable only so the skip link can land on it. Without this, the
-  // browser paints a focus ring around the whole page when it does.
   &:focus {
     outline: none;
   }

@@ -9,13 +9,6 @@ import { DEFAULT_PAGE_LANG, PageLangService } from './page-lang';
 @Component({ template: 'x' })
 class Dummy {}
 
-/**
- * These tests are the only thing standing between a route and a wrong `<html
- * lang>`, and a wrong `lang` is invisible: the page looks perfect and a screen
- * reader reads Spanish with English phonemes. Nothing else in the build catches
- * it — which is why the router is driven for real here instead of calling
- * `updateTitle` by hand.
- */
 describe('PageHeadStrategy', () => {
   const original = document.documentElement.lang;
 
@@ -85,11 +78,6 @@ describe('PageHeadStrategy', () => {
     expect(document.documentElement.lang).toBe('es-MX');
   });
 
-  /**
-   * US-007. The social card rides the same hook as `lang` for the same reason,
-   * so these assertions are about the WIRING — that navigating really writes
-   * them — and not about the tags themselves, which `page-social.spec.ts` owns.
-   */
   describe('the social card', () => {
     it('is written on navigation', async () => {
       await navigate('/aviso');
@@ -112,8 +100,6 @@ describe('PageHeadStrategy', () => {
       await navigate('/');
       await navigate('/sin-lang');
 
-      // Still the previous page's card rather than an empty one: a half-written
-      // card is a worse preview than a stale but consistent one.
       expect(
         document.head.querySelector('meta[property="og:url"]')?.getAttribute('content'),
       ).toBe(absoluteUrl('/'));
@@ -145,11 +131,6 @@ describe('resolveCard', () => {
 });
 
 describe('resolveLang', () => {
-  /**
-   * A hand-built snapshot chain. `resolveLang` only reads `data` and
-   * `firstChild`, so this is the whole contract — and testing it directly is
-   * what makes the router tests above about wiring rather than about the walk.
-   */
   function chain(...langs: readonly (string | undefined)[]) {
     const nodes = langs.map((lang) => ({
       data: lang ? { lang } : {},
@@ -164,8 +145,6 @@ describe('resolveLang', () => {
   });
 
   it('keeps a parent language when the child does not declare one', () => {
-    // A layout route that only groups children should not have to repeat the
-    // language of every child.
     expect(resolveLang(chain('es-MX', undefined))).toBe('es-MX');
   });
 

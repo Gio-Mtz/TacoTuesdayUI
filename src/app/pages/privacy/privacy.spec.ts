@@ -17,7 +17,6 @@ describe('Privacy', () => {
   }
 
   it('names the same mailbox the footer offers, as the channel to be deleted', () => {
-    // If these two ever drift, the notice promises a channel that nobody reads.
     const links = Array.from(el().querySelectorAll('a[href^="mailto:"]'));
     expect(links.length).toBeGreaterThan(0);
     links.forEach((link) => {

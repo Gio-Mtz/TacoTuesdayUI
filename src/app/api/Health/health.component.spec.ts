@@ -16,9 +16,7 @@ describe('HealthComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HealthComponent],
-      // Without these two the component issues a REAL http call during the
-      // test and fails with "Http failure response ... 0 Unknown Error".
-      // provideHttpClientTesting swaps the backend for one we control.
+
       providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
@@ -28,7 +26,6 @@ describe('HealthComponent', () => {
   });
 
   afterEach(() => {
-    // Fails the test if the component fired a request nobody asserted on.
     httpMock.verify();
   });
 

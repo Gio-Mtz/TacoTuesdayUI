@@ -9,22 +9,6 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 
 import { apiBaseUrlInterceptor } from './api-base-url.interceptor';
 
-/**
- * The interceptor reads `environment.apiBaseUrl`, and the environment file the
- * test builder imports is the local one — where that value is empty. So these
- * tests do two different jobs with two different subjects:
- *
- * - The real `apiBaseUrlInterceptor` is exercised as it will run in `ng serve`
- *   and in CI: base URL empty, URL must come out untouched. That is the case
- *   that keeps every other spec in the repo passing.
- * - A twin built by `withBaseUrl` exercises the production case. It is the same
- *   function with the environment lookup as a parameter, which is the only way
- *   to test the rewrite without a file replacement the test builder cannot do.
- *
- * The twin is a real risk and it is worth naming: it can drift from the
- * original. It is kept to four lines directly below, next to the import, so the
- * drift is visible in a diff instead of buried in another file.
- */
 const withBaseUrl =
   (baseUrl: string): HttpInterceptorFn =>
   (req, next) => {
@@ -82,9 +66,7 @@ describe('apiBaseUrlInterceptor', () => {
       const { http, mock } = setup(withBaseUrl(PROD_ORIGIN));
 
       http.get('/api').subscribe();
-      // A path that merely begins with the same letters must NOT be sent to the
-      // API. Without the `/api/` check this would become
-      // `https://…/apidocs` and a request for a local page would leave the site.
+
       http.get('/apidocs').subscribe();
 
       mock.expectOne(`${PROD_ORIGIN}/api`).flush({});

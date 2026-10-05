@@ -1,46 +1,4 @@
 #!/usr/bin/env node
-/**
- * Bakes each route's social card into static HTML, after `ng build`.
- *
- * ## Why this script exists at all
- *
- * Every crawler that draws a link preview — WhatsApp, LinkedIn, Slack,
- * Facebook, Twitter — fetches the URL and reads the HTML **without running
- * JavaScript**. This app is a single-page Angular bundle served by Azure Static
- * Web Apps, whose `navigationFallback` hands the SAME `index.html` to every
- * path. So before this script, two things were true at once:
- *
- *   - `PageSocialMetaService` wrote perfect Open Graph tags on navigation, and
- *   - every crawler saw the English landing's tags no matter which URL it asked
- *     for, because Angular had not booted when it read the file.
- *
- * Pasting `/talento` into WhatsApp would have previewed an English headline for
- * a Spanish page. The runtime half is not wrong, it is just invisible to the
- * only audience the feature has.
- *
- * This script writes one real HTML file per shareable route, each with its own
- * card, its own `<title>` and — the bonus that falls out for free — its own
- * `lang`. That last one closes the trade US-009 wrote down and US-010 inherited:
- * `src/index.html` ships `lang="en"`, so a JS-less crawler read `/privacidad`
- * and `/talento` as English. Now it does not.
- *
- * `public/staticwebapp.config.json` has the `routes` entries that make Static
- * Web Apps serve these files instead of falling through to `index.html`.
- * **Without those rewrites this script is decorative** — the two halves ship
- * together or not at all.
- *
- * ## Contract
- *
- *   node tools/emit-route-cards.mjs [--dist <dir>]
- *
- * Exit 0 — wrote and verified every file.
- * Exit 1 — wrote something that did not come back correct when re-read.
- * Exit 2 — could not even start: no build output, missing marker, bad manifest.
- *
- * Zero dependencies, plain Node, no `npm install`. Same rule as
- * `TacoTuesdayDesign/tools/sync-icons.mjs`, and for the same reason: a build
- * step that needs a package is a build step that breaks on a clean runner.
- */
 
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -56,7 +14,6 @@ function die(code, message) {
   process.exit(code);
 }
 
-/** Attribute-safe. `&` first, or it double-escapes the entities it just wrote. */
 function attr(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -65,14 +22,6 @@ function attr(value) {
     .replace(/"/g, '&quot;');
 }
 
-/**
- * Finds the one `dist/<project>/browser` with an `index.html` in it.
- *
- * Auto-detected rather than configured because the project name lives in
- * `angular.json` and the deploy workflow quotes it a third time; hard-coding a
- * fourth copy here is how this script silently starts writing into a directory
- * nobody deploys. Zero matches or more than one is a hard stop, never a guess.
- */
 function findDist(explicit) {
   if (explicit) {
     return existsSync(join(explicit, 'index.html'))
@@ -152,11 +101,6 @@ function render(template, card, manifest) {
   let out =
     template.slice(0, start + START.length) + '\n' + html + '\n  ' + template.slice(end);
 
-  // Only the attribute, never up to the `>`: the production build's critical
-  // CSS step adds `data-beasties-container` to this very tag, so a regex that
-  // assumed `lang` was the last attribute matched nothing and shipped every
-  // static file with `lang="en"`. Found by the verify pass below, which is the
-  // reason it exists.
   const langAttr = /(<html\b[^>]*?)\blang="[^"]*"/;
   if (!langAttr.test(out)) {
     die(2, 'index.html has no <html lang="..."> to rewrite');
@@ -166,11 +110,6 @@ function render(template, card, manifest) {
   return { out, url };
 }
 
-/**
- * Re-reads what was written and checks the four values that make the file
- * different from every other one. Writing and then trusting the write is how a
- * regex that matched nothing ships a directory of identical files.
- */
 function verify(path, card, url, manifest) {
   const html = readFileSync(path, 'utf8');
   const expectations = [
@@ -249,8 +188,6 @@ function main() {
   const template = readFileSync(rootPath, 'utf8');
   const written = [];
 
-  // The root card first, and from the pristine template, so `index.html` in the
-  // build output is regenerated too and cannot drift from the manifest.
   const home = Object.values(manifest.cards).find((card) => card.route === '/');
   if (!home) {
     die(2, 'no card has route "/" — index.html would keep whatever is checked in');

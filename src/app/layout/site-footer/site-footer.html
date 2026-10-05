@@ -4,23 +4,10 @@
       <p class="site-footer__name">{{ site.legalName }}</p>
       <p class="site-footer__tagline">{{ copy().footerTagline }}</p>
     </div>
-
     <nav class="site-footer__block" [attr.aria-label]="copy().footerNavLabel">
       <h2 class="site-footer__heading">{{ copy().footerContact }}</h2>
       <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a>
-      <!--
-        `hreflang` is static because the TARGET is always Spanish: the notice is a
-        Mexican aviso de privacidad. On the English page it warns of a change of
-        language; on the Spanish one it is simply true.
-      -->
       <a routerLink="/privacidad" hreflang="es-MX">{{ copy().footerPrivacy }}</a>
-
-      <!--
-        The other audience's page, and the one link on the site that is meant to
-        change language. `hreflang` comes from the data rather than being written
-        here because which language is "the other one" depends on which page you
-        are standing on. US-010.
-      -->
       <a
         [routerLink]="copy().crossLanguage.path"
         [attr.hreflang]="copy().crossLanguage.hreflang ?? null"
@@ -28,7 +15,6 @@
       >
     </nav>
   </div>
-
   <div class="tt-container">
     <p class="site-footer__legal">© {{ year }} {{ site.legalName }}. {{ copy().footerMadeIn }}</p>
   </div>
