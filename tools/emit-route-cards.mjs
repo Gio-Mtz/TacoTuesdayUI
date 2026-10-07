@@ -45,6 +45,38 @@ function findDist(explicit) {
   return found[0];
 }
 
+// GUARD, not documentation: these preloads are what keeps CLS at 0.002 instead of
+// 0.299 on /privacidad. The @font-face rules use font-display: swap, so without the
+// preload the three woff2 files land after first paint and reflow the whole text
+// block. The hashes change every build, which is why this is emitted and not
+// checked into src/index.html. If PRELOAD_FONTS stops matching the emitted file
+// names, this dies instead of silently shipping the shift back.
+const PRELOAD_FONTS = /^[a-z-]+-latin-wght-normal-[A-Z0-9]+\.woff2$/;
+
+function preloadFonts(template, dist) {
+  const mediaDir = join(dist, 'media');
+  if (!existsSync(mediaDir)) {
+    die(2, 'no media/ in dist — the font pipeline moved, preloads cannot be emitted');
+  }
+
+  const files = readdirSync(mediaDir)
+    .filter((name) => PRELOAD_FONTS.test(name))
+    .sort();
+  if (files.length === 0) {
+    die(2, `no file in media/ matches ${PRELOAD_FONTS} — preloads would be silently dropped`);
+  }
+
+  const links = files
+    .map((name) => `  <link rel="preload" as="font" type="font/woff2" crossorigin href="media/${name}">`)
+    .join('\n');
+
+  if (!template.includes('</head>')) {
+    die(2, 'index.html has no </head> to insert the font preloads before');
+  }
+  const clean = template.replace(/[ \t]*<link rel="preload" as="font"[^>]*>\r?\n?/g, '');
+  return clean.replace('</head>', `${links}\n</head>`);
+}
+
 function cardTags(card, manifest) {
   const base = manifest.siteBaseUrl.replace(/\/$/, '');
   const url = card.route === '/' ? `${base}/` : `${base}${card.route}`;
@@ -113,6 +145,7 @@ function render(template, card, manifest) {
 function verify(path, card, url, manifest) {
   const html = readFileSync(path, 'utf8');
   const expectations = [
+    ['rel="preload" as="font"', 'font preload'],
     [`lang="${card.lang}"`, 'lang'],
     [`<title>${attr(card.documentTitle)}</title>`, 'title'],
     [`<meta property="og:title" content="${attr(card.title)}">`, 'og:title'],
@@ -185,7 +218,7 @@ function main() {
   }
 
   const rootPath = join(dist, 'index.html');
-  const template = readFileSync(rootPath, 'utf8');
+  const template = preloadFonts(readFileSync(rootPath, 'utf8'), dist);
   const written = [];
 
   const home = Object.values(manifest.cards).find((card) => card.route === '/');
