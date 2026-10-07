@@ -22,7 +22,13 @@
   font-weight: 700;
   line-height: 1;
 
-  color: var(--tt-border-strong);
+  // GUARD, not documentation: this number is 36px/700, which WCAG treats as large
+  // text and requires 3:1 against --tt-bg-surface. --tt-text-muted is the faintest
+  // token that clears it (4.58:1 light, 5.71:1 dark); the next rung down, barro-400,
+  // measures 2.91:1 in light and fails. Do NOT swap this for a --tt-border-* token:
+  // that is what TD-008 was (1.88:1 light, 1.73:1 dark). Verify with
+  // `npm run check:contrast`.
+  color: var(--tt-text-muted);
 }
 
 .steps__item {
