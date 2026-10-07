@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "postbuild": "node tools/emit-route-cards.mjs",
+    "check:contrast": "node tools/check-contrast.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
