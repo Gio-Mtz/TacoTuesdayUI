@@ -39,6 +39,20 @@ const CHECKS = [
     min: 4.5,
     why: 'normal text floor, applied to the strongest pair',
   },
+  {
+    where: 'cookie-banner accept button (.tt-btn--primary)',
+    fg: '--tt-on-brand',
+    bg: '--tt-brand',
+    min: 4.5,
+    why: '16px/600 -> normal text. The consent choice cannot be the unreadable one.',
+  },
+  {
+    where: 'cookie-banner reject button + privacy link (.tt-btn--secondary)',
+    fg: '--tt-brand-text',
+    bg: '--tt-bg-surface',
+    min: 4.5,
+    why: '16px/600 on the banner panel -> normal text. Reject must read as plainly as accept.',
+  },
 ];
 
 function declarationsIn(block) {

@@ -7,4 +7,6 @@ export const environment = {
     'https://tacotuesday-api.delightfultree-708c7167.southcentralus.azurecontainerapps.io',
 
   siteBaseUrl: SOCIAL.siteBaseUrl,
+
+  analyticsMeasurementId: '',
 } as const;

@@ -5,11 +5,12 @@ import { PageLangService } from './core/i18n/page-lang';
 import { SHELL_COPY } from './core/i18n/shell-copy';
 import { SiteFooter } from './layout/site-footer/site-footer';
 import { SiteHeader } from './layout/site-header/site-header';
+import { CookieBanner } from './shared/cookie-banner/cookie-banner';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, SiteHeader, SiteFooter],
+  imports: [RouterOutlet, SiteHeader, SiteFooter, CookieBanner],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

@@ -41,12 +41,31 @@
       oponerte a que lo usemos.
     </p>
 
-    <h2>Cookies</h2>
+    <h2>Cookies y analítica</h2>
     <p>
-      Esta página no usa cookies de rastreo ni de publicidad. Lo único que se guarda en tu
-      navegador es si elegiste el tema claro u oscuro, y eso no sale de tu equipo ni nos dice quién
-      eres.
+      Usamos <strong>Google Analytics 4</strong> para contar visitas y ver qué partes de la página
+      funcionan. <strong>Sólo si lo aceptas.</strong> Mientras no aceptes, el script de Google no se
+      descarga y no se guarda ninguna cookie suya — no es que se cargue y no mida: no se carga.
     </p>
+    <p>
+      Si aceptas, Google guarda cookies propias en tu navegador (<code>_ga</code> y
+      <code>_ga_*</code>) para distinguir visitas repetidas. Lo dejamos configurado con la IP
+      anonimizada, sin señales de Google y sin personalización de anuncios: no usamos nada de esto
+      para publicidad ni lo cruzamos con otros servicios. La base legal es tu consentimiento, y
+      quitarlo es tan fácil como darlo — el botón de aquí abajo.
+    </p>
+    <p>
+      Aparte de eso, y sin que haga falta tu permiso porque no te identifica ni sale de tu equipo,
+      se guarda si elegiste el tema claro u oscuro y cuál fue tu decisión sobre estas cookies.
+    </p>
+
+    <div class="privacy__consent">
+      <h3 class="privacy__consent-title">{{ copy.manageTitle }}</h3>
+      <p class="privacy__consent-state" aria-live="polite">{{ consentLabel() }}</p>
+      <button type="button" class="tt-btn tt-btn--secondary" (click)="changeChoice()">
+        {{ copy.manageChange }}
+      </button>
+    </div>
 
     <h2>Cambios</h2>
     <p>
