@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        run: npx ng test --watch=false --browsers=ChromeHeadless
+
+      - name: Build
+        run: npm run build
+
+      - name: The postbuild really emitted the social cards
+        run: |
+          set -e
+          for f in dist/taco-tuesday-ui/browser/talento/index.html \
+                   dist/taco-tuesday-ui/browser/privacidad/index.html \
+                   dist/taco-tuesday-ui/browser/sitemap.xml \
+                   dist/taco-tuesday-ui/browser/robots.txt; do
+            test -s "$f" || { echo "::error::missing $f - did postbuild run?"; exit 1; }
+          done
+          grep -q 'property="og:title"' dist/taco-tuesday-ui/browser/talento/index.html \
+            || { echo "::error::talento/index.html has no og:title"; exit 1; }
