@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npx ng test --watch=false --browsers=ChromeHeadless
+        run: npx ng test --watch=false
 
       - name: Build
         run: npm run build
