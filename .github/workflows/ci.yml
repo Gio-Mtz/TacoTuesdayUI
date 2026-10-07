@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Test
-        run: npx ng test --watch=false --browsers=ChromeHeadless
+        run: npx ng test --watch=false
 
       - name: Build
         run: npm run build
@@ -34,11 +34,11 @@ jobs:
       - name: The postbuild really emitted the social cards
         run: |
           set -e
-          for f in dist/taco-tuesday-ui/browser/talento/index.html \
-                   dist/taco-tuesday-ui/browser/privacidad/index.html \
-                   dist/taco-tuesday-ui/browser/sitemap.xml \
-                   dist/taco-tuesday-ui/browser/robots.txt; do
+          for f in dist/TacoTuesdayUI/browser/talento/index.html \
+                   dist/TacoTuesdayUI/browser/privacidad/index.html \
+                   dist/TacoTuesdayUI/browser/sitemap.xml \
+                   dist/TacoTuesdayUI/browser/robots.txt; do
             test -s "$f" || { echo "::error::missing $f - did postbuild run?"; exit 1; }
           done
-          grep -q 'property="og:title"' dist/taco-tuesday-ui/browser/talento/index.html \
+          grep -q 'property="og:title"' dist/TacoTuesdayUI/browser/talento/index.html \
             || { echo "::error::talento/index.html has no og:title"; exit 1; }
