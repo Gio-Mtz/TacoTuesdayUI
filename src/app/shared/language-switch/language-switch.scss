@@ -1,0 +1,19 @@
+// --tt-brand-text on --tt-bg-canvas (the header background) is a checked pair in
+// tools/check-contrast.mjs: "in-paragraph links on the page background". 14px/600
+// is normal text, so it is held to the 4.5:1 floor, which that pair clears.
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  border-radius: var(--tt-radius-sm);
+  color: var(--tt-brand-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -1,4 +1,4 @@
-import { DOCUMENT, Injectable, inject } from '@angular/core';
+import { DOCUMENT, Injectable, inject, signal } from '@angular/core';
 import { Meta } from '@angular/platform-browser';
 
 import { environment } from '../../../environments/environment';
@@ -25,9 +25,19 @@ export interface SocialCard {
   readonly indexable: boolean;
 
   readonly alternate: SocialCardKey | null;
+
+  // The SAME page in the other language, or null when this route has no
+  // translation. Deliberately NOT `alternate`: `/` and `/talento` are each
+  // other's hreflang alternates but they are two audiences, not two versions
+  // of one text, so sending a visitor between them with a language control
+  // would be a lie. This field is what the language switch reads, which is why
+  // it is here next to the hreflang data instead of in a list of its own --
+  // the visible control and the <link rel="alternate"> tags cannot drift apart
+  // if they come from the same card.
+  readonly translation: SocialCardKey | null;
 }
 
-export type SocialCardKey = 'home' | 'talento' | 'privacidad' | 'health';
+export type SocialCardKey = 'home' | 'talento' | 'privacidad' | 'privacy' | 'health';
 
 export interface SocialManifest {
   readonly siteName: string;
@@ -54,7 +64,16 @@ export class PageSocialMetaService {
   private readonly meta = inject(Meta);
   private readonly documentRef = inject(DOCUMENT);
 
+  private readonly active = signal<SocialCard | null>(null);
+
+  // The card the router last applied. The language switch derives its target
+  // from this, so what the control offers is always the card that produced the
+  // canonical and hreflang tags on the very same navigation.
+  readonly card = this.active.asReadonly();
+
   apply(card: SocialCard): void {
+    this.active.set(card);
+
     const url = absoluteUrl(card.route);
     const image = absoluteUrl(card.image);
 
@@ -93,9 +112,7 @@ export class PageSocialMetaService {
 
   private alternates(card: SocialCard): void {
     const head = this.documentRef.head;
-    head
-      .querySelectorAll('link[rel="alternate"][hreflang]')
-      .forEach((element) => element.remove());
+    head.querySelectorAll('link[rel="alternate"][hreflang]').forEach((element) => element.remove());
 
     if (!card.alternate) {
       return;
@@ -109,9 +126,7 @@ export class PageSocialMetaService {
 
   private link(rel: string, href: string, hreflang: string | null): void {
     const document = this.documentRef;
-    const selector = hreflang
-      ? `link[rel="${rel}"][hreflang="${hreflang}"]`
-      : `link[rel="${rel}"]`;
+    const selector = hreflang ? `link[rel="${rel}"][hreflang="${hreflang}"]` : `link[rel="${rel}"]`;
 
     let element = document.head.querySelector<HTMLLinkElement>(selector);
     if (!element) {

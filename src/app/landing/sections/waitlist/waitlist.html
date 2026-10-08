@@ -1,8 +1,4 @@
-<section
-  [id]="sectionId()"
-  class="tt-section waitlist"
-  aria-labelledby="waitlist-title"
->
+<section [id]="sectionId()" class="tt-section waitlist" aria-labelledby="waitlist-title">
   <div class="tt-container waitlist__inner">
     <p class="tt-eyebrow">{{ copy().eyebrow }}</p>
     <h2 id="waitlist-title" class="tt-title">{{ copy().title }}</h2>
@@ -164,7 +160,9 @@
             </button>
             <p class="form__legal">
               {{ copy().legalBefore }}
-              <a routerLink="/privacidad" hreflang="es-MX">{{ copy().legalLink }}</a
+              <a [routerLink]="privacyLink()" [attr.hreflang]="privacyLang()">{{
+                copy().legalLink
+              }}</a
               >{{ copy().legalAfter }}
             </p>
           </div>

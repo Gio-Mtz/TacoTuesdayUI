@@ -7,7 +7,7 @@
     <nav class="site-footer__block" [attr.aria-label]="copy().footerNavLabel">
       <h2 class="site-footer__heading">{{ copy().footerContact }}</h2>
       <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a>
-      <a routerLink="/privacidad" hreflang="es-MX">{{ copy().footerPrivacy }}</a>
+      <a [routerLink]="privacyLink()" [attr.hreflang]="privacyLang()">{{ copy().footerPrivacy }}</a>
       <a
         [routerLink]="copy().crossLanguage.path"
         [attr.hreflang]="copy().crossLanguage.hreflang ?? null"

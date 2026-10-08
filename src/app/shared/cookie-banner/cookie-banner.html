@@ -4,9 +4,12 @@
       <div class="cookie-banner__text">
         <h2 class="cookie-banner__title" id="cookie-banner-title">{{ copy().title }}</h2>
         <p class="cookie-banner__body">{{ copy().body }}</p>
-        <a class="cookie-banner__link" routerLink="/privacidad" hreflang="es-MX">{{
-          copy().privacyLink
-        }}</a>
+        <a
+          class="cookie-banner__link"
+          [routerLink]="privacyLink()"
+          [attr.hreflang]="privacyLang()"
+          >{{ copy().privacyLink }}</a
+        >
       </div>
       <div class="cookie-banner__actions">
         <button type="button" class="tt-btn tt-btn--secondary" (click)="reject()">

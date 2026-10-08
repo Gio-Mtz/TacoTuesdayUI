@@ -1,0 +1,10 @@
+@if (target(); as to) {
+  <a
+    class="language-switch"
+    [routerLink]="to.route"
+    [attr.hreflang]="to.lang"
+    [attr.lang]="to.lang"
+    [attr.aria-label]="copy().languageSwitchLabel + ': ' + to.label"
+    >{{ to.label }}</a
+  >
+}

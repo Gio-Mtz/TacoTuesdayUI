@@ -30,6 +30,14 @@ export const routes: Routes = [
     component: Privacy,
   },
   {
+    // Eager for the same reason as the three above: it is a public page, and a
+    // lazy chunk arriving after the shell is what put CLS at 0.333.
+    path: 'privacy',
+    title: 'Privacy notice — Taco Tuesday',
+    data: { lang: 'en', card: 'privacy' } satisfies PageLangData & PageSocialData,
+    component: Privacy,
+  },
+  {
     path: 'health',
     title: 'API status — Taco Tuesday',
     data: { lang: 'en', card: 'health' } satisfies PageLangData & PageSocialData,

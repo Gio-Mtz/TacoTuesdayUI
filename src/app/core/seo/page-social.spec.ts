@@ -79,16 +79,37 @@ describe('PageSocialMetaService', () => {
   });
 
   it('announces no translation for a page that has none', () => {
-    service.apply(SOCIAL_CARDS.privacidad);
+    // Was /privacidad until US-011 gave it an English counterpart. /health is
+    // the card that genuinely has no alternate, and is noindex anyway.
+    service.apply(SOCIAL_CARDS.health);
 
     expect(document.head.querySelectorAll('link[rel="alternate"][hreflang]').length).toBe(0);
   });
 
   it('clears the alternates left by the previous page', () => {
     service.apply(SOCIAL_CARDS.home);
-    service.apply(SOCIAL_CARDS.privacidad);
+    service.apply(SOCIAL_CARDS.health);
 
     expect(document.head.querySelectorAll('link[rel="alternate"][hreflang]').length).toBe(0);
+  });
+
+  it('pairs the two privacy notices, which is what US-011 added', () => {
+    service.apply(SOCIAL_CARDS.privacidad);
+
+    const alternates = Array.from(
+      document.head.querySelectorAll('link[rel="alternate"][hreflang]'),
+    ).map((link) => [link.getAttribute('hreflang'), link.getAttribute('href')]);
+
+    expect(alternates).toContainEqual(['es-MX', absoluteUrl('/privacidad')]);
+    expect(alternates).toContainEqual(['en', absoluteUrl('/privacy')]);
+  });
+
+  it('remembers the card it applied, so the language switch reads the same one', () => {
+    service.apply(SOCIAL_CARDS.privacy);
+    expect(service.card()).toBe(SOCIAL_CARDS.privacy);
+
+    service.apply(SOCIAL_CARDS.home);
+    expect(service.card()).toBe(SOCIAL_CARDS.home);
   });
 
   it('writes robots on every page, so noindex cannot leak out of /health', () => {

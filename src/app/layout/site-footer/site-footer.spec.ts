@@ -34,12 +34,23 @@ describe('SiteFooter', () => {
   });
 
   it('links the privacy notice — required the moment the form captures an email', () => {
-    expect(el().querySelector('a[href="/privacidad"]')).toBeTruthy();
+    expect(el().querySelector('a[href="/privacy"]')).toBeTruthy();
   });
 
-  it('warns that the privacy notice is in another language', () => {
-    const privacy = el().querySelector('a[href="/privacidad"]')!;
-    expect(privacy.getAttribute('hreflang')).toBe('es-MX');
+  // US-011 reversed this one. It used to assert hreflang="es-MX" on an English
+  // shell, which was the bug written down as an expectation: the only notice
+  // that existed was the Spanish one.
+  it('no longer sends an English reader to the Spanish notice', () => {
+    expect(el().querySelector('a[href="/privacidad"]')).toBeNull();
+    expect(el().querySelector('a[href="/privacy"]')!.getAttribute('hreflang')).toBe('en');
+  });
+
+  it('sends a Spanish reader to the Spanish notice', async () => {
+    TestBed.inject(PageLangService).set('es-MX');
+    await fixture.whenStable();
+
+    expect(el().querySelector('a[href="/privacy"]')).toBeNull();
+    expect(el().querySelector('a[href="/privacidad"]')!.getAttribute('hreflang')).toBe('es-MX');
   });
 
   it('speaks the language of the page it is framing', async () => {

@@ -73,9 +73,21 @@ describe('CookieBanner', () => {
     expect(labels).toEqual([CONSENT_COPY['en'].reject, CONSENT_COPY['en'].accept]);
   });
 
-  it('links to the privacy notice', () => {
+  // This is the bug from Gio's mailbox, as a test: the banner correctly spoke
+  // English on `/` and then handed the reader a Spanish page.
+  it('links to the privacy notice in the language it is speaking', () => {
+    const link = el().querySelector<HTMLAnchorElement>('.cookie-banner__link')!;
+    expect(link.getAttribute('href')).toBe('/privacy');
+    expect(link.getAttribute('hreflang')).toBe('en');
+  });
+
+  it('links to the Spanish notice on a Spanish page', async () => {
+    TestBed.inject(PageLangService).set('es-MX');
+    await fixture.whenStable();
+
     const link = el().querySelector<HTMLAnchorElement>('.cookie-banner__link')!;
     expect(link.getAttribute('href')).toBe('/privacidad');
+    expect(link.getAttribute('hreflang')).toBe('es-MX');
   });
 
   it('disappears once the visitor accepts, and records it', async () => {
