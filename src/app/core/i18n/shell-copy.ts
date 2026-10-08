@@ -18,6 +18,8 @@ export interface ShellCopy {
 
   readonly crossLanguage: ShellNavLink;
 
+  readonly languageSwitchLabel: string;
+
   readonly footerTagline: string;
   readonly footerNavLabel: string;
   readonly footerContact: string;
@@ -39,6 +41,7 @@ export const SHELL_COPY: Readonly<Record<PageLang, ShellCopy>> = {
     ],
 
     crossLanguage: { label: 'Para devs', path: '/talento', hreflang: 'es-MX' },
+    languageSwitchLabel: 'Read this page in',
     footerTagline: 'Interviews with a date, feedback in writing, and nobody left on read.',
     footerNavLabel: 'Contact and notices',
     footerContact: 'Contact',
@@ -57,6 +60,7 @@ export const SHELL_COPY: Readonly<Record<PageLang, ShellCopy>> = {
       { label: 'Lista de espera', path: '/talento', fragment: 'lista-de-espera' },
     ],
     crossLanguage: { label: 'For companies', path: '/', hreflang: 'en' },
+    languageSwitchLabel: 'Leer esta página en',
     footerTagline: 'Entrevistas con fecha, con feedback y sin silencios.',
     footerNavLabel: 'Contacto y avisos',
     footerContact: 'Contacto',

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { privacyRoute } from '../../core/i18n/language-switch';
 import { PageLangService } from '../../core/i18n/page-lang';
 import { SHELL_COPY } from '../../core/i18n/shell-copy';
 import { SITE_INFO } from '../../core/site/site-info';
@@ -18,6 +19,10 @@ export class SiteFooter {
   protected readonly site = SITE_INFO;
 
   protected readonly copy = computed(() => SHELL_COPY[this.pageLang.lang()]);
+
+  protected readonly privacyLink = computed(() => privacyRoute(this.pageLang.lang()));
+
+  protected readonly privacyLang = this.pageLang.lang;
 
   protected readonly year = new Date().getFullYear();
 }

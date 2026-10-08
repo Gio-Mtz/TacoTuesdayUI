@@ -1,76 +1,142 @@
 <section class="tt-section privacy">
   <div class="tt-container privacy__inner">
-    <p class="tt-eyebrow">Aviso de privacidad</p>
-    <h1 class="tt-title">Qué hacemos con tu correo</h1>
-    <p class="privacy__updated">Última actualización: {{ site.privacyUpdatedAt }}.</p>
+    <p class="tt-eyebrow">{{ chrome().eyebrow }}</p>
+    <h1 class="tt-title">{{ chrome().title }}</h1>
+    <p class="privacy__updated">{{ chrome().updated }}: {{ updatedOn() }}.</p>
 
-    <h2>Quién lo recibe</h2>
-    <p>
-      {{ site.legalName }} es responsable de los datos que dejas en esta página. Puedes escribirnos
-      a <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a> para cualquier cosa
-      relacionada con ellos.
-    </p>
+    @if (isSpanish()) {
+      <h2>Quién lo recibe</h2>
+      <p>
+        {{ site.legalName }} es responsable de los datos que dejas en esta página. Puedes
+        escribirnos a <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a> para
+        cualquier cosa relacionada con ellos.
+      </p>
 
-    <h2>Qué recogemos</h2>
-    <p>
-      Sólo lo que escribes tú en el formulario de la lista de espera: tu correo, tu nombre y, según
-      si entras como empresa o como candidato, el nombre de tu empresa y cuánto contratas al año, o
-      tu stack principal y tus años de experiencia. Nada más — no pedimos documentos, ni teléfono,
-      ni dirección.
-    </p>
+      <h2>Qué recogemos</h2>
+      <p>
+        Sólo lo que escribes tú en el formulario de la lista de espera: tu correo, tu nombre y,
+        según si entras como empresa o como candidato, el nombre de tu empresa y cuánto contratas al
+        año, o tu stack principal y tus años de experiencia. Nada más — no pedimos documentos, ni
+        teléfono, ni dirección.
+      </p>
 
-    <h2>Para qué</h2>
-    <p>
-      Para avisarte cuando la plataforma abra y, si lo pediste como empresa, para contactarte sobre
-      las vacantes que quieras cubrir. No vendemos ni compartimos tu correo con nadie, y no lo
-      usamos para mandarte publicidad de terceros.
-    </p>
+      <h2>Para qué</h2>
+      <p>
+        Para avisarte cuando la plataforma abra y, si lo pediste como empresa, para contactarte
+        sobre las vacantes que quieras cubrir. No vendemos ni compartimos tu correo con nadie, y no
+        lo usamos para mandarte publicidad de terceros.
+      </p>
 
-    <h2>Cuánto tiempo</h2>
-    <p>
-      Hasta que la plataforma abra y te avisemos, o hasta que nos pidas que lo borremos — lo que
-      pase primero. Si un año después de que te registraste esto sigue sin arrancar, borramos la
-      lista.
-    </p>
+      <h2>Cuánto tiempo</h2>
+      <p>
+        Hasta que la plataforma abra y te avisemos, o hasta que nos pidas que lo borremos — lo que
+        pase primero. Si un año después de que te registraste esto sigue sin arrancar, borramos la
+        lista.
+      </p>
 
-    <h2>Cómo lo borras</h2>
-    <p>
-      Nos escribes a <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a> desde el
-      mismo correo que registraste y lo quitamos. No tienes que dar explicaciones y no hay un
-      formulario que llenar. También puedes pedirnos acceder a lo que tenemos tuyo, corregirlo u
-      oponerte a que lo usemos.
-    </p>
+      <h2>Cómo lo borras</h2>
+      <p>
+        Nos escribes a <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a> desde
+        el mismo correo que registraste y lo quitamos. No tienes que dar explicaciones y no hay un
+        formulario que llenar. También puedes pedirnos acceder a lo que tenemos tuyo, corregirlo u
+        oponerte a que lo usemos.
+      </p>
 
-    <h2>Cookies y analítica</h2>
-    <p>
-      Usamos <strong>Google Analytics 4</strong> para contar visitas y ver qué partes de la página
-      funcionan. <strong>Sólo si lo aceptas.</strong> Mientras no aceptes, el script de Google no se
-      descarga y no se guarda ninguna cookie suya — no es que se cargue y no mida: no se carga.
-    </p>
-    <p>
-      Si aceptas, Google guarda cookies propias en tu navegador (<code>_ga</code> y
-      <code>_ga_*</code>) para distinguir visitas repetidas. Lo dejamos configurado con la IP
-      anonimizada, sin señales de Google y sin personalización de anuncios: no usamos nada de esto
-      para publicidad ni lo cruzamos con otros servicios. La base legal es tu consentimiento, y
-      quitarlo es tan fácil como darlo — el botón de aquí abajo.
-    </p>
-    <p>
-      Aparte de eso, y sin que haga falta tu permiso porque no te identifica ni sale de tu equipo,
-      se guarda si elegiste el tema claro u oscuro y cuál fue tu decisión sobre estas cookies.
-    </p>
+      <h2>Cookies y analítica</h2>
+      <p>
+        Usamos <strong>Google Analytics 4</strong> para contar visitas y ver qué partes de la página
+        funcionan. <strong>Sólo si lo aceptas.</strong> Mientras no aceptes, el script de Google no
+        se descarga y no se guarda ninguna cookie suya — no es que se cargue y no mida: no se carga.
+      </p>
+      <p>
+        Si aceptas, Google guarda cookies propias en tu navegador (<code>_ga</code> y
+        <code>_ga_*</code>) para distinguir visitas repetidas. Lo dejamos configurado con la IP
+        anonimizada, sin señales de Google y sin personalización de anuncios: no usamos nada de esto
+        para publicidad ni lo cruzamos con otros servicios. La base legal es tu consentimiento, y
+        quitarlo es tan fácil como darlo — el botón de aquí abajo.
+      </p>
+      <p>
+        Aparte de eso, y sin que haga falta tu permiso porque no te identifica ni sale de tu equipo,
+        se guarda si elegiste el tema claro u oscuro y cuál fue tu decisión sobre estas cookies.
+      </p>
+    } @else {
+      <h2>Who receives it</h2>
+      <p>
+        {{ site.legalName }} is responsible for the data you leave on this page. You can write to us
+        at <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a> about anything to
+        do with it.
+      </p>
+
+      <h2>What we collect</h2>
+      <p>
+        Only what you type into the waitlist form: your email, your name and, depending on whether
+        you join as a company or as a candidate, your company name and how much you hire per year,
+        or your main stack and your years of experience. Nothing else — we do not ask for documents,
+        a phone number or an address.
+      </p>
+
+      <h2>What for</h2>
+      <p>
+        To tell you when the platform opens and, if you asked as a company, to contact you about the
+        roles you want to fill. We do not sell or share your email with anyone, and we do not use it
+        to send you third-party advertising.
+      </p>
+
+      <h2>How long</h2>
+      <p>
+        Until the platform opens and we have told you, or until you ask us to delete it — whichever
+        comes first. If a year after you signed up this still has not launched, we delete the list.
+      </p>
+
+      <h2>How you delete it</h2>
+      <p>
+        You write to <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a> from the
+        same address you signed up with and we remove it. You do not have to explain yourself and
+        there is no form to fill in. You can also ask us for access to what we hold about you, to
+        correct it, or to object to our using it.
+      </p>
+
+      <h2>Cookies and analytics</h2>
+      <p>
+        We use <strong>Google Analytics 4</strong> to count visits and see which parts of the page
+        work. <strong>Only if you accept.</strong> Until you accept, Google's script is not
+        downloaded and none of its cookies are stored — it is not that it loads and does not
+        measure: it does not load.
+      </p>
+      <p>
+        If you accept, Google stores its own cookies in your browser (<code>_ga</code> and
+        <code>_ga_*</code>) to tell repeat visits apart. We have it configured with the IP
+        anonymised, with Google signals off and without ad personalisation: we use none of this for
+        advertising and we do not cross it with other services. The legal basis is your consent, and
+        taking it back is as easy as giving it — the button just below.
+      </p>
+      <p>
+        Beyond that, and without needing your permission because it does not identify you and never
+        leaves your device, we store whether you chose the light or dark theme and what you decided
+        about these cookies.
+      </p>
+    }
 
     <div class="privacy__consent">
-      <h3 class="privacy__consent-title">{{ copy.manageTitle }}</h3>
+      <h3 class="privacy__consent-title">{{ copy().manageTitle }}</h3>
       <p class="privacy__consent-state" aria-live="polite">{{ consentLabel() }}</p>
       <button type="button" class="tt-btn tt-btn--secondary" (click)="changeChoice()">
-        {{ copy.manageChange }}
+        {{ copy().manageChange }}
       </button>
     </div>
 
-    <h2>Cambios</h2>
-    <p>
-      Si cambia lo que pedimos o para qué lo usamos, actualizamos esta página y movemos la fecha de
-      arriba. Si el cambio es de fondo y ya estás en la lista, te avisamos por correo antes.
-    </p>
+    @if (isSpanish()) {
+      <h2>Cambios</h2>
+      <p>
+        Si cambia lo que pedimos o para qué lo usamos, actualizamos esta página y movemos la fecha
+        de arriba. Si el cambio es de fondo y ya estás en la lista, te avisamos por correo antes.
+      </p>
+    } @else {
+      <h2>Changes</h2>
+      <p>
+        If what we ask for or what we use it for changes, we update this page and move the date at
+        the top. If the change is substantive and you are already on the list, we email you first.
+      </p>
+    }
   </div>
 </section>

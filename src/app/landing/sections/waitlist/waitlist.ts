@@ -17,6 +17,7 @@ import { RouterLink } from '@angular/router';
 
 import { ILeadRequest, LeadKind } from '../../../api/Leads/ILead';
 import { LeadsService } from '../../../api/Leads/leads.service';
+import { privacyRoute } from '../../../core/i18n/language-switch';
 import { PageLangService } from '../../../core/i18n/page-lang';
 import { Icon } from '../../../shared/icon/icon';
 import { WAITLIST_COPY, WaitlistFailureCopy } from './waitlist-copy';
@@ -47,6 +48,10 @@ export class Waitlist implements OnInit {
   readonly sectionId = input<string>('waitlist');
 
   protected readonly copy = computed(() => WAITLIST_COPY[this.pageLang.lang()]);
+
+  protected readonly privacyLink = computed(() => privacyRoute(this.pageLang.lang()));
+
+  protected readonly privacyLang = this.pageLang.lang;
 
   protected readonly form = this.fb.nonNullable.group({
     kind: this.fb.nonNullable.control<LeadKind>('company'),
@@ -211,9 +216,7 @@ export class Waitlist implements OnInit {
       return;
     }
 
-    this.host.nativeElement
-      .querySelector<HTMLElement>(`#waitlist-${first}`)
-      ?.focus();
+    this.host.nativeElement.querySelector<HTMLElement>(`#waitlist-${first}`)?.focus();
   }
 }
 

@@ -18,7 +18,8 @@
       "imageAlt": "Taco Tuesday. Interviews with a date, feedback in writing, and nobody left on read.",
       "indexable": true,
       "alternate": "talento",
-      "imageEyebrow": "For teams hiring engineers"
+      "imageEyebrow": "For teams hiring engineers",
+      "translation": null
     },
     "talento": {
       "route": "/talento",
@@ -32,7 +33,8 @@
       "imageAlt": "Taco Tuesday. ¿Odias que los reclutas te ghosteen? Deja que ellos te busquen.",
       "indexable": true,
       "alternate": "home",
-      "imageEyebrow": "Para devs"
+      "imageEyebrow": "Para devs",
+      "translation": null
     },
     "privacidad": {
       "route": "/privacidad",
@@ -45,8 +47,24 @@
       "image": "/og/home.png",
       "imageAlt": "Taco Tuesday. Interviews with a date, feedback in writing, and nobody left on read.",
       "indexable": true,
-      "alternate": null,
-      "imageEyebrow": "For teams hiring engineers"
+      "alternate": "privacy",
+      "imageEyebrow": "For teams hiring engineers",
+      "translation": "privacy"
+    },
+    "privacy": {
+      "route": "/privacy",
+      "dir": "privacy",
+      "lang": "en",
+      "locale": "en_US",
+      "title": "Privacy notice — Taco Tuesday",
+      "description": "How Taco Tuesday handles your personal data: what is stored, what for, and how to ask for it to be deleted.",
+      "documentTitle": "Privacy notice — Taco Tuesday",
+      "image": "/og/home.png",
+      "imageAlt": "Taco Tuesday. Interviews with a date, feedback in writing, and nobody left on read.",
+      "indexable": true,
+      "alternate": "privacidad",
+      "imageEyebrow": "For teams hiring engineers",
+      "translation": "privacidad"
     },
     "health": {
       "route": "/health",
@@ -60,7 +78,8 @@
       "imageAlt": "Taco Tuesday.",
       "indexable": false,
       "alternate": null,
-      "imageEyebrow": "For teams hiring engineers"
+      "imageEyebrow": "For teams hiring engineers",
+      "translation": null
     }
   }
 }
