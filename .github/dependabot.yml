@@ -24,3 +24,13 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # Un major de Angular es una migracion con `ng update`, nunca un PR
+      # automatico: los siete paquetes del framework pinnean sus peers con
+      # version EXACTA, asi que Dependabot no puede abrir uno que resuelva.
+      - dependency-name: '@angular/*'
+        update-types: ['version-update:semver-major']
+      # TypeScript va amarrado a la version de Angular. TS 7 con Angular 21
+      # no compila, y el bump saldria rojo para siempre.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
