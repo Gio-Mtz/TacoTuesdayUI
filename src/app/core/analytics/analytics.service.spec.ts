@@ -30,6 +30,34 @@ function dataLayer(): unknown[][] {
   return ((window as unknown as { dataLayer?: unknown[][] }).dataLayer ??= []);
 }
 
+// Copied verbatim out of the gtag.js container that googletagmanager.com serves for
+// this Measurement ID. `Qb` is what gtag.js uses to decide whether a dataLayer entry
+// is a command at all, and `xE` is what it uses to decide whether to process it.
+// They live here, unaltered, so this suite judges the service by Google's rule rather
+// than by our own idea of what the queue should look like — the mistake that let a
+// broken queue ship green for three work blocks.
+function isArgumentsObject(entry: unknown): boolean {
+  return (
+    !!entry &&
+    (Object.prototype.toString.call(entry) === '[object Arguments]' ||
+      Object.prototype.hasOwnProperty.call(entry, 'callee'))
+  );
+}
+
+function gtagWouldProcess(entry: unknown): boolean {
+  if (entry === null || typeof entry !== 'object') {
+    return false;
+  }
+  if ((entry as { event?: unknown }).event) {
+    return true;
+  }
+  if (isArgumentsObject(entry)) {
+    const command = (entry as Record<number, unknown>)[0];
+    return command === 'config' || command === 'event' || command === 'js' || command === 'get';
+  }
+  return false;
+}
+
 describe('AnalyticsService', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -92,6 +120,43 @@ describe('AnalyticsService', () => {
         allow_google_signals: false,
         allow_ad_personalization_signals: false,
       });
+    });
+
+    // The dimension nothing measured until 8-oct-2026, and the one that was broken.
+    // Every assertion above reads the queue by index, which an array satisfies just as
+    // well as an `arguments` object — so they all passed while gtag.js threw away all
+    // three commands and GA4 recorded nothing. Measured in Chromium against the built
+    // `main`: 3 entries, all `[object Array]`, 0 of 3 accepted, 0 hits to /g/collect.
+    it('queues each command as an arguments object — gtag.js drops anything else', () => {
+      const { analytics, consent } = create(REAL_ID);
+      consent.grant();
+      analytics.sync();
+
+      const queued = dataLayer();
+      expect(queued.length).toBeGreaterThan(0);
+
+      for (const entry of queued) {
+        expect(Object.prototype.toString.call(entry)).toBe('[object Arguments]');
+      }
+    });
+
+    it("is accepted by gtag.js's own predicate — the queue is useless otherwise", () => {
+      const { analytics, consent } = create(REAL_ID);
+      consent.grant();
+      analytics.sync();
+
+      const commands = dataLayer().map((entry) => String((entry as Record<number, unknown>)[0]));
+      expect(commands).toEqual(['consent', 'js', 'config']);
+
+      const processed = dataLayer().filter((entry) => gtagWouldProcess(entry));
+      const names = processed.map((entry) => String((entry as Record<number, unknown>)[0]));
+
+      // `consent` is not in xE's list of commands; it reaches gtag.js through the same
+      // queue but is read later, so the two that must be accepted here are `js` and
+      // `config`. If `config` is dropped, the Measurement ID is never configured and
+      // no hit is ever sent — which is exactly the bug this test exists to catch.
+      expect(names).toContain('js');
+      expect(names).toContain('config');
     });
 
     it('is idempotent — syncing again does not duplicate the tag', () => {

@@ -58,9 +58,28 @@ export class AnalyticsService {
     }
 
     const dataLayer = (view.dataLayer ??= []);
-    const push = (...args: unknown[]): void => {
-      dataLayer.push(args);
-    };
+
+    // gtag.js only treats a dataLayer entry as a command when that entry is an
+    // `arguments` object. Its own predicate, from the container served for this
+    // Measurement ID, is:
+    //
+    //   function Qb(a) { return !!a && (Object.prototype.toString.call(a) ===
+    //     "[object Arguments]" || Object.prototype.hasOwnProperty.call(a, "callee")) }
+    //   function xE(a) { ... if (a.event) return true;
+    //     if (Qb(a)) { var b = a[0]; if (b === "config" || b === "event" ||
+    //       b === "js" || b === "get") return true } return false }
+    //
+    // An array fails `Qb`, so `xE` rejects it and the command is dropped without a
+    // warning: the tag downloads with 200, `config` never runs, and not one hit is
+    // ever sent. That is the whole reason GA4 stayed empty while the network tab
+    // showed gtag.js loading fine. This is also why the official snippet is written
+    // `function gtag(){dataLayer.push(arguments)}` and not with a rest parameter —
+    // the `arguments` object is the contract, not a style choice.
+    function gtag(): void {
+      dataLayer.push(arguments as unknown as unknown[]);
+    }
+
+    const push = gtag as (...args: readonly unknown[]) => void;
     view.gtag ??= push;
 
     push('consent', 'default', {
