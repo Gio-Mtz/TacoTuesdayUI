@@ -8,5 +8,5 @@ export const environment = {
 
   siteBaseUrl: SOCIAL.siteBaseUrl,
 
-  analyticsMeasurementId: '',
+  analyticsMeasurementId: 'G-3MCBFGG7QH',
 } as const;

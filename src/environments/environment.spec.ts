@@ -1,5 +1,6 @@
 import { environment as local } from './environment';
 import { environment as production } from './environment.production';
+import { isValidMeasurementId } from '../app/core/analytics/consent';
 
 describe('environments', () => {
   describe('local (also what ng test and ng serve get)', () => {
@@ -42,9 +43,10 @@ describe('environments', () => {
       expect(production.apiBaseUrl).not.toContain('.centralus.');
     });
 
-    it('carries an analytics id slot that is either empty or a real GA4 id', () => {
-      const id = production.analyticsMeasurementId;
-      expect(id === '' || /^G-[A-Z0-9]{6,12}$/.test(id)).toBe(true);
+    it('carries a real GA4 measurement id, so the banner renders and analytics can load', () => {
+      // Reuses the app's own validator instead of a second copy of the pattern,
+      // so this guard cannot drift away from what AnalyticsService accepts.
+      expect(isValidMeasurementId(production.analyticsMeasurementId)).toBe(true);
     });
   });
 });
