@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # Los paquetes del framework de Angular pinnean sus peers con version
+      # EXACTA entre ellos, asi que subir uno solo deja el arbol sin resolver.
+      # Agrupados, Dependabot abre UN PR que los mueve a todos a la vez.
+      angular-framework:
+        patterns:
+          - '@angular/*'
+        update-types:
+          - minor
+          - patch
+      # El resto de los parches, en un solo PR, para no tener ocho abiertos.
+      minor-and-patch:
+        patterns:
+          - '*'
+        exclude-patterns:
+          - '@angular/*'
+        update-types:
+          - minor
+          - patch
