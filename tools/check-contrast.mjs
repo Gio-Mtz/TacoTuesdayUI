@@ -8,7 +8,7 @@
 // chain down to a hex, and checks the WCAG 2.1 contrast ratio in BOTH themes.
 // Adding a pair to CHECKS below is how you protect a new piece of text.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -53,7 +53,61 @@ const CHECKS = [
     min: 4.5,
     why: '16px/600 on the banner panel -> normal text. Reject must read as plainly as accept.',
   },
+  {
+    where: 'footer legal line + footer column headings',
+    fg: '--tt-text-muted',
+    bg: '--tt-bg-surface',
+    min: 4.5,
+    why: '14px/400 and 14px/600 -> normal text, NOT large. Same token pair as the step numbers above with a higher floor, and in light it clears 4.5:1 by 0.08. It cannot drift.',
+  },
+  {
+    where: 'form placeholders + privacy last-updated line',
+    fg: '--tt-text-secondary',
+    bg: '--tt-bg-canvas',
+    min: 4.5,
+    why: '--tt-bg-canvas is the input background, not the panel. 16px placeholder and 14px timestamp -> normal text.',
+  },
+  {
+    where: 'in-paragraph links on the page background (/privacidad prose)',
+    fg: '--tt-brand-text',
+    bg: '--tt-bg-canvas',
+    min: 4.5,
+    why: '16px/400 inside a paragraph -> normal text. A link that only color distinguishes has to clear the body floor.',
+  },
+  {
+    where: 'eyebrow + in-paragraph links on .tt-section--alt',
+    fg: '--tt-brand-text',
+    bg: '--tt-bg-subtle',
+    min: 4.5,
+    why: '14px/400 mono on the alternating section background -> normal text.',
+  },
+  {
+    where: 'form field error (.field__error) on the waitlist panel',
+    fg: '--tt-danger',
+    bg: '--tt-bg-surface',
+    min: 4.5,
+    why: '14px/400 -> normal text. The message that says what went wrong cannot be the one you cannot read.',
+  },
 ];
+
+// Second guard, and the one that would have caught the bug this card fixed.
+// --tt-text-muted measures 4.39:1 against --tt-bg-canvas in the light theme:
+// below the 4.5:1 floor for normal text. So it is a LARGE-TEXT-ONLY token, and
+// /privacidad was using it for a 14px line. A comment saying so does not survive
+// (TD-012 stripped the ones that recorded intent), so the restriction lives here:
+// every use of the token in component styles must be listed, with the size that
+// makes it legal. A new use fails the build until it is justified.
+const MUTED_TOKEN = '--tt-text-muted';
+const MUTED_ALLOWLIST = new Map([
+  [
+    'src/app/landing/sections/how-it-works/how-it-works.scss',
+    '.steps__number, 36px/700 -> large text, checked above at 3:1',
+  ],
+  [
+    'src/app/layout/site-footer/site-footer.scss',
+    '.site-footer__heading and .site-footer__legal, 14px on --tt-bg-surface, checked above at 4.5:1',
+  ],
+]);
 
 function declarationsIn(block) {
   const out = new Map();
@@ -131,8 +185,49 @@ try {
   process.exit(1);
 }
 
+function scssFilesUnder(dir) {
+  const out = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...scssFilesUnder(full));
+    else if (entry.name.endsWith('.scss') || entry.name.endsWith('.css')) out.push(full);
+  }
+  return out;
+}
+
+const SRC = join(root, 'src');
+const unlisted = [];
+const stale = new Set(MUTED_ALLOWLIST.keys());
+
+for (const file of scssFilesUnder(SRC)) {
+  const rel = file.slice(root.length + 1).split('\\').join('/');
+  if (rel === 'src/styles/theme.css') continue;
+  const uses = readFileSync(file, 'utf8')
+    .split('\n')
+    .some((line) => !line.trimStart().startsWith('//') && line.includes(MUTED_TOKEN));
+  if (!uses) continue;
+  if (MUTED_ALLOWLIST.has(rel)) stale.delete(rel);
+  else unlisted.push(rel);
+}
+
+for (const rel of unlisted) {
+  failed += 1;
+  console.log(
+    `FAIL  ${MUTED_TOKEN} used in ${rel}, which is not in MUTED_ALLOWLIST  <-- the token is 4.39:1 on --tt-bg-canvas in light: large text only. Add the pair to CHECKS with the real background and size, then list the file here.`,
+  );
+}
+for (const rel of stale) {
+  failed += 1;
+  console.log(
+    `FAIL  MUTED_ALLOWLIST lists ${rel}, which no longer uses ${MUTED_TOKEN}  <-- drop the entry so the allowlist keeps meaning something.`,
+  );
+}
+if (unlisted.length === 0 && stale.size === 0) {
+  console.log(`\n${MUTED_TOKEN} usage: ${MUTED_ALLOWLIST.size} file(s), all accounted for.`);
+}
+
 if (failed > 0) {
-  console.error(`\n${failed} contrast check(s) below the WCAG floor.`);
+  console.error(`\n${failed} check(s) failed.`);
   process.exit(1);
 }
-console.log(`\nAll ${CHECKS.length * 2} contrast checks pass.`);
+console.log(`All ${CHECKS.length * 2} contrast checks pass.`);
