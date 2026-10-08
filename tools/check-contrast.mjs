@@ -377,6 +377,95 @@ for (const [token, { where }] of restricted) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Third guard: the focus ring.
+//
+// TD-026. Measured on 8-oct before this half existed: --tt-focus was
+// --tt-agave-400 (#41A695) and MISSED the 3:1 non-text floor on all four page
+// surfaces in light -- 2.83 canvas, 2.95 surface, 2.69 subtle, 2.46 inset.
+// Lighthouse accessibility was 100/100 on four routes on that same commit and
+// did not see it, because contrast of a focus indicator is not one of the
+// things it measures. A keyboard user on the light theme had a ring that was
+// legally invisible, and no check in the repo covered the dimension.
+//
+// Derived, like the restricted-token half above: this does NOT name
+// --tt-focus. It finds every token that paints an `outline` anywhere in the
+// stylesheets -- in this codebase `outline` is only ever the focus ring, the
+// global rule in theme.css and the focus-ring mixin in _tokens.scss -- and
+// checks each one against every surface in PAGE_SURFACES, in both themes.
+// Repoint the mixin at a different token tomorrow and the guard follows it
+// without anyone editing this file.
+//
+// Why PAGE_SURFACES and not the button fill: the ring ships with
+// outline-offset: 2px, so the gap shows the PARENT background and the ring is
+// adjacent to that same background on both of its sides. --tt-brand is never an
+// adjacent color, so asserting against it would be inventing a requirement.
+// Recorded and deliberately NOT asserted: in dark, --tt-focus and --tt-brand
+// both resolve to --tt-agave-300, which is 1.00:1 against itself. The offset
+// gap is what keeps that legal under 1.4.11, and it is still worth knowing that
+// the ring around the primary button is the same color as the button.
+// ---------------------------------------------------------------------------
+const FOCUS_RING_FLOOR = 3; // WCAG 2.1 SC 1.4.11, non-text contrast.
+
+// `outline-offset` does not match: after `outline` comes `-offset`, which the
+// optional `-color` group and the required colon reject.
+function outlineTokensIn(source) {
+  const out = new Set();
+  for (const line of source.split('\n')) {
+    if (line.trimStart().startsWith('//')) continue;
+    for (const m of line.matchAll(/(?:^|[^-\w])outline(?:-color)?\s*:[^;}]*var\(\s*(--tt-[\w-]+)/g)) {
+      out.add(m[1]);
+    }
+  }
+  return out;
+}
+
+const ringTokens = new Map(); // token -> Set of files that paint an outline with it
+
+for (const file of scssFilesUnder(SRC)) {
+  const rel = file
+    .slice(root.length + 1)
+    .split('\\')
+    .join('/');
+  for (const token of outlineTokensIn(readFileSync(file, 'utf8'))) {
+    if (!ringTokens.has(token)) ringTokens.set(token, new Set());
+    ringTokens.get(token).add(rel);
+  }
+}
+
+// A guard that passes because it found nothing to check is the adornment this
+// repo keeps catching itself writing. If the ring stops being painted with a
+// token, that is a finding, not a pass.
+if (ringTokens.size === 0) {
+  failed += 1;
+  console.log(
+    'FAIL  no token paints an `outline` anywhere under src/  <-- either the focus ring stopped being a token (check theme.css and the focus-ring mixin in _tokens.scss) or this guard stopped being able to see it. Both are breakage.',
+  );
+}
+
+for (const [token, files] of [...ringTokens.entries()].sort()) {
+  for (const surface of PAGE_SURFACES) {
+    for (const [name, vars] of THEMES) {
+      let r;
+      try {
+        r = ratio(resolve(token, vars), resolve(surface, vars));
+      } catch (err) {
+        failed += 1;
+        console.log(`FAIL  focus ring ${token} in ${[...files].join(', ')}  <-- ${err.message}`);
+        continue;
+      }
+      const ok = r >= FOCUS_RING_FLOOR;
+      if (!ok) failed += 1;
+      const line = `${ok ? 'PASS' : 'FAIL'}  ${r.toFixed(2)}:1 (needs ${FOCUS_RING_FLOOR}:1)  ${name.padEnd(5)}  focus ring ${token} on ${surface}`;
+      console.log(
+        ok
+          ? line
+          : `${line}  <-- the ring sits directly against this surface, and a focus indicator under ${FOCUS_RING_FLOOR}:1 is WCAG 2.1 1.4.11. Darken the token for this theme; the agave ramp is in theme.css.`,
+      );
+    }
+  }
+}
+
 // The other direction: an entry whose token is no longer restricted. Keeping it
 // would turn the list into ceremony, and ceremony is what stops being read.
 for (const token of ALLOWLIST.keys()) {
@@ -403,4 +492,6 @@ if (failed > 0) {
   console.error(`\n${failed} check(s) failed.`);
   process.exit(1);
 }
-console.log(`All ${CHECKS.length * 2} contrast checks pass.`);
+console.log(
+  `All ${CHECKS.length * 2} contrast checks pass, plus the focus ring on ${PAGE_SURFACES.length} page surfaces in both themes (${[...ringTokens.keys()].join(', ')}).`,
+);
