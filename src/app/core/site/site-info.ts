@@ -5,5 +5,5 @@ export const SITE_INFO = {
 
   contactEmail: 'hello@tacotuesdayco.com',
 
-  privacyUpdatedAt: '29 de septiembre de 2026',
+  privacyUpdatedAt: '7 de octubre de 2026',
 } as const;

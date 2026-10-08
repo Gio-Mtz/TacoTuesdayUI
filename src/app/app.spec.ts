@@ -52,6 +52,22 @@ describe('App', () => {
     expect(main.querySelector('router-outlet')).toBeTruthy();
   });
 
+  it('mounts the cookie banner in the shell, so every route can ask', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.querySelector('ttco-cookie-banner')).toBeTruthy();
+  });
+
+  it('asks nothing when no analytics id is configured, which is what ng test gets', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.querySelector('.cookie-banner')).toBeNull();
+  });
+
   it('opens the tab order with a skip link that targets that main', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();

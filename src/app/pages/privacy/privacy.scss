@@ -26,3 +26,22 @@
     color: var(--tt-brand-text);
   }
 }
+
+.privacy__consent {
+  margin-top: tt.space(5);
+  padding: tt.space(5);
+  background: var(--tt-bg-subtle);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-lg);
+}
+
+.privacy__consent-title {
+  margin: 0 0 tt.space(2);
+  font-size: var(--tt-text-lg);
+}
+
+.privacy__consent-state {
+  margin: 0 0 tt.space(4);
+  font-size: var(--tt-text-sm);
+  color: var(--tt-text-secondary);
+}

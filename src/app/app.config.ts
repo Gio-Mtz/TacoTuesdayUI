@@ -11,6 +11,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { PageHeadStrategy } from './core/i18n/page-head-strategy';
 import { ThemeService } from './core/theme/theme.service';
+import { AnalyticsService } from './core/analytics/analytics.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -30,6 +31,7 @@ export const appConfig: ApplicationConfig = {
 
     provideAppInitializer(() => {
       inject(ThemeService);
+      inject(AnalyticsService);
     }),
   ],
 };

@@ -4,4 +4,6 @@ export const environment = {
   apiBaseUrl: '',
 
   siteBaseUrl: 'http://localhost:4200',
+
+  analyticsMeasurementId: '',
 } as const;

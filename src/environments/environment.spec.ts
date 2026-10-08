@@ -14,6 +14,10 @@ describe('environments', () => {
     it('points canonical at the dev server, not at the live site', () => {
       expect(local.siteBaseUrl).toContain('localhost');
     });
+
+    it('has no analytics id, so ng serve and ng test never talk to Google', () => {
+      expect(local.analyticsMeasurementId).toBe('');
+    });
   });
 
   describe('production', () => {
@@ -36,6 +40,11 @@ describe('environments', () => {
     it('is not the Central US host that OPS-5 destroyed', () => {
       expect(production.apiBaseUrl).not.toContain('ambitiousmeadow');
       expect(production.apiBaseUrl).not.toContain('.centralus.');
+    });
+
+    it('carries an analytics id slot that is either empty or a real GA4 id', () => {
+      const id = production.analyticsMeasurementId;
+      expect(id === '' || /^G-[A-Z0-9]{6,12}$/.test(id)).toBe(true);
     });
   });
 });

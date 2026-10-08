@@ -1,0 +1,21 @@
+@if (visible()) {
+  <div class="cookie-banner" role="region" aria-labelledby="cookie-banner-title">
+    <div class="cookie-banner__panel">
+      <div class="cookie-banner__text">
+        <h2 class="cookie-banner__title" id="cookie-banner-title">{{ copy().title }}</h2>
+        <p class="cookie-banner__body">{{ copy().body }}</p>
+        <a class="cookie-banner__link" routerLink="/privacidad" hreflang="es-MX">{{
+          copy().privacyLink
+        }}</a>
+      </div>
+      <div class="cookie-banner__actions">
+        <button type="button" class="tt-btn tt-btn--secondary" (click)="reject()">
+          {{ copy().reject }}
+        </button>
+        <button type="button" class="tt-btn tt-btn--primary" (click)="accept()">
+          {{ copy().accept }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
