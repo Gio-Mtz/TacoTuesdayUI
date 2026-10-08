@@ -38,6 +38,17 @@ describe('environments', () => {
       expect(production.siteBaseUrl).toMatch(/^https:\/\/[^/]+$/);
     });
 
+    it('points canonical at the custom apex domain, not at the Static Web Apps default host', () => {
+      // TD-018. Every absolute URL the build emits - og:url, canonical, the
+      // hreflang alternates, sitemap.xml and robots.txt - is this string plus a
+      // path, because emit-route-cards.mjs reads it from social-cards.json. If it
+      // ever points back at the generated *.azurestaticapps.net host, the live
+      // site advertises a canonical nobody is meant to link to, and it does it
+      // silently: the shape guard above passes either way.
+      expect(production.siteBaseUrl).toBe('https://tacotuesdayco.com');
+      expect(production.siteBaseUrl).not.toContain('azurestaticapps.net');
+    });
+
     it('is not the Central US host that OPS-5 destroyed', () => {
       expect(production.apiBaseUrl).not.toContain('ambitiousmeadow');
       expect(production.apiBaseUrl).not.toContain('.centralus.');
