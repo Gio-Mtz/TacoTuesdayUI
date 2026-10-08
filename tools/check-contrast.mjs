@@ -88,24 +88,116 @@ const CHECKS = [
     min: 4.5,
     why: '14px/400 -> normal text. The message that says what went wrong cannot be the one you cannot read.',
   },
+  {
+    where: '.tt-btn--primary :hover repaint',
+    fg: '--tt-on-brand',
+    bg: '--tt-brand-hover',
+    min: 4.5,
+    why: 'The button keeps its text color and swaps its background on hover. A pair that only holds in the resting state is half a check.',
+  },
+  {
+    where: '.tt-btn--primary :active repaint',
+    fg: '--tt-on-brand',
+    bg: '--tt-brand-active',
+    min: 4.5,
+    why: 'Same button, the pressed background. In dark these two go LIGHTER (agave-200/100), not darker, so the direction cannot be assumed.',
+  },
+  {
+    where: '.tt-btn--secondary :hover + .variant__label when checked',
+    fg: '--tt-brand-text',
+    bg: '--tt-brand-subtle',
+    min: 4.5,
+    why: '16px/600 once the hover fill lands under it, and the same pair carries .variant__icon on the selected option.',
+  },
+  {
+    where: '.form__failure panel copy',
+    fg: '--tt-text-primary',
+    bg: '--tt-danger-subtle',
+    min: 4.5,
+    why: '14px/400 on a semantic fill, not on a --tt-bg-* surface. The error panel is the one place the user has to read on the first try.',
+  },
+  {
+    where: '.form__failure-icon',
+    fg: '--tt-danger',
+    bg: '--tt-danger-subtle',
+    min: 3,
+    why: 'A glyph, not text: WCAG 2.1 1.4.11 non-text contrast is 3:1. Same-hue fg and bg is exactly where that floor gets missed.',
+  },
+  {
+    where: '.confirm__icon',
+    fg: '--tt-success',
+    bg: '--tt-success-subtle',
+    min: 3,
+    why: 'The 56px success glyph, 4.39:1 in light. It clears the 3:1 non-text floor and would MISS the 4.5:1 text floor, which is why --tt-success is restricted below.',
+  },
 ];
 
-// Second guard, and the one that would have caught the bug this card fixed.
-// --tt-text-muted measures 4.39:1 against --tt-bg-canvas in the light theme:
-// below the 4.5:1 floor for normal text. So it is a LARGE-TEXT-ONLY token, and
-// /privacidad was using it for a 14px line. A comment saying so does not survive
-// (TD-012 stripped the ones that recorded intent), so the restriction lives here:
-// every use of the token in component styles must be listed, with the size that
-// makes it legal. A new use fails the build until it is justified.
-const MUTED_TOKEN = '--tt-text-muted';
-const MUTED_ALLOWLIST = new Map([
+// ---------------------------------------------------------------------------
+// Second guard: restricted text-color tokens.
+//
+// TD-014 widened the pair list above after a 14px line painted with
+// --tt-text-muted shipped at 4.39:1. Pairs protect the cases someone thought
+// of; they do nothing about the NEXT unlisted use. So this half states the
+// rule instead of the cases -- and the rule is DERIVED from the token table
+// rather than hand-written.
+//
+// A token used as a `color:` is RESTRICTED when it measurably misses the
+// normal-text floor against at least one of the surfaces a page actually
+// paints. Every use of a restricted token in component styles has to be listed
+// below with the size and the background that make it legal.
+//
+// Deriving it pays in both directions. Darken a safe token tomorrow and it
+// becomes restricted by itself -- the build stops until its uses are
+// justified, and nobody has to remember to come add it here. Lighten a
+// restricted one and the guard says the restriction is now pointless, so the
+// list cannot silently fill up with ceremony.
+//
+// Measured against this table on 8-oct: --tt-text-secondary (worst 5.65:1) and
+// --tt-brand-text (6.42:1) clear the floor on every page surface and are
+// therefore NOT restricted and deliberately absent. Listing them would have
+// been paperwork with no safety in it. The three that ARE restricted:
+// --tt-on-brand (1.00:1 on --tt-bg-surface, inverse-only by design),
+// --tt-text-muted (3.82:1 on --tt-bg-inset, large-text-only) and --tt-success
+// (4.15:1 on --tt-bg-inset, legal for glyphs at 3:1 but not for text).
+// ---------------------------------------------------------------------------
+const PAGE_SURFACES = ['--tt-bg-canvas', '--tt-bg-surface', '--tt-bg-subtle', '--tt-bg-inset'];
+const NORMAL_TEXT_FLOOR = 4.5;
+
+const ALLOWLIST = new Map([
   [
-    'src/app/landing/sections/how-it-works/how-it-works.scss',
-    '.steps__number, 36px/700 -> large text, checked above at 3:1',
+    '--tt-text-muted',
+    new Map([
+      [
+        'src/app/landing/sections/how-it-works/how-it-works.scss',
+        '.steps__number, 36px/700 on --tt-bg-surface -> large text, checked above at 3:1',
+      ],
+      [
+        'src/app/layout/site-footer/site-footer.scss',
+        '.site-footer__heading and .site-footer__legal, 14px on --tt-bg-surface, checked above at 4.5:1',
+      ],
+    ]),
   ],
   [
-    'src/app/layout/site-footer/site-footer.scss',
-    '.site-footer__heading and .site-footer__legal, 14px on --tt-bg-surface, checked above at 4.5:1',
+    '--tt-on-brand',
+    new Map([
+      [
+        'src/app/layout/site-header/site-header.scss',
+        '.site-header__mark, 14px/700 mono inside a 32px tile filled with --tt-brand, checked above at 4.5:1',
+      ],
+      [
+        'src/styles/_layout.scss',
+        '.tt-btn--primary and .tt-skip-link on --tt-brand, plus the hover and active repaints -- all three backgrounds checked above at 4.5:1',
+      ],
+    ]),
+  ],
+  [
+    '--tt-success',
+    new Map([
+      [
+        'src/app/landing/sections/waitlist/waitlist.scss',
+        '.confirm__icon, a 56px glyph on --tt-success-subtle -> non-text contrast, checked above at 3:1. NOT legal as text anywhere.',
+      ],
+    ]),
   ],
 ]);
 
@@ -160,15 +252,26 @@ function ratio(a, b) {
 }
 
 let failed = 0;
+let light;
+let dark;
 
 try {
-  const { light, dark } = themes(readFileSync(THEME, 'utf8'));
+  ({ light, dark } = themes(readFileSync(THEME, 'utf8')));
+} catch (err) {
+  // A renamed or deleted token lands here. Say so in one line instead of a stack
+  // trace, and still exit non-zero: an unreadable token table is a failed check.
+  console.error(`check-contrast could not read the token table: ${err.message}`);
+  process.exit(1);
+}
 
+const THEMES = [
+  ['light', light],
+  ['dark', dark],
+];
+
+try {
   for (const check of CHECKS) {
-    for (const [name, vars] of [
-      ['light', light],
-      ['dark', dark],
-    ]) {
+    for (const [name, vars] of THEMES) {
       const fg = resolve(check.fg, vars);
       const bg = resolve(check.bg, vars);
       const r = ratio(fg, bg);
@@ -179,9 +282,7 @@ try {
     }
   }
 } catch (err) {
-  // A renamed or deleted token lands here. Say so in one line instead of a stack
-  // trace, and still exit non-zero: an unreadable token table is a failed check.
-  console.error(`check-contrast could not read the token table: ${err.message}`);
+  console.error(`check-contrast could not resolve a pair in CHECKS: ${err.message}`);
   process.exit(1);
 }
 
@@ -195,35 +296,107 @@ function scssFilesUnder(dir) {
   return out;
 }
 
+// Only `color:` counts. `background-color`, `border-color` and `caret-color` are
+// all preceded by a dash, which is what the character class in front rules out --
+// a token painting a border is not text and does not belong to this guard.
+function colorTokensIn(source) {
+  const out = new Set();
+  for (const line of source.split('\n')) {
+    if (line.trimStart().startsWith('//')) continue;
+    for (const m of line.matchAll(/(?:^|[^-\w])color\s*:\s*var\(\s*(--tt-[\w-]+)/g)) out.add(m[1]);
+  }
+  return out;
+}
+
+// The worst this token measures against any surface a page actually paints, in
+// either theme. This is what decides "restricted" -- the table decides, not a
+// hand-written list that someone has to remember to update.
+function worstOnPageSurfaces(token) {
+  let worst = Infinity;
+  let where = '';
+  for (const surface of PAGE_SURFACES) {
+    for (const [name, vars] of THEMES) {
+      const r = ratio(resolve(token, vars), resolve(surface, vars));
+      if (r < worst) {
+        worst = r;
+        where = `${r.toFixed(2)}:1 on ${surface} in ${name}`;
+      }
+    }
+  }
+  return { worst, where };
+}
+
 const SRC = join(root, 'src');
-const unlisted = [];
-const stale = new Set(MUTED_ALLOWLIST.keys());
+const usedAsColor = new Map(); // token -> Set of files that paint text with it
 
 for (const file of scssFilesUnder(SRC)) {
-  const rel = file.slice(root.length + 1).split('\\').join('/');
+  const rel = file
+    .slice(root.length + 1)
+    .split('\\')
+    .join('/');
   if (rel === 'src/styles/theme.css') continue;
-  const uses = readFileSync(file, 'utf8')
-    .split('\n')
-    .some((line) => !line.trimStart().startsWith('//') && line.includes(MUTED_TOKEN));
-  if (!uses) continue;
-  if (MUTED_ALLOWLIST.has(rel)) stale.delete(rel);
-  else unlisted.push(rel);
+  for (const token of colorTokensIn(readFileSync(file, 'utf8'))) {
+    if (!usedAsColor.has(token)) usedAsColor.set(token, new Set());
+    usedAsColor.get(token).add(rel);
+  }
 }
 
-for (const rel of unlisted) {
+const restricted = new Map(); // token -> { worst, where }
+for (const token of [...usedAsColor.keys()].sort()) {
+  let measured;
+  try {
+    measured = worstOnPageSurfaces(token);
+  } catch (err) {
+    // A typo or a token someone deleted from theme.css. Fail with the file that
+    // uses it, not with a stack trace from three frames down.
+    failed += 1;
+    console.log(
+      `FAIL  color: var(${token}) in ${[...usedAsColor.get(token)].join(', ')}  <-- ${err.message}`,
+    );
+    continue;
+  }
+  if (measured.worst < NORMAL_TEXT_FLOOR) restricted.set(token, measured);
+}
+
+for (const [token, { where }] of restricted) {
+  const listed = ALLOWLIST.get(token) ?? new Map();
+  const files = usedAsColor.get(token);
+  for (const rel of files) {
+    if (listed.has(rel)) continue;
+    failed += 1;
+    console.log(
+      `FAIL  color: var(${token}) in ${rel} is not listed for that token  <-- it measures ${where}, under the ${NORMAL_TEXT_FLOOR}:1 normal-text floor, so this use needs a reason. Add the real pair to CHECKS with the background and size, then list the file under ${token} in ALLOWLIST.`,
+    );
+  }
+  for (const rel of listed.keys()) {
+    if (files.has(rel)) continue;
+    failed += 1;
+    console.log(
+      `FAIL  ALLOWLIST lists ${rel} under ${token}, which no longer paints text with it  <-- drop the entry so the list keeps meaning something.`,
+    );
+  }
+}
+
+// The other direction: an entry whose token is no longer restricted. Keeping it
+// would turn the list into ceremony, and ceremony is what stops being read.
+for (const token of ALLOWLIST.keys()) {
+  if (restricted.has(token)) continue;
   failed += 1;
+  const used = usedAsColor.has(token)
+    ? `it now clears ${NORMAL_TEXT_FLOOR}:1 on every page surface`
+    : 'it is no longer used as a text color anywhere';
   console.log(
-    `FAIL  ${MUTED_TOKEN} used in ${rel}, which is not in MUTED_ALLOWLIST  <-- the token is 4.39:1 on --tt-bg-canvas in light: large text only. Add the pair to CHECKS with the real background and size, then list the file here.`,
+    `FAIL  ALLOWLIST restricts ${token}, but ${used}  <-- remove the whole entry. A restriction that protects nothing costs attention on every future change.`,
   );
 }
-for (const rel of stale) {
-  failed += 1;
+
+if (failed === 0) {
+  const entries = [...restricted.keys()]
+    .map((t) => `${t} (${ALLOWLIST.get(t).size} file(s))`)
+    .join(', ');
   console.log(
-    `FAIL  MUTED_ALLOWLIST lists ${rel}, which no longer uses ${MUTED_TOKEN}  <-- drop the entry so the allowlist keeps meaning something.`,
+    `\nRestricted text tokens, derived from theme.css: ${restricted.size} of ${usedAsColor.size} tokens used as a color -- ${entries}. All uses accounted for.`,
   );
-}
-if (unlisted.length === 0 && stale.size === 0) {
-  console.log(`\n${MUTED_TOKEN} usage: ${MUTED_ALLOWLIST.size} file(s), all accounted for.`);
 }
 
 if (failed > 0) {
