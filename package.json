@@ -7,6 +7,7 @@
     "build": "ng build",
     "postbuild": "node tools/emit-route-cards.mjs",
     "check:contrast": "node tools/check-contrast.mjs",
+    "check:fontsize": "node tools/check-font-sizes.mjs",
     "watch": "ng build --watch --configuration development",
     "serve:dist": "node tools/serve-dist.mjs",
     "test": "ng test",

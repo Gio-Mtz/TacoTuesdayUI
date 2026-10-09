@@ -22,12 +22,15 @@
   font-weight: 700;
   line-height: 1;
 
-  // GUARD, not documentation: this number is 36px/700, which WCAG treats as large
-  // text and requires 3:1 against --tt-bg-surface. --tt-text-muted is the faintest
-  // token that clears it (4.58:1 light, 5.71:1 dark); the next rung down, barro-400,
-  // measures 2.91:1 in light and fails. Do NOT swap this for a --tt-border-* token:
-  // that is what TD-008 was (1.88:1 light, 1.73:1 dark). Verify with
-  // `npm run check:contrast`.
+  // GUARD, not documentation: --tt-text-muted on --tt-bg-surface is checked at the
+  // 4.5:1 NORMAL-text floor (4.58:1 light, 5.71:1 dark), not at the 3:1 WCAG allows
+  // for 36px/700. TD-028 promoted it on purpose: the pair clears the stricter floor
+  // anyway, so the old 3:1 made this number's SIZE load-bearing for its contrast --
+  // change --tt-text-4xl here to --tt-text-lg and the guard would have kept passing
+  // while the text became illegal. The floor no longer depends on this line.
+  // The next rung down, barro-400, measures 2.91:1 in light and fails either way. Do
+  // NOT swap this for a --tt-border-* token: that is what TD-008 was (1.88:1 light,
+  // 1.73:1 dark). Verify with `npm run check:contrast`.
   color: var(--tt-text-muted);
 }
 

@@ -34,6 +34,9 @@ jobs:
       - name: Contrast guard
         run: npm run check:contrast
 
+      - name: Font size guard
+        run: npm run check:fontsize
+
       - name: The postbuild really emitted the social cards
         run: |
           set -e

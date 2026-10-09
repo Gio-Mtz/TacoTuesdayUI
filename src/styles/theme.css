@@ -19,7 +19,7 @@
   --tt-font-body:'Inter','Segoe UI',system-ui,sans-serif;
   --tt-font-mono:'JetBrains Mono','Cascadia Code',ui-monospace,monospace;
 
-  --tt-text-xs:.75rem;  --tt-text-sm:.875rem; --tt-text-base:1rem;
+  --tt-text-sm:.875rem; --tt-text-base:1rem;
   --tt-text-lg:1.125rem;--tt-text-xl:1.25rem; --tt-text-2xl:1.5rem;
   --tt-text-3xl:1.875rem;--tt-text-4xl:2.25rem;--tt-text-5xl:3rem;
 
