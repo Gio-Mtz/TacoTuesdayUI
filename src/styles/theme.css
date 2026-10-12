@@ -19,7 +19,7 @@
   --tt-font-body:'Inter','Segoe UI',system-ui,sans-serif;
   --tt-font-mono:'JetBrains Mono','Cascadia Code',ui-monospace,monospace;
 
-  --tt-text-xs:.75rem;  --tt-text-sm:.875rem; --tt-text-base:1rem;
+  --tt-text-sm:.875rem; --tt-text-base:1rem;
   --tt-text-lg:1.125rem;--tt-text-xl:1.25rem; --tt-text-2xl:1.5rem;
   --tt-text-3xl:1.875rem;--tt-text-4xl:2.25rem;--tt-text-5xl:3rem;
 
@@ -68,7 +68,7 @@
   --tt-danger:#BC3B2E;  --tt-danger-subtle:#FBEDEB;
   --tt-info:#35688F;    --tt-info-subtle:#EAF1F7;
 
-  --tt-focus:var(--tt-agave-400);
+  --tt-focus:var(--tt-agave-500);
   --tt-overlay:rgba(33,30,26,.48);
 
   --tt-shadow-sm:0 1px 2px rgba(33,30,26,.06), 0 1px 1px rgba(33,30,26,.04);
