@@ -50,6 +50,11 @@ export const SOCIAL: SocialManifest = MANIFEST as SocialManifest;
 
 export const SOCIAL_CARDS = SOCIAL.cards;
 
+// The language that answers a visitor whose own language matches nothing in an
+// hreflang cluster. A property of the product (the site's default copy is
+// English), not of any one page.
+const DEFAULT_LANG = 'en';
+
 export interface PageSocialData {
   readonly card: SocialCardKey;
 }
@@ -121,7 +126,21 @@ export class PageSocialMetaService {
     const other = SOCIAL_CARDS[card.alternate];
     this.link('alternate', absoluteUrl(card.route), card.lang);
     this.link('alternate', absoluteUrl(other.route), other.lang);
-    this.link('alternate', absoluteUrl(SOCIAL_CARDS.home.route), 'x-default');
+
+    // x-default is the DEFAULT_LANG member of THIS cluster, not the site's home
+    // page. It used to be `SOCIAL_CARDS.home.route` unconditionally, which is
+    // accidentally right for the landing cluster -- `/` IS its English member --
+    // and wrong for the privacy notices, where it named a URL outside the
+    // cluster. Google honours an hreflang set only when every annotation is
+    // reciprocal, so that one line voided the whole set US-011 added. The
+    // emitted build has the same rule in `tools/emit-route-cards.mjs` and
+    // `tools/check-hreflang.mjs` measures the result.
+    const fallback = [card, other].find(
+      (entry) => entry.lang === DEFAULT_LANG || entry.lang.startsWith(`${DEFAULT_LANG}-`),
+    );
+    if (fallback) {
+      this.link('alternate', absoluteUrl(fallback.route), 'x-default');
+    }
   }
 
   private link(rel: string, href: string, hreflang: string | null): void {
