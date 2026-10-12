@@ -40,11 +40,19 @@ jobs:
       - name: Route config guard
         run: npm run check:routes
 
+      # Reads the EMITTED dist, so it has to run after Build. Checks that the
+      # hreflang sets are reciprocal and self-contained, and that sitemap.xml
+      # and the pages say the same thing -- the two preconditions Google needs
+      # before it honours any of them.
+      - name: Hreflang guard
+        run: npm run check:hreflang
+
       - name: The postbuild really emitted the social cards
         run: |
           set -e
           for f in dist/TacoTuesdayUI/browser/talento/index.html \
                    dist/TacoTuesdayUI/browser/privacidad/index.html \
+                   dist/TacoTuesdayUI/browser/privacy/index.html \
                    dist/TacoTuesdayUI/browser/sitemap.xml \
                    dist/TacoTuesdayUI/browser/robots.txt; do
             test -s "$f" || { echo "::error::missing $f - did postbuild run?"; exit 1; }

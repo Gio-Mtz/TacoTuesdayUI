@@ -104,6 +104,59 @@ describe('PageSocialMetaService', () => {
     expect(alternates).toContainEqual(['en', absoluteUrl('/privacy')]);
   });
 
+  // The three below are the hole this spec used to have. The test above asserted
+  // the two pairs with toContainEqual and never looked at x-default, so it
+  // passed for as long as x-default pointed at `/` -- a URL outside the privacy
+  // cluster, which made every annotation on both notices non-reciprocal and
+  // voided the set. Asserting the WHOLE set, not a subset, is what closes it.
+  it('points x-default inside the cluster, not at the home page', () => {
+    service.apply(SOCIAL_CARDS.privacidad);
+
+    const xDefault = Array.from(
+      document.head.querySelectorAll('link[rel="alternate"][hreflang="x-default"]'),
+    ).map((link) => link.getAttribute('href'));
+
+    // /privacy is the English member of THIS cluster. `/` is not in it at all.
+    expect(xDefault).toEqual([absoluteUrl('/privacy')]);
+    expect(xDefault).not.toContain(absoluteUrl('/'));
+  });
+
+  it('annotates nothing outside the cluster it is in', () => {
+    for (const key of ['privacidad', 'privacy'] as const) {
+      service.apply(SOCIAL_CARDS[key]);
+
+      const cluster = [absoluteUrl('/privacidad'), absoluteUrl('/privacy')];
+      const hrefs = Array.from(
+        document.head.querySelectorAll('link[rel="alternate"][hreflang]'),
+      ).map((link) => link.getAttribute('href'));
+
+      expect(hrefs.length).toBeGreaterThan(0);
+      for (const href of hrefs) {
+        expect(cluster).toContain(href);
+      }
+    }
+  });
+
+  it('keeps the landing cluster exactly as it was, x-default included', () => {
+    // The old hardcoded x-default was accidentally RIGHT here, because `/` is
+    // this cluster's English member. The fix must not move it.
+    service.apply(SOCIAL_CARDS.home);
+
+    const alternates = Array.from(
+      document.head.querySelectorAll('link[rel="alternate"][hreflang]'),
+    )
+      .map((link) => `${link.getAttribute('hreflang')} ${link.getAttribute('href')}`)
+      .sort();
+
+    expect(alternates).toEqual(
+      [
+        `en ${absoluteUrl('/')}`,
+        `es-MX ${absoluteUrl('/talento')}`,
+        `x-default ${absoluteUrl('/')}`,
+      ].sort(),
+    );
+  });
+
   it('remembers the card it applied, so the language switch reads the same one', () => {
     service.apply(SOCIAL_CARDS.privacy);
     expect(service.card()).toBe(SOCIAL_CARDS.privacy);

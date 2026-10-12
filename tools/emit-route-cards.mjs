@@ -14,6 +14,50 @@ function die(code, message) {
   process.exit(code);
 }
 
+// The language that answers a visitor whose own language matches nothing in a
+// cluster. It is a property of the product (the site's default copy is English),
+// not of any one page.
+const DEFAULT_LANG = 'en';
+
+/**
+ * The hreflang set for one card: the card, its alternate, and an x-default --
+ * and the x-default is the DEFAULT_LANG member of THAT cluster, not the site's
+ * home page.
+ *
+ * This function exists because the set used to be built twice, separately: once
+ * here for the emitted HTML and once in `sitemap()`, which forgot x-default
+ * entirely. Both copies also hardcoded x-default to the home route, which is
+ * accidentally correct for the landing cluster (its English member IS `/`) and
+ * wrong for the privacy cluster, where it named a URL outside the cluster that
+ * never annotated back. Google honours an hreflang set only when it is
+ * reciprocal, so that one line voided the annotations US-011 added. One
+ * function, two callers, and `tools/check-hreflang.mjs` measures the emitted
+ * result against both rules.
+ */
+function hreflangSet(card, manifest) {
+  if (!card.alternate) return [];
+  const other = manifest.cards[card.alternate];
+  if (!other) {
+    die(2, `card "${card.route}" points at alternate "${card.alternate}", which does not exist`);
+  }
+  const cluster = [card, other];
+  const fallback = cluster.find(
+    (entry) => entry.lang === DEFAULT_LANG || entry.lang.startsWith(`${DEFAULT_LANG}-`),
+  );
+  if (!fallback) {
+    die(
+      2,
+      `cluster ${card.route} <-> ${other.route} has no "${DEFAULT_LANG}" member, so x-default ` +
+        `cannot point inside it -- add one or drop the alternate`,
+    );
+  }
+  return [
+    [card.lang, card.route],
+    [other.lang, other.route],
+    ['x-default', fallback.route],
+  ];
+}
+
 function attr(value) {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -103,20 +147,9 @@ function cardTags(card, manifest) {
 
   lines.push(`  <link rel="canonical" href="${attr(url)}">`);
 
-  if (card.alternate) {
-    const other = manifest.cards[card.alternate];
-    if (!other) {
-      die(2, `card "${card.route}" points at alternate "${card.alternate}", which does not exist`);
-    }
-    const home = manifest.cards.home;
-    for (const [hreflang, route] of [
-      [card.lang, card.route],
-      [other.lang, other.route],
-      ['x-default', home.route],
-    ]) {
-      const href = route === '/' ? `${base}/` : `${base}${route}`;
-      lines.push(`  <link rel="alternate" hreflang="${attr(hreflang)}" href="${attr(href)}">`);
-    }
+  for (const [hreflang, route] of hreflangSet(card, manifest)) {
+    const href = route === '/' ? `${base}/` : `${base}${route}`;
+    lines.push(`  <link rel="alternate" hreflang="${attr(hreflang)}" href="${attr(href)}">`);
   }
 
   return { html: lines.join('\n'), url };
@@ -167,11 +200,12 @@ function sitemap(manifest) {
     .filter((card) => card.indexable)
     .map((card) => {
       const loc = card.route === '/' ? `${base}/` : `${base}${card.route}`;
-      const alternates = card.alternate
-        ? [card, manifest.cards[card.alternate]]
-            .map((entry) => {
-              const href = entry.route === '/' ? `${base}/` : `${base}${entry.route}`;
-              return `    <xhtml:link rel="alternate" hreflang="${entry.lang}" href="${href}" />`;
+      const set = hreflangSet(card, manifest);
+      const alternates = set.length
+        ? set
+            .map(([hreflang, route]) => {
+              const href = route === '/' ? `${base}/` : `${base}${route}`;
+              return `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${href}" />`;
             })
             .join('\n') + '\n'
         : '';
