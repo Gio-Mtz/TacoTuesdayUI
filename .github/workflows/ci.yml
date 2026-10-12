@@ -37,6 +37,9 @@ jobs:
       - name: Font size guard
         run: npm run check:fontsize
 
+      - name: Route config guard
+        run: npm run check:routes
+
       - name: The postbuild really emitted the social cards
         run: |
           set -e

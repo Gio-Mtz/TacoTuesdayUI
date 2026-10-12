@@ -9,6 +9,10 @@
     {
       "route": "/privacidad",
       "rewrite": "/privacidad/index.html"
+    },
+    {
+      "route": "/privacy",
+      "rewrite": "/privacy/index.html"
     }
   ],
 
