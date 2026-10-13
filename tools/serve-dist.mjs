@@ -77,12 +77,19 @@ const MIME_TYPES = {
 
 /** Text assets Azure compresses. Images and fonts are already compressed. */
 const COMPRESSIBLE = new Set([
-  '.html', '.js', '.css', '.json', '.map', '.svg', '.xml', '.txt', '.webmanifest',
+  '.html',
+  '.js',
+  '.css',
+  '.json',
+  '.map',
+  '.svg',
+  '.xml',
+  '.txt',
+  '.webmanifest',
 ]);
 
 /** Mirrors the `*.{css,js,...}` glob in navigationFallback.exclude. */
-const EXCLUDED_EXTENSIONS =
-  /\.(css|js|map|png|jpe?g|svg|ico|webp|woff2?|txt|xml|webmanifest)$/i;
+const EXCLUDED_EXTENSIONS = /\.(css|js|map|png|jpe?g|svg|ico|webp|woff2?|txt|xml|webmanifest)$/i;
 
 /** Angular emits hashed filenames; those are safe to cache forever. */
 const HASHED_ASSET = /-[A-Z0-9]{8}\.(js|css)$/;
@@ -111,9 +118,7 @@ async function isFile(path) {
 
 function isExcludedFromFallback(pathname, exclude) {
   if (EXCLUDED_EXTENSIONS.test(pathname)) return true;
-  return exclude.some(
-    (glob) => glob.endsWith('/*') && pathname.startsWith(glob.slice(0, -1)),
-  );
+  return exclude.some((glob) => glob.endsWith('/*') && pathname.startsWith(glob.slice(0, -1)));
 }
 
 /** Resolves a request path to a file in the served root, the way Azure does. */
@@ -196,9 +201,7 @@ async function main() {
     );
     res.setHeader(
       'Cache-Control',
-      HASHED_ASSET.test(target)
-        ? 'public, max-age=31536000, immutable'
-        : 'no-cache',
+      HASHED_ASSET.test(target) ? 'public, max-age=31536000, immutable' : 'no-cache',
     );
     res.setHeader('Vary', 'Accept-Encoding');
 

@@ -18,7 +18,7 @@ record is about the decisions that are not obvious from reading the component.
 The API it posts to does not exist yet: `POST /api/leads` is US-004. That
 ordering is deliberate (the form is what proves the contract is worth building)
 but it means this story's Definition of Done is front-end only. See
-*Consequences*.
+_Consequences_.
 
 ## Decisions
 
@@ -137,20 +137,20 @@ for one radio button.
 
 ## Consequences
 
-* **This story is Done as front end only.** `ng build` and `ng test` pass and the
+- **This story is Done as front end only.** `ng build` and `ng test` pass and the
   four states were rendered and measured in Chromium. The form cannot be
   exercised end to end until US-004 provides `POST /api/leads` and US-006 wires
   the environments and CORS. Until then it will fail in production with a
   network error and the message in decision 4 — which is the honest behaviour,
   but it is a reason not to announce the landing yet.
-* **US-004 inherits two requirements from this record**: the contract in
+- **US-004 inherits two requirements from this record**: the contract in
   `src/app/api/Leads/ILead.ts` (including `alreadyRegistered`), and server-side
   rate limiting, because the honeypot does not cover a direct post.
-* **The form collects personal data that the privacy notice already promises to
+- **The form collects personal data that the privacy notice already promises to
   delete on request**, and that promise names `SITE_INFO.contactEmail`, which is
   still the placeholder from OPS-6. The form makes that impediment more
   expensive, not less: it is now a page that collects addresses while offering a
   deletion channel that bounces.
-* `_layout.scss` gained nothing. The form's controls are used once, on one page,
+- `_layout.scss` gained nothing. The form's controls are used once, on one page,
   so they live in the component. When a second form appears, the input and the
   label move up — not before.

@@ -1,0 +1,23 @@
+# What Prettier must NOT touch, and why. Every line here is a decision, not a
+# default: an ignore file that grows by habit is how a style gate stops meaning
+# anything.
+
+# Build output. `npm run build` writes it, `tools/emit-route-cards.mjs` rewrites
+# the emitted HTML afterwards, and nothing in it is reviewed by a human. Without
+# this line `npm run check:format` passes on a clean checkout and fails right
+# after a build, which would teach everyone to ignore the gate.
+dist/
+
+# npm owns the lockfile. It is machine-written on every install, and reformatting
+# it would put the gate in a fight it cannot win.
+package-lock.json
+
+# Two reasons, and the second one is the one that matters. First: the bridge
+# Claude writes through rejects `.github/`, so a block cannot fix a finding here.
+# Second, measured on 13-oct: the ONLY thing Prettier changes in this whole
+# directory is one continuation line of an HTML comment in
+# `pull_request_template.md`, which it indents eight spaces deeper -- a change
+# that makes the file harder to read, not easier. So this is not a gap waiting
+# to be closed by hand: it is a decision. Revisit it if Prettier's markdown
+# output ever earns it.
+.github/

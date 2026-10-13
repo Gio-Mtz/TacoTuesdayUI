@@ -19,13 +19,7 @@ describe('Waitlist', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Waitlist],
-      providers: [
-        provideHttpClient(),
-
-        provideHttpClientTesting(),
-
-        provideRouter([]),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     }).compileComponents();
 
     http = TestBed.inject(HttpTestingController);
@@ -89,9 +83,7 @@ describe('Waitlist', () => {
 
   it('gives every visible input a label that points at it', () => {
     const inputs = Array.from(
-      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLInputElement>(
-        '.field__input',
-      ),
+      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLInputElement>('.field__input'),
     );
     expect(inputs.length).toBeGreaterThan(0);
     for (const input of inputs) {

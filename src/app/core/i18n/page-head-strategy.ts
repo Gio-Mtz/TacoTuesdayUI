@@ -1,10 +1,6 @@
 import { DOCUMENT, Injectable, inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import {
-  ActivatedRouteSnapshot,
-  DefaultTitleStrategy,
-  RouterStateSnapshot,
-} from '@angular/router';
+import { ActivatedRouteSnapshot, DefaultTitleStrategy, RouterStateSnapshot } from '@angular/router';
 
 import {
   PageSocialData,

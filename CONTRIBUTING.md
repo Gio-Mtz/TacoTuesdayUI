@@ -30,13 +30,13 @@ setup exists to prevent.
 
 ## Conventions
 
-| | |
-| --- | --- |
-| Components | Standalone. No NgModules |
-| State | Signals. `toSignal()` to bridge anything from RxJS |
-| Change detection | Zoneless. **Mutating a plain property will not re-render** |
-| Styling | The design tokens in `src/styles`. Never a raw hex in a component |
-| Routing | Lazy `loadComponent` per feature |
+|                  |                                                                   |
+| ---------------- | ----------------------------------------------------------------- |
+| Components       | Standalone. No NgModules                                          |
+| State            | Signals. `toSignal()` to bridge anything from RxJS                |
+| Change detection | Zoneless. **Mutating a plain property will not re-render**        |
+| Styling          | The design tokens in `src/styles`. Never a raw hex in a component |
+| Routing          | Lazy `loadComponent` per feature                                  |
 
 ### The zoneless rule is the one that bites
 
@@ -55,9 +55,9 @@ this.data.set(response);
 
 ```scss
 .card {
-  background: var(--tt-bg-surface);   // ✅ follows light/dark
-  background: #ffffff;                // ❌ stays white in dark mode
-  color: tt.agave(600);               // ❌ Sass resolves at build time, cannot change at runtime
+  background: var(--tt-bg-surface); // ✅ follows light/dark
+  background: #ffffff; // ❌ stays white in dark mode
+  color: tt.agave(600); // ❌ Sass resolves at build time, cannot change at runtime
 }
 ```
 

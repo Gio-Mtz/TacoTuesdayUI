@@ -36,12 +36,12 @@ Measure **all four routes**, not just the home page: `/`, `/talento`,
 
 ## Measured on 2026-10-09 (commit `d8bda05`, mobile preset, 2 runs per route)
 
-| Route | Compressed (as deployed) | Uncompressed floor |
-| --- | --- | --- |
-| `/` | **93–94** | 76–78 |
-| `/talento` | **94** | 80–81 |
-| `/privacidad` | **96** | 82 |
-| `/privacy` | **96** | 81–82 |
+| Route         | Compressed (as deployed) | Uncompressed floor |
+| ------------- | ------------------------ | ------------------ |
+| `/`           | **93–94**                | 76–78              |
+| `/talento`    | **94**                   | 80–81              |
+| `/privacidad` | **96**                   | 82                 |
+| `/privacy`    | **96**                   | 81–82              |
 
 Core Web Vitals, compressed: FCP 1.41–1.44 s, LCP 2.31–2.45 s,
 TBT 131–230 ms, CLS 0.000 in 15 of 16 runs (one 0.075 outlier on `/privacy`,

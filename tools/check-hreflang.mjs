@@ -70,7 +70,10 @@ function findDist(explicit) {
   }
   const root = join(REPO, 'dist');
   if (!existsSync(root)) {
-    die(2, 'no dist/ -- run `npm run build` first (this guard reads what was emitted, not what should have been)');
+    die(
+      2,
+      'no dist/ -- run `npm run build` first (this guard reads what was emitted, not what should have been)',
+    );
   }
   const found = readdirSync(root, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -91,7 +94,9 @@ function read(path, label) {
 }
 
 const manifest = JSON.parse(read(MANIFEST_PATH, 'the social card manifest'));
-const dist = findDist(process.argv.includes('--dist') ? process.argv[process.argv.indexOf('--dist') + 1] : null);
+const dist = findDist(
+  process.argv.includes('--dist') ? process.argv[process.argv.indexOf('--dist') + 1] : null,
+);
 const base = String(manifest.siteBaseUrl ?? '').replace(/\/$/, '');
 if (!base) {
   die(2, 'the manifest has no siteBaseUrl -- every href below would be relative and uncomparable');
@@ -140,7 +145,9 @@ function annotationsInSitemap(xml) {
   for (const [block] of xml.matchAll(blockPattern)) {
     const loc = block.match(/<loc>\s*([^<\s]+)\s*<\/loc>/i);
     if (!loc) {
-      fail('a <url> block in sitemap.xml has no <loc> -- it annotates nothing and cannot be checked');
+      fail(
+        'a <url> block in sitemap.xml has no <loc> -- it annotates nothing and cannot be checked',
+      );
       checks += 1;
       continue;
     }
@@ -160,11 +167,17 @@ function annotationsInSitemap(xml) {
 
 const sitemapPath = join(dist, 'sitemap.xml');
 if (!existsSync(sitemapPath)) {
-  die(2, 'no sitemap.xml in dist -- the emitter did not run, and an absent sitemap is not a passing sitemap');
+  die(
+    2,
+    'no sitemap.xml in dist -- the emitter did not run, and an absent sitemap is not a passing sitemap',
+  );
 }
 const sitemap = annotationsInSitemap(read(sitemapPath, 'the emitted sitemap'));
 if (sitemap.size === 0) {
-  die(2, 'sitemap.xml declares no <url> -- against the void, that is a failure and not an empty pass');
+  die(
+    2,
+    'sitemap.xml declares no <url> -- against the void, that is a failure and not an empty pass',
+  );
 }
 
 // --- the clusters, derived from the manifest ---------------------------------
@@ -182,7 +195,10 @@ const sorted = (pairs) => [...pairs].map(key).sort();
 for (const [name, card] of paired) {
   const other = manifest.cards[card.alternate];
   if (!other) {
-    die(2, `card "${name}" points at alternate "${card.alternate}", which does not exist in the manifest`);
+    die(
+      2,
+      `card "${name}" points at alternate "${card.alternate}", which does not exist in the manifest`,
+    );
   }
 
   // The cluster is the card plus its alternate, and nothing else. Every
@@ -203,22 +219,30 @@ for (const [name, card] of paired) {
   }
   if (!existsSync(htmlPath)) {
     checks += 1;
-    fail(`card "${name}" (${card.route}) should be emitted at ${htmlPath} and is not -- nothing to annotate`);
+    fail(
+      `card "${name}" (${card.route}) should be emitted at ${htmlPath} and is not -- nothing to annotate`,
+    );
     continue;
   }
   const annotations = annotationsInHtml(read(htmlPath, `the emitted page for "${name}"`));
 
   checks += 1;
   if (annotations.length === 0) {
-    fail(`card "${name}" (${card.route}) emits no hreflang at all, yet its alternate is "${card.alternate}"`);
+    fail(
+      `card "${name}" (${card.route}) emits no hreflang at all, yet its alternate is "${card.alternate}"`,
+    );
     continue;
   }
-  pass(`${card.route} emits ${annotations.length} annotation(s)  (card "${name}", lang=${card.lang})`);
+  pass(
+    `${card.route} emits ${annotations.length} annotation(s)  (card "${name}", lang=${card.lang})`,
+  );
 
   // 1. Self-reference. A cluster where a page does not name itself is not a
   //    cluster Google will read.
   checks += 1;
-  const self = annotations.find(([lang, href]) => lang === card.lang && href === absolute(card.route));
+  const self = annotations.find(
+    ([lang, href]) => lang === card.lang && href === absolute(card.route),
+  );
   if (self) {
     pass(`  ${card.route} names itself as ${card.lang}`);
   } else {
@@ -259,7 +283,9 @@ for (const [name, card] of paired) {
     if (got.length === 0) {
       fail(`  ${card.route} declares no x-default -- visitors matching no language get no answer`);
     } else if (got.length > 1) {
-      fail(`  ${card.route} declares x-default ${got.length} times (${got.join(', ')}) -- only one can be right`);
+      fail(
+        `  ${card.route} declares x-default ${got.length} times (${got.join(', ')}) -- only one can be right`,
+      );
     } else if (got[0] !== wanted) {
       fail(
         `  ${card.route} points x-default at ${got[0]}, expected ${wanted} ` +
@@ -275,10 +301,14 @@ for (const [name, card] of paired) {
   checks += 1;
   const otherPath = emittedFile(other);
   if (otherPath === null || !existsSync(otherPath)) {
-    fail(`  alternate "${card.alternate}" has no emitted file at ${otherPath} -- reciprocity cannot hold`);
+    fail(
+      `  alternate "${card.alternate}" has no emitted file at ${otherPath} -- reciprocity cannot hold`,
+    );
   } else {
     const back = annotationsInHtml(read(otherPath, `the emitted page for "${card.alternate}"`));
-    const namesUs = back.some(([lang, href]) => href === absolute(card.route) && lang === card.lang);
+    const namesUs = back.some(
+      ([lang, href]) => href === absolute(card.route) && lang === card.lang,
+    );
     if (namesUs) {
       pass(`  ${other.route} annotates ${card.lang} -> ${absolute(card.route)} back`);
     } else {
@@ -326,7 +356,9 @@ for (const [name, card] of unpaired) {
     // served by the fallback. Saying so beats both a silent skip and a FAIL
     // measured off the wrong file.
     checks += 1;
-    pass(`${card.route} has no emitted file of its own (dir: null) -- nothing is emitted to annotate (card "${name}")`);
+    pass(
+      `${card.route} has no emitted file of its own (dir: null) -- nothing is emitted to annotate (card "${name}")`,
+    );
     continue;
   }
   if (!existsSync(htmlPath)) continue;
