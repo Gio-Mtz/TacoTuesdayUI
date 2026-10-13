@@ -48,6 +48,13 @@ export class Waitlist implements OnInit {
 
   readonly lockedKind = input<LeadKind | null>(null);
 
+  /**
+   * Which side to open on when the chooser is still visible. `lockedKind`
+   * removes the chooser; this one only moves it, so the visitor can still
+   * change their mind. `lockedKind` wins if both are set.
+   */
+  readonly initialKind = input<LeadKind | null>(null);
+
   readonly sectionId = input<string>('waitlist');
 
   protected readonly copy = computed(() => WAITLIST_COPY[this.pageLang.lang()]);
@@ -133,6 +140,18 @@ export class Waitlist implements OnInit {
 
     effect(() => {
       this.successHeading()?.nativeElement.focus();
+    });
+
+    // An effect and not `ngOnInit`: the home page is a single component
+    // instance, so clicking the other hero door changes the query parameter
+    // without re-creating anything. `ngOnInit` would read the first door the
+    // visitor clicked and then ignore the second one.
+    effect(() => {
+      const requested = this.initialKind();
+
+      if (requested && !this.lockedKind()) {
+        this.form.controls.kind.setValue(requested);
+      }
     });
   }
 

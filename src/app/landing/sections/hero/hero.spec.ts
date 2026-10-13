@@ -52,6 +52,21 @@ describe('Hero', () => {
     const hrefs = Array.from(el().querySelectorAll('.hero__actions a')).map((a) =>
       a.getAttribute('href'),
     );
-    expect(hrefs).toEqual(['/#waitlist', '/#waitlist']);
+
+    for (const href of hrefs) {
+      expect(href).toContain('#waitlist');
+    }
+  });
+
+  it('sends each door to its OWN side of the form, not both to the same one (US-013)', () => {
+    // This is the whole card in one assertion. Until US-013 both hrefs were
+    // `/#waitlist`, so the engineer door opened a form that asked the engineer
+    // for the name of their company.
+    const hrefs = Array.from(el().querySelectorAll('.hero__actions a')).map((a) =>
+      a.getAttribute('href'),
+    );
+
+    expect(hrefs).toEqual(['/?side=company#waitlist', '/?side=candidate#waitlist']);
+    expect(hrefs[0]).not.toBe(hrefs[1]);
   });
 });

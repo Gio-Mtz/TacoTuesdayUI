@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 
 import { routes } from '../app.routes';
 import { Landing } from './landing';
@@ -16,6 +16,17 @@ describe('Landing', () => {
     fixture = TestBed.createComponent(Landing);
     await fixture.whenStable();
   });
+
+  // Navigates first and renders afterwards, which is the order a visitor
+  // arrives in when they paste a link or click a hero door.
+  async function openWith(url: string): Promise<HTMLElement> {
+    await TestBed.inject(Router).navigateByUrl(url);
+
+    const routed = TestBed.createComponent(Landing);
+    await routed.whenStable();
+
+    return routed.nativeElement as HTMLElement;
+  }
 
   function el(): HTMLElement {
     return fixture.nativeElement as HTMLElement;
@@ -37,5 +48,48 @@ describe('Landing', () => {
 
   it('has exactly one <h1> so the heading outline is valid', () => {
     expect(el().querySelectorAll('h1').length).toBe(1);
+  });
+
+  it('opens the form on the company side when nobody said otherwise', () => {
+    // The default has to stay what it has always been: the home page leads with
+    // "For teams hiring engineers", so a visitor with no parameter is treated
+    // as a company, exactly as before US-013.
+    const company = el().querySelector<HTMLInputElement>('input[value="company"]');
+
+    expect(company?.checked).toBe(true);
+    expect(el().querySelector('#waitlist-company')).not.toBeNull();
+  });
+
+  it('opens the form on the ENGINEER side when the engineer door was used (US-013)', async () => {
+    const host = await openWith('/?side=candidate');
+
+    expect(host.querySelector<HTMLInputElement>('input[value="candidate"]')?.checked).toBe(true);
+
+    // The point of the card: the engineer is not asked for the name of their
+    // company, and the field they DO have is there.
+    expect(host.querySelector('#waitlist-company')).toBeNull();
+    expect(host.querySelector('#waitlist-role')).not.toBeNull();
+  });
+
+  it('still lets the visitor change their mind, unlike /talento', async () => {
+    const host = await openWith('/?side=candidate');
+
+    // `lockedKind` removes the chooser. `initialKind` must only move it.
+    expect(host.querySelector('fieldset')).not.toBeNull();
+    expect(host.querySelectorAll('input[type="radio"]').length).toBe(2);
+  });
+
+  it('opens the form on the company side when the door said company', async () => {
+    const host = await openWith('/?side=company');
+
+    expect(host.querySelector<HTMLInputElement>('input[value="company"]')?.checked).toBe(true);
+    expect(host.querySelector('#waitlist-company')).not.toBeNull();
+  });
+
+  it('falls back to the default form on junk instead of breaking the page', async () => {
+    const host = await openWith('/?side=engineer');
+
+    expect(host.querySelector<HTMLInputElement>('input[value="company"]')?.checked).toBe(true);
+    expect(host.querySelectorAll('section').length).toBe(5);
   });
 });
