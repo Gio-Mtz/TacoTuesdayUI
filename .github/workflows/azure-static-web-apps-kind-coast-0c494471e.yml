@@ -11,8 +11,16 @@ on:
 
 jobs:
   build_and_deploy_job:
+    # Gated on the pull request's AUTHOR, never on `github.actor`. A staging
+    # environment is created here and destroyed in the job below, on a later
+    # event, and `github.actor` is a different person on those two events: the
+    # pusher on `synchronize`, whoever clicked close on `closed`. Gating the two
+    # halves of one lifecycle on a value that changes mid-lifecycle is how this
+    # app ran out of staging slots. `github.event.pull_request.user.login` is
+    # the same string on every event of one pull request, and it is `null` on
+    # `push`, so main still deploys. See tools/check-swa-pr-symmetry.mjs.
     if: >-
-      github.actor != 'dependabot[bot]' &&
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
       (github.event_name == 'push' ||
        (github.event_name == 'pull_request' && github.event.action != 'closed'))
     runs-on: ubuntu-latest
@@ -37,8 +45,12 @@ jobs:
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
+    # Deliberately gated on NOTHING but the event. Closing an environment that
+    # was never created is a no-op; failing to close one that was costs a
+    # staging slot forever and eventually blocks an unrelated pull request's
+    # deploy with `maximum number of staging environments`. The costs are not
+    # symmetric, so this job never asks who is closing.
     if: >-
-      github.actor != 'dependabot[bot]' &&
       github.event_name == 'pull_request' &&
       github.event.action == 'closed'
     runs-on: ubuntu-latest
