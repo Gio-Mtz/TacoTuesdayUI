@@ -25,6 +25,13 @@ jobs:
       - name: Install
         run: npm ci
 
+      # Runs first because it is about the environment everything below runs
+      # in: `jsdom@30` raised this tree's Node floor to 22.22.2 and nothing in
+      # the repo said so, which left `node-version: 22` above green by whatever
+      # `setup-node` happens to resolve. Needs only package.json + the lock.
+      - name: Node engine guard
+        run: npm run check:nodeengine
+
       - name: Test
         run: npx ng test --watch=false
 
