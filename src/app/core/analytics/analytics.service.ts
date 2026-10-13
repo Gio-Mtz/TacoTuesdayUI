@@ -47,6 +47,35 @@ export class AnalyticsService {
     return this.document.getElementById(GTAG_SCRIPT_ID) !== null;
   }
 
+  /**
+   * Sends one GA4 event, or refuses and says so.
+   *
+   * It returns a boolean instead of void on purpose: every reason to refuse here is
+   * silent at runtime — no consent, no Measurement ID, no gtag on the page — and a
+   * void method would make those four paths indistinguishable from a delivered hit,
+   * which is exactly how this file's `config` command stayed broken for three work
+   * blocks while the network tab looked fine. The caller gets a fact, and the suite
+   * can assert on it without reaching into `window`.
+   *
+   * The push goes through `view.gtag`, never through `dataLayer.push` directly: gtag.js
+   * only treats an entry as a command when it is an `arguments` object (see the comment
+   * in `load()`), and `view.gtag` is the function that wraps it. An array here would be
+   * dropped without a warning.
+   */
+  event(name: string, params: Readonly<Record<string, string | number | boolean>> = {}): boolean {
+    if (!this.configured || !this.consent.granted()) {
+      return false;
+    }
+
+    const send = this.view()?.gtag;
+    if (!send) {
+      return false;
+    }
+
+    send('event', name, params);
+    return true;
+  }
+
   private load(): void {
     if (!this.configured || this.isLoaded()) {
       return;

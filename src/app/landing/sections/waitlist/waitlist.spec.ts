@@ -4,9 +4,11 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideRouter } from '@angular/router';
 
 import { ILeadRequest, ILeadResponse } from '../../../api/Leads/ILead';
+import { AnalyticsService } from '../../../core/analytics/analytics.service';
 import { PageLangService } from '../../../core/i18n/page-lang';
 import { WAITLIST_COPY } from './waitlist-copy';
 import { Waitlist, describeFailure } from './waitlist';
+import { WAITLIST_LEAD_EVENT } from './waitlist-event';
 
 describe('Waitlist', () => {
   let fixture: ComponentFixture<Waitlist>;
@@ -480,5 +482,141 @@ describe('Waitlist on a Spanish page, pinned to the engineer', () => {
     expect(text()).toContain(es.errors.emailRequired);
 
     expect(text()).not.toContain(es.errors.companyRequired);
+  });
+});
+
+describe('Waitlist analytics', () => {
+  let fixture: ComponentFixture<Waitlist>;
+  let http: HttpTestingController;
+  let sent: { name: string; params: Record<string, unknown> }[];
+
+  const LEADS_URL = '/api/leads';
+
+  // A recorder rather than the real service: this suite is about WHEN the component
+  // reports a lead and with what, not about how AnalyticsService talks to gtag — that
+  // is covered, against gtag's own predicate, in analytics.service.spec.ts.
+  class AnalyticsRecorder {
+    event(name: string, params: Record<string, unknown> = {}): boolean {
+      sent.push({ name, params });
+      return true;
+    }
+  }
+
+  beforeEach(async () => {
+    sent = [];
+
+    await TestBed.configureTestingModule({
+      imports: [Waitlist],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        { provide: AnalyticsService, useClass: AnalyticsRecorder },
+      ],
+    }).compileComponents();
+
+    http = TestBed.inject(HttpTestingController);
+    fixture = TestBed.createComponent(Waitlist);
+    await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    http.verify();
+  });
+
+  const el = <T extends HTMLElement>(selector: string): T | null =>
+    (fixture.nativeElement as HTMLElement).querySelector<T>(selector);
+
+  async function type(id: string, value: string): Promise<void> {
+    const input = el<HTMLInputElement>(`#${id}`);
+    if (!input) {
+      throw new Error(`No input with id ${id} — the template changed.`);
+    }
+    input.value = value;
+    input.dispatchEvent(new Event('input'));
+    await fixture.whenStable();
+  }
+
+  async function submit(): Promise<void> {
+    el<HTMLFormElement>('form')?.dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    );
+    await fixture.whenStable();
+  }
+
+  async function fillValidCompany(): Promise<void> {
+    await type('waitlist-name', 'Gio Martínez');
+    await type('waitlist-email', 'gio@empresa.mx');
+    await type('waitlist-company', 'Taco Tuesday');
+  }
+
+  it('reports a company lead once the API confirmed it', async () => {
+    await fillValidCompany();
+    await submit();
+    http.expectOne(LEADS_URL).flush({ id: 'lead-1', alreadyRegistered: false });
+    await fixture.whenStable();
+
+    expect(sent).toHaveLength(1);
+    expect(sent[0].name).toBe(WAITLIST_LEAD_EVENT);
+    expect(sent[0].params).toEqual({ lead_kind: 'company', already_registered: false });
+  });
+
+  it('tells the two sides of the marketplace apart — the question the sprint exists to answer', async () => {
+    el<HTMLInputElement>('input[type="radio"][value="candidate"]')?.click();
+    await fixture.whenStable();
+    await type('waitlist-name', 'Gio');
+    await type('waitlist-email', 'gio@correo.mx');
+    await type('waitlist-role', 'Backend .NET');
+    await submit();
+    http.expectOne(LEADS_URL).flush({ id: 'lead-2', alreadyRegistered: false });
+    await fixture.whenStable();
+
+    expect(sent[0].params).toEqual({ lead_kind: 'candidate', already_registered: false });
+  });
+
+  it('carries already_registered so a repeat address is not counted as a new lead', async () => {
+    await fillValidCompany();
+    await submit();
+    http.expectOne(LEADS_URL).flush({ id: 'lead-1', alreadyRegistered: true });
+    await fixture.whenStable();
+
+    expect(sent[0].params['already_registered']).toBe(true);
+  });
+
+  it('reports nothing when the honeypot is filled — otherwise bots inflate the one number', async () => {
+    await fillValidCompany();
+    await type('waitlist-website', 'https://spam.example');
+    await submit();
+
+    http.expectNone(LEADS_URL);
+    expect(sent).toHaveLength(0);
+  });
+
+  it('reports nothing when the API fails, even though the visitor did everything right', async () => {
+    await fillValidCompany();
+    await submit();
+    http.expectOne(LEADS_URL).flush('boom', { status: 500, statusText: 'Server Error' });
+    await fixture.whenStable();
+
+    expect(sent).toHaveLength(0);
+  });
+
+  it('reports nothing when the form never passed validation', async () => {
+    await submit();
+
+    http.expectNone(LEADS_URL);
+    expect(sent).toHaveLength(0);
+  });
+
+  it('reports exactly once even if the visitor hammers the button', async () => {
+    await fillValidCompany();
+    await submit();
+    await submit();
+    await submit();
+
+    http.expectOne(LEADS_URL).flush({ id: 'lead-1', alreadyRegistered: false });
+    await fixture.whenStable();
+
+    expect(sent).toHaveLength(1);
   });
 });
