@@ -14,7 +14,8 @@
     "serve:dist": "node tools/serve-dist.mjs",
     "test": "ng test",
     "check:audit": "npm audit --audit-level=critical",
-    "check:nodeengine": "node tools/check-node-engine.mjs"
+    "check:nodeengine": "node tools/check-node-engine.mjs",
+    "check:swa": "node tools/check-swa-pr-symmetry.mjs"
   },
   "private": true,
   "packageManager": "npm@11.17.0",

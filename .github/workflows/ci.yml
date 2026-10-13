@@ -32,6 +32,13 @@ jobs:
       - name: Node engine guard
         run: npm run check:nodeengine
 
+      # Reads .github/workflows only -- no build, no dist. Asserts that every
+      # staging environment the Azure workflow can create has a path that
+      # closes it, for every identity. The gap it closes cost a real deploy:
+      # `maximum number of staging environments` on PR #35.
+      - name: Static Web Apps lifecycle guard
+        run: npm run check:swa
+
       - name: Test
         run: npx ng test --watch=false
 
