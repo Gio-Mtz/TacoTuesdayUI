@@ -4,12 +4,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   selector: 'ttco-icon',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg
-      [attr.width]="size()"
-      [attr.height]="size()"
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg [attr.width]="size()" [attr.height]="size()" aria-hidden="true" focusable="false">
       <use [attr.href]="href()"></use>
     </svg>
   `,

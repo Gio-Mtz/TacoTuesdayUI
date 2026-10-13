@@ -19,8 +19,8 @@ Two questions had to be answered.
 `styles` array of `angular.json`, ahead of `src/styles.scss`.
 
 The obvious alternative, `@import './styles/theme.css'` inside `styles.scss`,
-is a trap. Dart Sass treats an `@import` whose URL ends in `.css` as a *plain
-CSS import* and passes it straight through to the output — so the browser would
+is a trap. Dart Sass treats an `@import` whose URL ends in `.css` as a _plain
+CSS import_ and passes it straight through to the output — so the browser would
 fetch `theme.css` as a second, render-blocking request instead of inlining it
 in the bundle. Dropping the extension (`@import './styles/theme'`) would inline
 it, but `@import` is deprecated in Dart Sass and Angular 21 warns on it.
@@ -30,7 +30,7 @@ anything that might override it, and keeps `theme.css` byte-identical to the
 copy in `TacoTuesdayDesign`. That last point is the one that will matter in six
 months: re-syncing the design system is a copy, never a merge.
 
-**Consequence:** anyone adding a global stylesheet must keep it *after*
+**Consequence:** anyone adding a global stylesheet must keep it _after_
 `theme.css` in that array, or their rules will lose to the token defaults.
 
 ## Decision 2 — "system" means removing `data-theme`, not computing it
@@ -59,7 +59,7 @@ follows their OS. The anti-flash script in `index.html` depends on exactly this
 ## Decision 3 — an inline script in `index.html` for the anti-flash
 
 `theme.css` handles `prefers-color-scheme` on its own, so the only visitor who
-would see a wrong-theme flash is one whose saved choice *disagrees* with their
+would see a wrong-theme flash is one whose saved choice _disagrees_ with their
 OS. Angular boots after first paint, so the service cannot prevent it. Six
 lines of inline script before the stylesheet can.
 

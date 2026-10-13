@@ -15,8 +15,8 @@ they are mostly Mexican, and they do not read a hiring-manager pitch in English.
 Three concrete things were left broken or lost by that decision:
 
 1. **The brand line was translated, which cost it its voice.** The stakeholder's
-   own sentence is *«¿Odias que los reclutas te ghosteen? Deja que ellos te
-   busquen»*, and `brand.md` calls it "the brand". On `/` it renders as "Tired of
+   own sentence is _«¿Odias que los reclutas te ghosteen? Deja que ellos te
+   busquen»_, and `brand.md` calls it "the brand". On `/` it renders as "Tired of
    recruiters ghosting you? Let them come to you" — correct, and flat.
    `ghosteen` is a Spanglish verb a Mexican dev has actually said out loud.
 2. **The Spanish shell pointed at English pages.** `shell-copy.ts` offered
@@ -87,7 +87,7 @@ labels against three hardcoded anchors. A label is translatable; a destination i
 a different page. The `es-MX` nav now points at `/talento`.
 
 The cross-language link — the other audience's page — lives in the **footer**,
-carries `hreflang`, and is labelled in its own language. `hreflang` is set *only*
+carries `hreflang`, and is labelled in its own language. `hreflang` is set _only_
 when the target's language differs from the shell's, because a `hreflang` that
 repeats the current language is still something a screen reader reads.
 

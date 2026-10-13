@@ -43,9 +43,7 @@ describe('SiteHeader', () => {
   });
 
   it('says nothing about language while the link and the page agree', () => {
-    const flags = Array.from(el().querySelectorAll('nav a')).map((a) =>
-      a.getAttribute('hreflang'),
-    );
+    const flags = Array.from(el().querySelectorAll('nav a')).map((a) => a.getAttribute('hreflang'));
     expect(flags).toEqual([null, null, null]);
   });
 
@@ -81,9 +79,7 @@ describe('SiteHeader', () => {
     TestBed.inject(PageLangService).set('es-MX');
     await fixture.whenStable();
 
-    const flags = Array.from(el().querySelectorAll('nav a')).map((a) =>
-      a.getAttribute('hreflang'),
-    );
+    const flags = Array.from(el().querySelectorAll('nav a')).map((a) => a.getAttribute('hreflang'));
     expect(flags).toEqual([null, null, null]);
   });
 

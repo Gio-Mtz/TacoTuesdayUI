@@ -15,12 +15,7 @@ describe('Talent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Talent],
-      providers: [
-        provideHttpClient(),
-
-        provideHttpClientTesting(),
-        provideRouter(routes),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter(routes)],
     }).compileComponents();
 
     http = TestBed.inject(HttpTestingController);

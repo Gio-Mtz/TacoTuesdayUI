@@ -35,8 +35,7 @@ export class ConsentService {
     }
     try {
       storage.removeItem(CONSENT_STORAGE_KEY);
-    } catch {
-    }
+    } catch {}
   }
 
   private persist(state: Exclude<ConsentState, 'unset'>): void {
@@ -48,8 +47,7 @@ export class ConsentService {
     }
     try {
       storage.setItem(CONSENT_STORAGE_KEY, state);
-    } catch {
-    }
+    } catch {}
   }
 
   private readStored(): ConsentState {

@@ -229,6 +229,12 @@ function themes(css) {
   // Light lives in the first :root block. Dark overrides it in :root[data-theme="dark"],
   // which carries the same values as the prefers-color-scheme block.
   const lightBlock = css.slice(css.indexOf('{') + 1, css.indexOf('}'));
+  // This indexOf is coupled to the DOUBLE quotes in that selector, and that is
+  // why `.prettierrc` overrides `singleQuote` to false for *.css. Measured on
+  // 13-oct: with `singleQuote: true` applying to CSS, Prettier rewrites the
+  // selector to [data-theme='dark'] and this guard exits 1 with "no
+  // :root[data-theme=\"dark\"] block found" -- loudly, not silently, but it
+  // stops measuring contrast. Flip that override and you lose this guard.
   const darkStart = css.indexOf(':root[data-theme="dark"]');
   if (darkStart === -1) throw new Error('theme.css: no :root[data-theme="dark"] block found');
   const darkBlock = css.slice(
@@ -453,7 +459,9 @@ function outlineTokensIn(source) {
   const out = new Set();
   for (const line of source.split('\n')) {
     if (line.trimStart().startsWith('//')) continue;
-    for (const m of line.matchAll(/(?:^|[^-\w])outline(?:-color)?\s*:[^;}]*var\(\s*(--tt-[\w-]+)/g)) {
+    for (const m of line.matchAll(
+      /(?:^|[^-\w])outline(?:-color)?\s*:[^;}]*var\(\s*(--tt-[\w-]+)/g,
+    )) {
       out.add(m[1]);
     }
   }

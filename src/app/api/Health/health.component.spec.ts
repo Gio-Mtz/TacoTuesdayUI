@@ -1,9 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { HealthComponent } from './health.component';
 import { IPingResponse } from './IPingResponse';
@@ -38,7 +35,11 @@ describe('HealthComponent', () => {
     const request = httpMock.expectOne((r) => r.url === '/api/candidates/ping');
     expect(request.request.method).toBe('GET');
     expect(request.request.params.get('name')).toBe('Gio');
-    request.flush({ module: 'Candidates', message: 'Hello, Gio', serverTimeUtc: '2026-09-29T00:00:00Z' });
+    request.flush({
+      module: 'Candidates',
+      message: 'Hello, Gio',
+      serverTimeUtc: '2026-09-29T00:00:00Z',
+    });
   });
 
   it('should render the message returned by the API', async () => {

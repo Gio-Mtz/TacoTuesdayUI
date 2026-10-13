@@ -10,6 +10,8 @@
     "check:fontsize": "node tools/check-font-sizes.mjs",
     "check:routes": "node tools/check-route-config.mjs",
     "check:hreflang": "node tools/check-hreflang.mjs",
+    "format": "prettier --write .",
+    "check:format": "prettier --check .",
     "watch": "ng build --watch --configuration development",
     "serve:dist": "node tools/serve-dist.mjs",
     "test": "ng test",

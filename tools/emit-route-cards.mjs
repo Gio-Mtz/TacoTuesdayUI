@@ -111,7 +111,10 @@ function preloadFonts(template, dist) {
   }
 
   const links = files
-    .map((name) => `  <link rel="preload" as="font" type="font/woff2" crossorigin href="media/${name}">`)
+    .map(
+      (name) =>
+        `  <link rel="preload" as="font" type="font/woff2" crossorigin href="media/${name}">`,
+    )
     .join('\n');
 
   if (!template.includes('</head>')) {
@@ -163,8 +166,7 @@ function render(template, card, manifest) {
   }
 
   const { html, url } = cardTags(card, manifest);
-  let out =
-    template.slice(0, start + START.length) + '\n' + html + '\n  ' + template.slice(end);
+  let out = template.slice(0, start + START.length) + '\n' + html + '\n  ' + template.slice(end);
 
   const langAttr = /(<html\b[^>]*?)\blang="[^"]*"/;
   if (!langAttr.test(out)) {
@@ -183,7 +185,10 @@ function verify(path, card, url, manifest) {
     [`<title>${attr(card.documentTitle)}</title>`, 'title'],
     [`<meta property="og:title" content="${attr(card.title)}">`, 'og:title'],
     [`<meta property="og:url" content="${attr(url)}">`, 'og:url'],
-    [`<meta property="og:image" content="${manifest.siteBaseUrl.replace(/\/$/, '')}${card.image}">`, 'og:image'],
+    [
+      `<meta property="og:image" content="${manifest.siteBaseUrl.replace(/\/$/, '')}${card.image}">`,
+      'og:image',
+    ],
   ];
   const missing = expectations.filter(([needle]) => !html.includes(needle)).map(([, name]) => name);
   if (missing.length) {

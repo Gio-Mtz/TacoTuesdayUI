@@ -99,7 +99,9 @@ describe('AnalyticsService', () => {
       consent.grant();
       analytics.sync();
 
-      const theDefault = dataLayer().find((entry) => entry[0] === 'consent' && entry[1] === 'default');
+      const theDefault = dataLayer().find(
+        (entry) => entry[0] === 'consent' && entry[1] === 'default',
+      );
       expect(theDefault?.[2]).toEqual({
         ad_storage: 'denied',
         ad_user_data: 'denied',

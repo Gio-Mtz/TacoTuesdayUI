@@ -142,9 +142,7 @@ describe('PageSocialMetaService', () => {
     // this cluster's English member. The fix must not move it.
     service.apply(SOCIAL_CARDS.home);
 
-    const alternates = Array.from(
-      document.head.querySelectorAll('link[rel="alternate"][hreflang]'),
-    )
+    const alternates = Array.from(document.head.querySelectorAll('link[rel="alternate"][hreflang]'))
       .map((link) => `${link.getAttribute('hreflang')} ${link.getAttribute('href')}`)
       .sort();
 

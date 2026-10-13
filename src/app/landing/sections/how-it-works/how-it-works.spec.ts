@@ -31,7 +31,9 @@ describe('HowItWorks', () => {
   });
 
   it('gives a screen reader the step number too, since the visible one is hidden', () => {
-    const spoken = Array.from(el().querySelectorAll('.tt-sr-only')).map((n) => n.textContent?.trim());
+    const spoken = Array.from(el().querySelectorAll('.tt-sr-only')).map((n) =>
+      n.textContent?.trim(),
+    );
     expect(spoken).toEqual(['Step 1:', 'Step 2:', 'Step 3:']);
   });
 });

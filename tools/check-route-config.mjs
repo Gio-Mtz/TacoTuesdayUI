@@ -71,7 +71,10 @@ if (cards.length === 0) {
 // exists to catch, so it must never read as "nothing to compare".
 const routes = config.routes ?? null;
 if (routes === null) {
-  die(2, `${CONFIG_PATH} has no "routes" array -- every emitted page would fall into navigationFallback`);
+  die(
+    2,
+    `${CONFIG_PATH} has no "routes" array -- every emitted page would fall into navigationFallback`,
+  );
 }
 if (!Array.isArray(routes)) {
   die(2, '"routes" is not an array');
@@ -82,16 +85,24 @@ if (!Array.isArray(routes)) {
 // trusted.
 const fallback = config.navigationFallback?.rewrite ?? null;
 if (fallback === null) {
-  die(2, 'no navigationFallback.rewrite -- re-read this guard before trusting it, its premise is gone');
+  die(
+    2,
+    'no navigationFallback.rewrite -- re-read this guard before trusting it, its premise is gone',
+  );
 }
-pass(`navigationFallback.rewrite is ${fallback} -- anything without a rewrite is served as that file`);
+pass(
+  `navigationFallback.rewrite is ${fallback} -- anything without a rewrite is served as that file`,
+);
 checks += 1;
 
 const withFile = cards.filter(([, card]) => card.dir);
 const withoutFile = cards.filter(([, card]) => !card.dir && card.route !== '/');
 
 if (withFile.length === 0) {
-  die(2, 'no card has a "dir" -- the emitter would write no page of its own, and this guard would pass on nothing');
+  die(
+    2,
+    'no card has a "dir" -- the emitter would write no page of its own, and this guard would pass on nothing',
+  );
 }
 
 const declared = new Map();
@@ -102,7 +113,9 @@ for (const entry of routes) {
     continue;
   }
   if (declared.has(entry.route)) {
-    fail(`"${entry.route}" is declared twice in routes -- the first one wins and the second is dead config`);
+    fail(
+      `"${entry.route}" is declared twice in routes -- the first one wins and the second is dead config`,
+    );
     checks += 1;
   }
   declared.set(entry.route, entry);
@@ -138,7 +151,9 @@ for (const [name, card] of withoutFile) {
     );
     continue;
   }
-  pass(`${card.route} has no file and no rewrite -- lands on ${fallback} for the router, as intended`);
+  pass(
+    `${card.route} has no file and no rewrite -- lands on ${fallback} for the router, as intended`,
+  );
 }
 
 const knownRoutes = new Set(cards.map(([, card]) => card.route));

@@ -43,8 +43,7 @@ export class ThemeService {
       } else {
         storage.setItem(THEME_STORAGE_KEY, preference);
       }
-    } catch {
-    }
+    } catch {}
   }
 
   toggle(): void {

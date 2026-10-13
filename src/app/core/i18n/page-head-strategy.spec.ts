@@ -91,18 +91,18 @@ describe('PageHeadStrategy', () => {
       await navigate('/aviso');
       await navigate('/');
 
-      expect(
-        document.head.querySelector('meta[property="og:url"]')?.getAttribute('content'),
-      ).toBe(absoluteUrl('/'));
+      expect(document.head.querySelector('meta[property="og:url"]')?.getAttribute('content')).toBe(
+        absoluteUrl('/'),
+      );
     });
 
     it('leaves the head alone for a route that declares no card', async () => {
       await navigate('/');
       await navigate('/sin-lang');
 
-      expect(
-        document.head.querySelector('meta[property="og:url"]')?.getAttribute('content'),
-      ).toBe(absoluteUrl('/'));
+      expect(document.head.querySelector('meta[property="og:url"]')?.getAttribute('content')).toBe(
+        absoluteUrl('/'),
+      );
     });
   });
 });

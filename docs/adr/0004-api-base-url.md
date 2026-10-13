@@ -16,9 +16,9 @@ production:
 
 In production the two halves live on different origins:
 
-| Half | Origin |
-| --- | --- |
-| UI (Azure Static Web Apps) | `https://kind-coast-0c494471e.3.azurestaticapps.net` |
+| Half                       | Origin                                                                                 |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| UI (Azure Static Web Apps) | `https://kind-coast-0c494471e.3.azurestaticapps.net`                                   |
 | API (Azure Container Apps) | `https://tacotuesday-api.delightfultree-708c7167.southcentralus.azurecontainerapps.io` |
 
 A relative `/api/leads` from the first origin asks the **Static Web App** for
@@ -108,7 +108,7 @@ that whoever first tries to show a real countdown knows why the header is
 **The FQDN is infrastructure and it has already changed once.** OPS-5 moved the
 Container Apps environment from Central US to South Central US to sit beside the
 SQL server, and the old `ambitiousmeadow-…centralus…` host stopped existing.
-Recreating the *environment* changes this value again. That is why a wrong FQDN
+Recreating the _environment_ changes this value again. That is why a wrong FQDN
 has a test naming the dead region, and why `environment.production.ts` carries the
 `az containerapp show … ingress.fqdn` query in a comment: the next person to hit
 this should check the value before suspecting the code.

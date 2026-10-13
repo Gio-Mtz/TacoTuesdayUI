@@ -1,8 +1,7 @@
 @use '../../../../styles/tokens' as tt;
 
 .hero {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, var(--tt-brand-subtle), transparent 70%);
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, var(--tt-brand-subtle), transparent 70%);
   padding-block: tt.space(8) tt.space(9);
 }
 

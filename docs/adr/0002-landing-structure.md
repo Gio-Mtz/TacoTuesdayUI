@@ -25,7 +25,7 @@ same thing five times. The second force is the one that actually matters:
 three slightly different buttons is how a design system dies, and it dies
 quietly — nobody notices until the fourth one.
 
-Angular's emulated encapsulation scopes a *component's* styles to that
+Angular's emulated encapsulation scopes a _component's_ styles to that
 component; it does not stop global CSS from reaching the component's DOM. So a
 global class is usable from any template with no `::ng-deep` and no host
 selectors.
@@ -60,14 +60,14 @@ The header and the hero use `routerLink="/" fragment="empresas"`, and
 A bare `href="#empresas"` is simpler and works — but only while the visitor is
 already on the landing. From `/privacidad` the same link scrolls to nothing,
 silently. Going through the router means the link navigates to the landing
-first and *then* scrolls, from anywhere, which is what the visitor meant.
+first and _then_ scrolls, from anywhere, which is what the visitor meant.
 
 `scrollPositionRestoration: 'enabled'` comes along for the ride: without it,
 Back from the privacy notice drops the visitor at the top of the landing
 instead of where they were reading.
 
 The one place that deliberately keeps a bare `href` is the skip link in
-`app.html`. A skip link has to move *focus*, not just the scroll position, and
+`app.html`. A skip link has to move _focus_, not just the scroll position, and
 the browser's own same-document jump is the only thing that does both —
 `tabindex="-1"` on `<main>` is what lets focus land there.
 
