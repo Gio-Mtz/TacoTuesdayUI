@@ -17,10 +17,12 @@ import { RouterLink } from '@angular/router';
 
 import { ILeadRequest, LeadKind } from '../../../api/Leads/ILead';
 import { LeadsService } from '../../../api/Leads/leads.service';
+import { AnalyticsService } from '../../../core/analytics/analytics.service';
 import { privacyRoute } from '../../../core/i18n/language-switch';
 import { PageLangService } from '../../../core/i18n/page-lang';
 import { Icon } from '../../../shared/icon/icon';
 import { WAITLIST_COPY, WaitlistFailureCopy } from './waitlist-copy';
+import { WAITLIST_LEAD_EVENT, waitlistLeadParams } from './waitlist-event';
 
 export type WaitlistStatus = 'idle' | 'sending' | 'success' | 'error';
 
@@ -42,6 +44,7 @@ export class Waitlist implements OnInit {
   private readonly leads = inject(LeadsService);
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly pageLang = inject(PageLangService);
+  private readonly analytics = inject(AnalyticsService);
 
   readonly lockedKind = input<LeadKind | null>(null);
 
@@ -177,6 +180,17 @@ export class Waitlist implements OnInit {
       next: (response) => {
         this.alreadyRegistered.set(response.alreadyRegistered);
         this.status.set('success');
+
+        // Deliberately here and nowhere else. The honeypot branch above also shows the
+        // success screen, and an error never reaches this callback: this is the only
+        // point in the component where a real person's address actually reached the API.
+        // Reporting from the success *screen* instead would count every bot that filled
+        // the hidden field, and the one number this sprint exists to produce would be
+        // wrong in the direction that feels good.
+        this.analytics.event(
+          WAITLIST_LEAD_EVENT,
+          waitlistLeadParams(payload.kind, response.alreadyRegistered),
+        );
       },
       error: (error: unknown) => {
         this.requestError.set(describeFailure(error, this.copy().failures));

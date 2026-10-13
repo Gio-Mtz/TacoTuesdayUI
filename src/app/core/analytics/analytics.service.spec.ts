@@ -223,4 +223,83 @@ describe('AnalyticsService', () => {
       expect(create(REAL_ID).analytics.configured).toBe(true);
     });
   });
+
+  describe('event()', () => {
+    const PARAMS = { lead_kind: 'company', already_registered: false } as const;
+
+    function sentEvents(): unknown[][] {
+      return dataLayer().filter((entry) => (entry as Record<number, unknown>)[0] === 'event');
+    }
+
+    it('sends the event with its name and params, and says it sent it', () => {
+      const { analytics, consent } = create(REAL_ID);
+      consent.grant();
+      analytics.sync();
+
+      expect(analytics.event('generate_lead', PARAMS)).toBe(true);
+
+      const events = sentEvents();
+      expect(events).toHaveLength(1);
+      expect(events[0][1]).toBe('generate_lead');
+      expect(events[0][2]).toEqual(PARAMS);
+    });
+
+    it('queues it the way gtag.js demands — by its own predicate, not by ours', () => {
+      const { analytics, consent } = create(REAL_ID);
+      consent.grant();
+      analytics.sync();
+      analytics.event('generate_lead', PARAMS);
+
+      const queued = sentEvents()[0];
+      expect(isArgumentsObject(queued)).toBe(true);
+      expect(gtagWouldProcess(queued)).toBe(true);
+    });
+
+    it('sends nothing before anyone has chosen — a hit is tracking, consent or not', () => {
+      const { analytics } = create(REAL_ID);
+      analytics.sync();
+
+      expect(analytics.event('generate_lead', PARAMS)).toBe(false);
+      expect(sentEvents()).toHaveLength(0);
+    });
+
+    it('sends nothing once consent is withdrawn, even though gtag is still on the page', () => {
+      const { analytics, consent } = create(REAL_ID);
+      consent.grant();
+      analytics.sync();
+      consent.deny();
+      analytics.sync();
+
+      expect(analytics.event('generate_lead', PARAMS)).toBe(false);
+      expect(sentEvents()).toHaveLength(0);
+    });
+
+    it('sends nothing when the id is not a GA4 id — this is what dev runs with', () => {
+      const { analytics, consent } = create('');
+      consent.grant();
+      analytics.sync();
+
+      expect(analytics.event('generate_lead', PARAMS)).toBe(false);
+      expect(sentEvents()).toHaveLength(0);
+    });
+
+    it('refuses instead of throwing when consent was granted but gtag never arrived', () => {
+      const { analytics, consent } = create(REAL_ID);
+      consent.grant();
+      analytics.sync();
+      delete (window as unknown as { gtag?: unknown }).gtag;
+
+      expect(() => analytics.event('generate_lead', PARAMS)).not.toThrow();
+      expect(analytics.event('generate_lead', PARAMS)).toBe(false);
+    });
+
+    it('defaults to no params rather than undefined', () => {
+      const { analytics, consent } = create(REAL_ID);
+      consent.grant();
+      analytics.sync();
+      analytics.event('generate_lead');
+
+      expect(sentEvents()[0][2]).toEqual({});
+    });
+  });
 });
