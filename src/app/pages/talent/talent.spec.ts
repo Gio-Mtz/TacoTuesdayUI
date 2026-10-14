@@ -83,6 +83,46 @@ describe('Talent', () => {
     expect(cta.getAttribute('href')).toBe('/talento#lista-de-espera');
   });
 
+  it('gives every section that argues its own door, not only the hero (US-015)', () => {
+    // The card in one assertion, and it is a count as much as a target. Before
+    // US-015 this page had exactly ONE door, in the hero, above the fold. The
+    // two sections under it -- the three things that change, and the three
+    // steps -- argued and then offered nothing to click, so an engineer
+    // convinced by the section written for him had to scroll back up.
+    //
+    // Reading the hrefs in DOM order is what keeps the doors where the argument
+    // ends instead of piling up in one place.
+    const doors = Array.from(
+      host().querySelectorAll<HTMLAnchorElement>('a[href*="lista-de-espera"]'),
+    ).map((a) => a.getAttribute('href'));
+
+    expect(doors).toEqual([
+      '/talento#lista-de-espera',
+      '/talento#lista-de-espera',
+      '/talento#lista-de-espera',
+    ]);
+  });
+
+  it('puts one door at the end of each section that argues, and labels them apart (US-015)', () => {
+    const sectionDoor = (selector: string): HTMLAnchorElement | null =>
+      host().querySelector<HTMLAnchorElement>(`${selector} .talent__actions a`);
+
+    const value = sectionDoor('section[aria-labelledby="talent-value-title"]');
+    const steps = sectionDoor('#como-funciona');
+
+    expect(value?.textContent?.trim()).toBe('Quiero que me busquen');
+    expect(steps?.textContent?.trim()).toBe('Dejar mi correo');
+  });
+
+  it('opens no door through the side query parameter, because this form has no sides (US-015)', () => {
+    // The copy-paste guard. On `/` a section door has to carry `?side=` so the
+    // shared form lands on the right side (US-013/US-014). Here the form is
+    // `lockedKind="candidate"` and renders no fieldset at all, so a `side=`
+    // parameter would be a parameter nothing reads -- and the first reader to
+    // see one would reasonably conclude that this page's form has two sides.
+    expect(host().querySelectorAll('a[href*="side="]').length).toBe(0);
+  });
+
   it('says nothing in English anywhere a visitor can read it', () => {
     const english = [
       WAITLIST_COPY.en.title,
