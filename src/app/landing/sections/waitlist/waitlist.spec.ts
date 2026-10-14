@@ -238,6 +238,47 @@ describe('Waitlist', () => {
     request.flush(OK);
   });
 
+  it('opens on the side it was handed, and keeps the chooser (US-013)', async () => {
+    fixture.componentRef.setInput('initialKind', 'candidate');
+    await fixture.whenStable();
+
+    expect(el<HTMLInputElement>('input[value="candidate"]')?.checked).toBe(true);
+    expect(el('#waitlist-company')).toBeNull();
+    expect(el('#waitlist-role')).not.toBeNull();
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelectorAll('input[type="radio"]').length,
+    ).toBe(2);
+  });
+
+  it('follows the second door too, not just the first one (US-013)', async () => {
+    // The home page never re-creates this component, so a visitor who clicks
+    // "I'm hiring" and then changes their mind to "I'm looking for work" has to
+    // end up on the engineer side.
+    //
+    // The order here is deliberate and the test is worthless reversed: the form
+    // already defaults to `company`, so ending on `company` proves nothing --
+    // an implementation that ignores the input entirely would pass. Ending on
+    // `candidate` can only happen if the SECOND value was applied.
+    fixture.componentRef.setInput('initialKind', 'company');
+    await fixture.whenStable();
+
+    fixture.componentRef.setInput('initialKind', 'candidate');
+    await fixture.whenStable();
+
+    expect(el<HTMLInputElement>('input[value="candidate"]')?.checked).toBe(true);
+    expect(el('#waitlist-company')).toBeNull();
+    expect(el('#waitlist-role')).not.toBeNull();
+  });
+
+  it('lets a manual pick stand: the URL opens the form, it does not own it', async () => {
+    fixture.componentRef.setInput('initialKind', 'candidate');
+    await fixture.whenStable();
+
+    await pick('company');
+
+    expect(el<HTMLInputElement>('input[value="company"]')?.checked).toBe(true);
+  });
+
   it('keeps the honeypot out of sight and out of the tab order', () => {
     const trap = el<HTMLInputElement>('#waitlist-website');
     expect(trap).toBeTruthy();
