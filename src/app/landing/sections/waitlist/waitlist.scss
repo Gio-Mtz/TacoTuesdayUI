@@ -247,3 +247,12 @@
 .confirm__again {
   margin-top: tt.space(2);
 }
+
+// Deliberately a link and not a second button: the primary action on this
+// screen is `confirm__again`, and two buttons side by side would make the
+// visitor choose between them instead of reading one as the way out.
+.confirm__privacy {
+  color: var(--tt-brand-text);
+  font-size: var(--tt-text-sm);
+  line-height: var(--tt-leading-snug);
+}
