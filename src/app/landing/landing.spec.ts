@@ -92,4 +92,43 @@ describe('Landing', () => {
     expect(host.querySelector<HTMLInputElement>('input[value="company"]')?.checked).toBe(true);
     expect(host.querySelectorAll('section').length).toBe(5);
   });
+
+  it('gives each audience a door where it is persuaded, not only in the hero (US-014)', () => {
+    // The card in one assertion, and it is a count as much as a target. Before
+    // US-014 the page had exactly TWO doors, both in the hero, above the fold.
+    // Everything after it -- the section for companies, the section for
+    // engineers, the three steps -- argued and then offered nothing to click,
+    // so a visitor convinced by the section written FOR them arrived at the
+    // form with the page having forgotten which side they said they were on.
+    //
+    // Reading the hrefs in DOM order is what catches the copy-paste: the two
+    // sections are separate components, so nothing but this test notices if the
+    // engineers section ends up carrying the hiring door.
+    const doors = Array.from(el().querySelectorAll<HTMLAnchorElement>('a[href*="side="]')).map(
+      (a) => a.getAttribute('href'),
+    );
+
+    expect(doors).toEqual([
+      '/?side=company#waitlist',
+      '/?side=candidate#waitlist',
+      '/?side=company#waitlist',
+      '/?side=candidate#waitlist',
+    ]);
+  });
+
+  it('puts the engineer door inside the engineer section and the hiring door inside the hiring one (US-014)', () => {
+    // Same defect, asked the other way round: the one above would still pass if
+    // both sections' doors were right but landed in each other's section.
+    expect(
+      el().querySelector('#engineers a[href*="side=candidate"]'),
+      'the engineers section must own the engineer door',
+    ).not.toBeNull();
+    expect(el().querySelector('#engineers a[href*="side=company"]')).toBeNull();
+
+    expect(
+      el().querySelector('#companies a[href*="side=company"]'),
+      'the companies section must own the hiring door',
+    ).not.toBeNull();
+    expect(el().querySelector('#companies a[href*="side=candidate"]')).toBeNull();
+  });
 });

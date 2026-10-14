@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { Icon } from '../../../shared/icon/icon';
+import { waitlistSideQuery } from '../waitlist/waitlist-side';
 
 export interface CompanyValuePoint {
   readonly icon: string;
@@ -11,11 +13,15 @@ export interface CompanyValuePoint {
 @Component({
   selector: 'ttco-companies',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Icon, RouterLink],
   templateUrl: './companies.html',
   styleUrl: './companies.scss',
 })
 export class Companies {
+  // Built from the helper and not typed into the template, for the same reason
+  // as the hero's: the name of the parameter lives in exactly one file.
+  protected readonly hiringQuery = waitlistSideQuery('company');
+
   protected readonly points: readonly CompanyValuePoint[] = [
     {
       icon: 'calendar',
