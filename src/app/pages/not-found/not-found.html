@@ -1,0 +1,25 @@
+<section class="tt-section not-found" aria-labelledby="not-found-title">
+  <div class="tt-container not-found__inner">
+    <p class="tt-eyebrow">{{ copy().eyebrow }}</p>
+    <h1 id="not-found-title" class="tt-title">{{ copy().title }}</h1>
+    <p class="tt-lede not-found__lede">{{ copy().lede }}</p>
+
+    <nav class="not-found__doors" [attr.aria-label]="copy().doorsLabel">
+      <h2 class="not-found__doors-title">{{ copy().doorsLabel }}</h2>
+      <ul class="not-found__list">
+        @for (door of doors; track door.route) {
+          <li>
+            <a
+              class="not-found__door"
+              [routerLink]="door.route"
+              [attr.lang]="door.lang"
+              [attr.hreflang]="door.lang"
+            >
+              {{ door.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+</section>

@@ -66,6 +66,21 @@
       "imageEyebrow": "For teams hiring engineers",
       "translation": "privacidad"
     },
+    "notfound": {
+      "route": "/404",
+      "dir": null,
+      "lang": "en",
+      "locale": "en_US",
+      "title": "Page not found — Taco Tuesday",
+      "description": "This address does not belong to any page on the site.",
+      "documentTitle": "Page not found — Taco Tuesday",
+      "image": "/og/home.png",
+      "imageAlt": "Taco Tuesday.",
+      "indexable": false,
+      "alternate": null,
+      "imageEyebrow": "For teams hiring engineers",
+      "translation": null
+    },
     "health": {
       "route": "/health",
       "dir": null,

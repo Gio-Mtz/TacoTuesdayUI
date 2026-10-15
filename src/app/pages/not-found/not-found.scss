@@ -1,0 +1,34 @@
+@use '../../../styles/tokens' as tt;
+
+.not-found__inner {
+  max-width: 70ch;
+}
+
+.not-found__lede {
+  margin: 0 0 tt.space(6);
+}
+
+.not-found__doors {
+  padding: tt.space(5);
+  background: var(--tt-bg-subtle);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-lg);
+}
+
+.not-found__doors-title {
+  margin: 0 0 tt.space(3);
+  font-size: var(--tt-text-lg);
+}
+
+.not-found__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: tt.space(2);
+}
+
+.not-found__door {
+  color: var(--tt-brand-text);
+  font-size: var(--tt-text-base);
+}
