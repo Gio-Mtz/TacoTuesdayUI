@@ -4,6 +4,8 @@ import { CONSENT_COPY } from '../../core/analytics/consent-copy';
 import { ConsentService } from '../../core/analytics/consent.service';
 import { PageLang, PageLangService } from '../../core/i18n/page-lang';
 import { SITE_INFO } from '../../core/site/site-info';
+import { THEME_COPY } from '../../core/theme/theme-copy';
+import { ThemeService } from '../../core/theme/theme.service';
 
 // US-011: one component, two languages. The prose branches in the template
 // because translated legal text is not reusable markup -- the sentences differ,
@@ -46,6 +48,8 @@ export class Privacy {
 
   private readonly pageLang = inject(PageLangService);
 
+  private readonly theme = inject(ThemeService);
+
   protected readonly site = SITE_INFO;
 
   protected readonly lang = this.pageLang.lang;
@@ -73,5 +77,26 @@ export class Privacy {
 
   protected changeChoice(): void {
     this.consent.reset();
+  }
+
+  protected readonly themeCopy = computed(() => THEME_COPY[this.lang()]);
+
+  // US-017: the header toggle only moves between light and dark, so 'system' --
+  // the state every visitor arrives in -- had no way back once they left it.
+  // This is that way back, and it lives here because this is the page that
+  // already tells them the choice was stored.
+  protected readonly themeOverridden = computed(() => this.theme.preference() !== 'system');
+
+  protected readonly themeLabel = computed(() => {
+    const copy = this.themeCopy();
+    const preference = this.theme.preference();
+    if (preference === 'light') {
+      return copy.manageLight;
+    }
+    return preference === 'dark' ? copy.manageDark : copy.manageSystem;
+  });
+
+  protected useSystemTheme(): void {
+    this.theme.useSystem();
   }
 }

@@ -27,7 +27,8 @@
   }
 }
 
-.privacy__consent {
+.privacy__consent,
+.privacy__theme {
   margin-top: tt.space(5);
   padding: tt.space(5);
   background: var(--tt-bg-subtle);
@@ -35,13 +36,22 @@
   border-radius: var(--tt-radius-lg);
 }
 
-.privacy__consent-title {
+.privacy__consent-title,
+.privacy__theme-title {
   margin: 0 0 tt.space(2);
   font-size: var(--tt-text-lg);
 }
 
-.privacy__consent-state {
+.privacy__consent-state,
+.privacy__theme-state {
   margin: 0 0 tt.space(4);
   font-size: var(--tt-text-sm);
   color: var(--tt-text-secondary);
+}
+
+// No button follows in the 'system' state, because there is nothing to undo
+// there: the promise is being kept. Without this the block would end in dead
+// space.
+.privacy__theme-state:last-child {
+  margin-bottom: 0;
 }
