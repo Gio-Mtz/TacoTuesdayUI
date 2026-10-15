@@ -3,6 +3,7 @@ import { Route } from '@angular/router';
 import { SHELL_COPY } from './core/i18n/shell-copy';
 import { routes } from './app.routes';
 import { SOCIAL_CARDS, SocialCard, SocialCardKey } from './core/seo/page-social';
+import { NotFound } from './pages/not-found/not-found';
 
 describe('routes', () => {
   const pages: readonly Route[] = routes.filter((route) => route.redirectTo === undefined);
@@ -46,10 +47,17 @@ describe('routes', () => {
   });
 });
 
+// The catch-all is a route, but it is not a PAGE: it answers every address the
+// site does not have, so there is no single path for a card to describe and
+// `pathOf` would measure it against `/**`. It is excluded from the manifest
+// checks below and gets its own, stricter ones at the bottom of this file --
+// excluded on purpose, not forgotten.
+const CATCH_ALL = '**';
+
 describe('routes and the social card manifest', () => {
   const declared = routes.filter(
     (route): route is Route & { path: string } =>
-      typeof route.path === 'string' && route.redirectTo === undefined,
+      typeof route.path === 'string' && route.path !== CATCH_ALL && route.redirectTo === undefined,
   );
 
   function pathOf(route: Route & { path: string }): string {
@@ -98,5 +106,40 @@ describe('routes and the social card manifest', () => {
       }
       expect(card.dir).toBe(card.route === '/' ? null : card.route.slice(1));
     }
+  });
+});
+
+describe('the catch-all', () => {
+  const catchAll = routes.find((route) => route.path === CATCH_ALL);
+
+  it('exists, because a URL this site does not have still has to answer something', () => {
+    expect(catchAll).toBeDefined();
+  });
+
+  it('is the last route — a catch-all above a real route eats it', () => {
+    expect(routes.at(-1)?.path).toBe(CATCH_ALL);
+  });
+
+  // THE regression guard for US-018. It said `redirectTo: ''` until 15-oct, so
+  // every wrong address silently became the home page and the address bar
+  // rewrote itself. If this ever goes back to a redirect, this fails.
+  it('renders a page instead of redirecting to the landing', () => {
+    expect(catchAll?.redirectTo).toBeUndefined();
+    expect(catchAll?.component).toBe(NotFound);
+  });
+
+  it('is not indexable, so one crawler cannot mint endless copies of a page', () => {
+    const card = SOCIAL_CARDS[catchAll!.data!['card'] as SocialCardKey];
+
+    expect(card.indexable).toBe(false);
+  });
+
+  it('answers in the same language and under the same card as /404', () => {
+    const page = routes.find((route) => route.path === '404');
+
+    expect(page).toBeDefined();
+    expect(catchAll?.data?.['card']).toBe(page?.data?.['card']);
+    expect(catchAll?.data?.['lang']).toBe(page?.data?.['lang']);
+    expect(catchAll?.title).toBe(page?.title);
   });
 });

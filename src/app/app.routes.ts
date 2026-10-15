@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { Landing } from './landing/landing';
+import { NotFound } from './pages/not-found/not-found';
 import { PageLangData } from './core/i18n/page-lang';
 import { PageSocialData } from './core/seo/page-social';
 import { Privacy } from './pages/privacy/privacy';
@@ -43,5 +44,33 @@ export const routes: Routes = [
     data: { lang: 'en', card: 'health' } satisfies PageLangData & PageSocialData,
     loadComponent: () => import('./api/Health/health.component').then((m) => m.HealthComponent),
   },
-  { path: '**', redirectTo: '' },
+  {
+    // US-018. A real address for the page, so the card in the manifest has a
+    // route to describe and so anything that needs to link to it has somewhere
+    // to point. Not indexable, and `dir: null` on purpose: it is not emitted as
+    // a file, because Azure never serves it by name -- every unknown URL comes
+    // through the catch-all below with the address the visitor actually typed.
+    path: '404',
+    title: 'Page not found — Taco Tuesday',
+    data: { lang: 'en', card: 'notfound' } satisfies PageLangData & PageSocialData,
+    component: NotFound,
+  },
+  {
+    // US-018. This said `redirectTo: ''` until 15-oct, which meant every URL
+    // this site does not have silently BECAME the home page: the visitor was
+    // never told, and the address bar -- the one place a person looks to find
+    // their own typo -- rewrote itself. It renders a page now, at the address
+    // that was asked for.
+    //
+    // The card is what handles the other half: `indexable: false` puts
+    // `noindex, nofollow` on whatever URL this answers, instead of offering a
+    // crawler the home page's indexable content at an unlimited number of
+    // addresses.
+    //
+    // It stays LAST. A catch-all above a real route eats it.
+    path: '**',
+    title: 'Page not found — Taco Tuesday',
+    data: { lang: 'en', card: 'notfound' } satisfies PageLangData & PageSocialData,
+    component: NotFound,
+  },
 ];
