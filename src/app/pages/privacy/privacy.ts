@@ -7,12 +7,9 @@ import { SITE_INFO } from '../../core/site/site-info';
 import { THEME_COPY } from '../../core/theme/theme-copy';
 import { ThemeService } from '../../core/theme/theme.service';
 
-// US-011: one component, two languages. The prose branches in the template
-// because translated legal text is not reusable markup -- the sentences differ,
-// the inline links differ, and pretending otherwise would mean a mini renderer
-// for `<strong>` and `<code>`. Everything that is NOT prose -- the consent
-// widget, the mailbox, the last-updated date -- is shared, so there is exactly
-// one place to change when the policy changes.
+// One component, two languages. The prose branches in the template because
+// translated legal text is not reusable markup; everything that is not prose is
+// shared, so the policy changes in one place.
 export const PRIVACY_CHROME: Readonly<
   Record<PageLang, { readonly eyebrow: string; readonly title: string; readonly updated: string }>
 > = {
@@ -29,9 +26,8 @@ export const PRIVACY_CHROME: Readonly<
 } as const;
 
 export function formatUpdatedOn(isoDate: string, lang: PageLang): string {
-  // timeZone: 'UTC' on purpose. `new Date('2026-10-07')` is UTC midnight, and
-  // formatting that in a negative-offset zone -- which is every zone this site
-  // is read from -- would print the 6th.
+  // timeZone 'UTC' on purpose: the date parses as UTC midnight, and a
+  // negative-offset zone -- every zone this site is read from -- prints the 6th.
   return new Intl.DateTimeFormat(lang, { dateStyle: 'long', timeZone: 'UTC' }).format(
     new Date(`${isoDate}T00:00:00Z`),
   );
@@ -62,8 +58,6 @@ export class Privacy {
     formatUpdatedOn(SITE_INFO.privacyUpdatedOn, this.lang()),
   );
 
-  // Was hardcoded to es-MX. On the English notice that would have printed the
-  // Spanish consent widget underneath English prose.
   protected readonly copy = computed(() => CONSENT_COPY[this.lang()]);
 
   protected readonly consentLabel = computed(() => {
@@ -81,10 +75,8 @@ export class Privacy {
 
   protected readonly themeCopy = computed(() => THEME_COPY[this.lang()]);
 
-  // US-017: the header toggle only moves between light and dark, so 'system' --
-  // the state every visitor arrives in -- had no way back once they left it.
-  // This is that way back, and it lives here because this is the page that
-  // already tells them the choice was stored.
+  // The header toggle only moves between light and dark, so 'system' -- the state
+  // every visitor arrives in -- has no way back except here.
   protected readonly themeOverridden = computed(() => this.theme.preference() !== 'system');
 
   protected readonly themeLabel = computed(() => {

@@ -51,9 +51,8 @@ describe('NotFound', () => {
     expect(hrefs).toEqual(['/', '/talento', '/privacidad', '/privacy']);
   });
 
-  // The whole reason the doors are labelled one by one instead of reusing the
-  // card titles: a Spanish reader who landed here by accident must not have to
-  // read English to find the way out.
+  // Why the doors are labelled one by one instead of reusing the card titles: a
+  // Spanish reader must not have to read English to find the way out.
   it('labels each door in its own language, and says so to a screen reader', () => {
     const doors = Array.from(host().querySelectorAll<HTMLAnchorElement>('.not-found__door'));
     const labelled = doors.map((anchor) => [
@@ -145,8 +144,8 @@ describe('an address this site does not have', () => {
     expect(component).toBeInstanceOf(NotFound);
   });
 
-  // The defect US-018 closes: the address bar used to rewrite itself to `/`,
-  // hiding the typo from the only person who could fix it.
+  // The address bar must keep what was asked for: rewriting it to `/` hides the
+  // typo from the only person who can fix it.
   it('keeps the address the visitor actually asked for', async () => {
     const harness = await RouterTestingHarness.create();
     await harness.navigateByUrl('/privacidadd');
@@ -189,9 +188,8 @@ describe('a real address with a trailing slash', () => {
 
   afterEach(() => http.verify());
 
-  // Measured on `main` before US-018: `/talento/` parsed to two segments, missed
-  // the one-segment route and landed on the ENGLISH home page. A trailing slash
-  // is not a typo -- chat apps and address bars add it on their own.
+  // A trailing slash is not a typo -- chat apps and address bars add it on their
+  // own -- and it used to parse as two segments and miss the route.
   it('reaches the page it names, not the catch-all', async () => {
     const harness = await RouterTestingHarness.create();
 

@@ -1,21 +1,14 @@
 import { LeadKind } from '../../../api/Leads/ILead';
 
-/**
- * GA4's own recommended event for "someone left their contact details". Using the
- * recommended name rather than an invented one is what lets this show up in GA4's
- * stock reports and be marked as a key event without any extra configuration.
- */
+// GA4's recommended event name: an invented one would not appear in the stock
+// reports or be markable as a key event.
 export const WAITLIST_LEAD_EVENT = 'generate_lead';
 
 export interface WaitlistLeadParams extends Record<string, string | boolean> {
-  /** Which side of the marketplace signed up. This is the question the sprint exists to answer. */
   readonly lead_kind: LeadKind;
 
-  /**
-   * True when the API recognised the address and returned the existing lead. These are
-   * not new leads, and counting them as such would quietly inflate the only number
-   * anyone is going to look at.
-   */
+  // True when the API recognised the address and returned the existing lead.
+  // Counting these as new would inflate the only number anyone looks at.
   readonly already_registered: boolean;
 }
 
