@@ -2,10 +2,17 @@ import { Routes, UrlTree } from '@angular/router';
 
 import { TrailingSlashUrlSerializer, withoutTrailingSlash } from './trailing-slash';
 
-// Only a path that is exactly one known segment is re-cased. `/Nope` and
+// Only a path that is exactly one known segment is normalized. `/Nope` and
 // `/Talento/extra` keep the spelling that arrived, so the 404 still answers the
 // address that was asked for instead of a rewritten one.
 const SINGLE_SEGMENT = /^\/([^/?#]+)$/;
+
+// A link shared by hand picks up the sentence it was written in: the period
+// that ends the message, the comma in a list, the space before or after a
+// paste. Stripped only from the ENDS, and only when what is left is a page --
+// the `known` check below is the lock.
+const STRAY_HEAD = /^(?:%20|\s)+/;
+const STRAY_TAIL = /(?:%20|\s|[.,!:])+$/;
 
 export function knownFirstSegments(routes: Routes): ReadonlySet<string> {
   const paths = routes
@@ -30,12 +37,12 @@ export function withKnownPathCase(url: string, known: ReadonlySet<string>): stri
     return url;
   }
 
-  const lower = segment.toLowerCase();
-  if (lower === segment || !known.has(lower)) {
+  const canonical = segment.replace(STRAY_HEAD, '').replace(STRAY_TAIL, '').toLowerCase();
+  if (canonical === segment || !known.has(canonical)) {
     return url;
   }
 
-  return `/${lower}${path.slice(bare.length)}${rest}`;
+  return `/${canonical}${path.slice(bare.length)}${rest}`;
 }
 
 export class CanonicalPathUrlSerializer extends TrailingSlashUrlSerializer {

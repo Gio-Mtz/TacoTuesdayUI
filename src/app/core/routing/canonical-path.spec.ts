@@ -58,6 +58,44 @@ describe('withKnownPathCase', () => {
     expect(withKnownPathCase('/privacy#A/b', known)).toBe('/privacy#A/b');
   });
 
+  it('lands a page whose address picked up the sentence that carried it', () => {
+    expect(withKnownPathCase('/talento.', known)).toBe('/talento');
+    expect(withKnownPathCase('/talento,', known)).toBe('/talento');
+    expect(withKnownPathCase('/talento!', known)).toBe('/talento');
+    expect(withKnownPathCase('/talento:', known)).toBe('/talento');
+    expect(withKnownPathCase('/privacy.', known)).toBe('/privacy');
+    expect(withKnownPathCase('/privacidad.', known)).toBe('/privacidad');
+  });
+
+  it('lands a page whose address arrived with a stray space, encoded or not', () => {
+    expect(withKnownPathCase('/talento%20', known)).toBe('/talento');
+    expect(withKnownPathCase('/talento ', known)).toBe('/talento');
+    expect(withKnownPathCase('/%20talento', known)).toBe('/talento');
+    expect(withKnownPathCase('/ talento', known)).toBe('/talento');
+  });
+
+  it('takes the capital and the sentence mark together, in one pass', () => {
+    expect(withKnownPathCase('/Talento.', known)).toBe('/talento');
+    expect(withKnownPathCase('/ PRIVACIDAD ', known)).toBe('/privacidad');
+  });
+
+  it('does NOT strip a mark off a path that is not a page — the 404 answers what was asked', () => {
+    expect(withKnownPathCase('/NoExiste.', known)).toBe('/NoExiste.');
+    expect(withKnownPathCase('/Talent.', known)).toBe('/Talent.');
+    expect(withKnownPathCase('/talento.extra', known)).toBe('/talento.extra');
+    expect(withKnownPathCase('/.', known)).toBe('/.');
+  });
+
+  it('leaves a mark that is INSIDE the segment alone — only the ends are stray', () => {
+    expect(withKnownPathCase('/tal.ento', known)).toBe('/tal.ento');
+    expect(withKnownPathCase('/privacidád', known)).toBe('/privacidád');
+  });
+
+  it('keeps a mark in the query or the fragment, where it carries meaning', () => {
+    expect(withKnownPathCase('/talento.?side=Dev.', known)).toBe('/talento?side=Dev.');
+    expect(withKnownPathCase('/talento.#lista.', known)).toBe('/talento#lista.');
+  });
+
   it('composes with the trailing slash instead of fighting it', () => {
     expect(withKnownPathCase('/Talento/', known)).toBe('/talento/');
     expect(withKnownPathCase('/TALENTO//', known)).toBe('/talento//');
@@ -121,9 +159,17 @@ describe('the router, end to end', () => {
     expect(final).toBe('/talento#lista-de-espera');
   });
 
+  it('takes an address that arrived inside a sentence to its page', async () => {
+    expect(await landOn('/talento.')).toEqual({ path: 'talento', final: '/talento' });
+    expect(await landOn('/privacy.')).toEqual({ path: 'privacy', final: '/privacy' });
+    expect(await landOn('/Talento.')).toEqual({ path: 'talento', final: '/talento' });
+    expect(await landOn('/talento%20')).toEqual({ path: 'talento', final: '/talento' });
+  });
+
   it('still sends a URL that is nobody to the 404, at the address that was asked', async () => {
     expect(await landOn('/NoExiste')).toEqual({ path: '**', final: '/NoExiste' });
     expect(await landOn('/Talento/extra')).toEqual({ path: '**', final: '/Talento/extra' });
+    expect(await landOn('/NoExiste.')).toEqual({ path: '**', final: '/NoExiste.' });
   });
 
   it('does not disturb the pages that were already right', async () => {
