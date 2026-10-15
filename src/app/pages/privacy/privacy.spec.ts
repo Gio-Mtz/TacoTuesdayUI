@@ -4,6 +4,8 @@ import { CONSENT_COPY } from '../../core/analytics/consent-copy';
 import { ConsentService } from '../../core/analytics/consent.service';
 import { PageLang, PageLangService } from '../../core/i18n/page-lang';
 import { SITE_INFO } from '../../core/site/site-info';
+import { THEME_COPY } from '../../core/theme/theme-copy';
+import { THEME_STORAGE_KEY, ThemeService } from '../../core/theme/theme.service';
 import { Privacy, formatUpdatedOn } from './privacy';
 
 describe('Privacy', () => {
@@ -197,6 +199,76 @@ describe('Privacy', () => {
 
       expect(consent.state()).toBe('unset');
       expect(state()).toBe(CONSENT_COPY['es-MX'].manageUnset);
+    });
+  });
+
+  // US-017. The header toggle is a two-state control over a three-state
+  // preference, so every one of these guards the way back to the third.
+  describe('the theme block', () => {
+    function themeState(): string {
+      return el().querySelector('.privacy__theme-state')!.textContent!.trim();
+    }
+
+    function systemButton(): HTMLButtonElement | null {
+      return el().querySelector('.privacy__theme button');
+    }
+
+    it('offers nothing to undo while the page still follows the system setting', async () => {
+      await inLang('es-MX');
+      expect(TestBed.inject(ThemeService).preference()).toBe('system');
+      expect(themeState()).toBe(THEME_COPY['es-MX'].manageSystem);
+      expect(systemButton()).toBeNull();
+    });
+
+    it('tells the visitor the toggle took the page off their system setting', async () => {
+      await inLang('es-MX');
+      TestBed.inject(ThemeService).setPreference('dark');
+      await fixture.whenStable();
+
+      expect(themeState()).toBe(THEME_COPY['es-MX'].manageDark);
+      expect(systemButton()).not.toBeNull();
+    });
+
+    it('hands the theme back to the system setting, the state the toggle cannot reach', async () => {
+      await inLang('es-MX');
+      const theme = TestBed.inject(ThemeService);
+      theme.setPreference('light');
+      await fixture.whenStable();
+      expect(themeState()).toBe(THEME_COPY['es-MX'].manageLight);
+
+      systemButton()!.click();
+      await fixture.whenStable();
+
+      expect(theme.preference()).toBe('system');
+      expect(themeState()).toBe(THEME_COPY['es-MX'].manageSystem);
+      expect(systemButton()).toBeNull();
+    });
+
+    it('stops overriding the document and forgets the stored choice', async () => {
+      await inLang('es-MX');
+      const theme = TestBed.inject(ThemeService);
+      theme.setPreference('dark');
+      await fixture.whenStable();
+      expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+      expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe('dark');
+
+      systemButton()!.click();
+      await fixture.whenStable();
+
+      expect(document.documentElement.hasAttribute('data-theme')).toBe(false);
+      expect(localStorage.getItem(THEME_STORAGE_KEY)).toBeNull();
+    });
+
+    it('says all of it in English too, on the English notice', async () => {
+      await inLang('en');
+      TestBed.inject(ThemeService).setPreference('dark');
+      await fixture.whenStable();
+
+      expect(el().querySelector('.privacy__theme-title')!.textContent!.trim()).toBe(
+        THEME_COPY.en.manageTitle,
+      );
+      expect(themeState()).toBe(THEME_COPY.en.manageDark);
+      expect(systemButton()!.textContent!.trim()).toBe(THEME_COPY.en.manageUseSystem);
     });
   });
 });

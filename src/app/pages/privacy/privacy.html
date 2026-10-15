@@ -125,6 +125,16 @@
       </button>
     </div>
 
+    <div class="privacy__theme">
+      <h3 class="privacy__theme-title">{{ themeCopy().manageTitle }}</h3>
+      <p class="privacy__theme-state" aria-live="polite">{{ themeLabel() }}</p>
+      @if (themeOverridden()) {
+        <button type="button" class="tt-btn tt-btn--secondary" (click)="useSystemTheme()">
+          {{ themeCopy().manageUseSystem }}
+        </button>
+      }
+    </div>
+
     @if (isSpanish()) {
       <h2>Cambios</h2>
       <p>
