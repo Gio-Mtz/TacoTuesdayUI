@@ -353,6 +353,47 @@ describe('Waitlist', () => {
     expect(el('.field__error')).toBeNull();
   });
 
+  it('keeps a door to the privacy notice once the data actually exists (US-016)', async () => {
+    // The form already carries one, under the submit button, in the same breath as
+    // the promise that the visitor can ask for their data back whenever they want.
+    expect(el('.form__legal a')).toBeTruthy();
+
+    await fillValidCompany();
+    await submit();
+    http.expectOne(LEADS_URL).flush(OK);
+    await fixture.whenStable();
+
+    // ...and that promise is only actionable from here on, so the link has to
+    // outlive the form it was written under.
+    const link = el<HTMLAnchorElement>('.confirm__privacy');
+
+    expect(link).toBeTruthy();
+    expect(link?.getAttribute('href')).toBe('/privacy');
+    expect(link?.textContent?.trim()).toBe(WAITLIST_COPY.en.deletionLink);
+  });
+
+  it('offers the same door to a repeat address, whose data also exists (US-016)', async () => {
+    await fillValidCompany();
+    await submit();
+    http.expectOne(LEADS_URL).flush({ id: 'lead-1', alreadyRegistered: true });
+    await fixture.whenStable();
+
+    expect(text()).toContain(WAITLIST_COPY.en.alreadyTitle);
+    expect(el<HTMLAnchorElement>('.confirm__privacy')?.getAttribute('href')).toBe('/privacy');
+  });
+
+  it('does not make the privacy link compete with the primary action (US-016)', async () => {
+    await fillValidCompany();
+    await submit();
+    http.expectOne(LEADS_URL).flush(OK);
+    await fixture.whenStable();
+
+    // A GUARD, not decoration: dressing the notice as a second button would put
+    // two equal-looking choices on a screen whose primary action is 'again'.
+    expect(el('.confirm__privacy')?.className).not.toContain('tt-btn');
+    expect(el('.confirm__again')).toBeTruthy();
+  });
+
   it('keeps the form and raises an alert when the API fails', async () => {
     await fillValidCompany();
     await submit();
@@ -523,6 +564,30 @@ describe('Waitlist on a Spanish page, pinned to the engineer', () => {
     expect(text()).toContain(es.errors.emailRequired);
 
     expect(text()).not.toContain(es.errors.companyRequired);
+  });
+
+  it('sends the engineer to the Spanish notice, not the English one (US-016)', async () => {
+    const fill = async (id: string, value: string): Promise<void> => {
+      const input = host().querySelector<HTMLInputElement>(`#${id}`)!;
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+      await fixture.whenStable();
+    };
+
+    await fill('waitlist-name', 'Gio');
+    await fill('waitlist-email', 'gio@dev.mx');
+
+    host().querySelector<HTMLFormElement>('form')!.dispatchEvent(new Event('submit'));
+    await fixture.whenStable();
+
+    http.expectOne('/api/leads').flush({ id: 'lead-9', alreadyRegistered: false });
+    await fixture.whenStable();
+
+    const link = host().querySelector<HTMLAnchorElement>('.confirm__privacy');
+
+    expect(link?.getAttribute('href')).toBe('/privacidad');
+    expect(link?.textContent?.trim()).toBe(es.deletionLink);
+    expect(text()).not.toContain(WAITLIST_COPY.en.deletionLink);
   });
 });
 

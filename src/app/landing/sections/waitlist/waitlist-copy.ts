@@ -34,6 +34,16 @@ export interface WaitlistCopy {
   readonly alreadyBody: string;
   readonly again: string;
 
+  /**
+   * The confirmation screen's only link. The form promises, one line under the
+   * submit button, that the visitor can ask for their data back whenever they
+   * want - and that promise only becomes actionable once the data exists, which
+   * is exactly the moment the form (and its privacy link) is replaced. So the
+   * link has to survive into the confirmation, and it names the thing the
+   * visitor can now do rather than repeating the notice's title.
+   */
+  readonly deletionLink: string;
+
   readonly errors: WaitlistErrorCopy;
   readonly failures: WaitlistFailureCopy;
 }
@@ -92,6 +102,7 @@ export const WAITLIST_COPY: Readonly<Record<PageLang, WaitlistCopy>> = {
       'That email was already registered, so we did not do anything twice. You are still on the ' +
       'list and we write to you when we open.',
     again: 'Sign someone else up',
+    deletionLink: 'How to ask us to delete your data',
 
     errors: {
       nameRequired: 'Write your name.',
@@ -146,6 +157,7 @@ export const WAITLIST_COPY: Readonly<Record<PageLang, WaitlistCopy>> = {
       'Ese correo ya estaba registrado, así que no hicimos nada dos veces. Sigues en la lista y te ' +
       'escribimos cuando abramos.',
     again: 'Apuntar a alguien más',
+    deletionLink: 'Cómo pedir que borremos tus datos',
 
     errors: {
       nameRequired: 'Escribe tu nombre.',

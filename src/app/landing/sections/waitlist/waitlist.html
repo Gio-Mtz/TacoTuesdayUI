@@ -29,6 +29,12 @@
           <button type="button" class="tt-btn tt-btn--secondary confirm__again" (click)="reset()">
             {{ copy().again }}
           </button>
+          <a
+            class="confirm__privacy"
+            [routerLink]="privacyLink()"
+            [attr.hreflang]="privacyLang()"
+            >{{ copy().deletionLink }}</a
+          >
         </div>
       } @else {
         <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
