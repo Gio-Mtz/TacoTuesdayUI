@@ -26,14 +26,9 @@ export interface SocialCard {
 
   readonly alternate: SocialCardKey | null;
 
-  // The SAME page in the other language, or null when this route has no
-  // translation. Deliberately NOT `alternate`: `/` and `/talento` are each
-  // other's hreflang alternates but they are two audiences, not two versions
-  // of one text, so sending a visitor between them with a language control
-  // would be a lie. This field is what the language switch reads, which is why
-  // it is here next to the hreflang data instead of in a list of its own --
-  // the visible control and the <link rel="alternate"> tags cannot drift apart
-  // if they come from the same card.
+  // The SAME page in the other language. Deliberately NOT `alternate`: `/` and
+  // `/talento` are hreflang alternates but two audiences, not two versions of
+  // one text, so a language control between them would be a lie.
   readonly translation: SocialCardKey | null;
 }
 
@@ -50,9 +45,8 @@ export const SOCIAL: SocialManifest = MANIFEST as SocialManifest;
 
 export const SOCIAL_CARDS = SOCIAL.cards;
 
-// The language that answers a visitor whose own language matches nothing in an
-// hreflang cluster. A property of the product (the site's default copy is
-// English), not of any one page.
+// Answers a visitor whose language matches nothing in an hreflang cluster. A
+// property of the product, not of any one page.
 const DEFAULT_LANG = 'en';
 
 export interface PageSocialData {
@@ -71,9 +65,8 @@ export class PageSocialMetaService {
 
   private readonly active = signal<SocialCard | null>(null);
 
-  // The card the router last applied. The language switch derives its target
-  // from this, so what the control offers is always the card that produced the
-  // canonical and hreflang tags on the very same navigation.
+  // The card the router last applied, so the language switch always offers the
+  // card that produced this navigation's canonical and hreflang tags.
   readonly card = this.active.asReadonly();
 
   apply(card: SocialCard): void {
@@ -127,14 +120,10 @@ export class PageSocialMetaService {
     this.link('alternate', absoluteUrl(card.route), card.lang);
     this.link('alternate', absoluteUrl(other.route), other.lang);
 
-    // x-default is the DEFAULT_LANG member of THIS cluster, not the site's home
-    // page. It used to be `SOCIAL_CARDS.home.route` unconditionally, which is
-    // accidentally right for the landing cluster -- `/` IS its English member --
-    // and wrong for the privacy notices, where it named a URL outside the
-    // cluster. Google honours an hreflang set only when every annotation is
-    // reciprocal, so that one line voided the whole set US-011 added. The
-    // emitted build has the same rule in `tools/emit-route-cards.mjs` and
-    // `tools/check-hreflang.mjs` measures the result.
+    // x-default is the DEFAULT_LANG member of THIS cluster, never the site's home
+    // page: Google honours an hreflang set only when every annotation is
+    // reciprocal, so naming a URL outside the cluster voids the whole set.
+    // `tools/emit-route-cards.mjs` repeats the rule; `check:hreflang` measures it.
     const fallback = [card, other].find(
       (entry) => entry.lang === DEFAULT_LANG || entry.lang.startsWith(`${DEFAULT_LANG}-`),
     );

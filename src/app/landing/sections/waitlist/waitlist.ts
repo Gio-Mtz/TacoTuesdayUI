@@ -48,11 +48,8 @@ export class Waitlist implements OnInit {
 
   readonly lockedKind = input<LeadKind | null>(null);
 
-  /**
-   * Which side to open on when the chooser is still visible. `lockedKind`
-   * removes the chooser; this one only moves it, so the visitor can still
-   * change their mind. `lockedKind` wins if both are set.
-   */
+  // Moves the chooser without removing it, unlike `lockedKind`, which wins if
+  // both are set.
   readonly initialKind = input<LeadKind | null>(null);
 
   readonly sectionId = input<string>('waitlist');
@@ -142,10 +139,9 @@ export class Waitlist implements OnInit {
       this.successHeading()?.nativeElement.focus();
     });
 
-    // An effect and not `ngOnInit`: the home page is a single component
-    // instance, so clicking the other hero door changes the query parameter
-    // without re-creating anything. `ngOnInit` would read the first door the
-    // visitor clicked and then ignore the second one.
+    // An effect and not `ngOnInit`: the component is never re-created when the
+    // other hero door changes the query parameter, so `ngOnInit` would read the
+    // first door clicked and ignore the second.
     effect(() => {
       const requested = this.initialKind();
 
@@ -200,12 +196,9 @@ export class Waitlist implements OnInit {
         this.alreadyRegistered.set(response.alreadyRegistered);
         this.status.set('success');
 
-        // Deliberately here and nowhere else. The honeypot branch above also shows the
-        // success screen, and an error never reaches this callback: this is the only
-        // point in the component where a real person's address actually reached the API.
-        // Reporting from the success *screen* instead would count every bot that filled
-        // the hidden field, and the one number this sprint exists to produce would be
-        // wrong in the direction that feels good.
+        // Here and nowhere else: the honeypot branch above also shows the success
+        // screen, so reporting from the screen would count every bot that filled
+        // the hidden field. This is the only point where an address reached the API.
         this.analytics.event(
           WAITLIST_LEAD_EVENT,
           waitlistLeadParams(payload.kind, response.alreadyRegistered),

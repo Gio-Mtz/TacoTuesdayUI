@@ -251,14 +251,9 @@ describe('Waitlist', () => {
   });
 
   it('follows the second door too, not just the first one (US-013)', async () => {
-    // The home page never re-creates this component, so a visitor who clicks
-    // "I'm hiring" and then changes their mind to "I'm looking for work" has to
-    // end up on the engineer side.
-    //
-    // The order here is deliberate and the test is worthless reversed: the form
-    // already defaults to `company`, so ending on `company` proves nothing --
-    // an implementation that ignores the input entirely would pass. Ending on
-    // `candidate` can only happen if the SECOND value was applied.
+    // The order is deliberate and the test is worthless reversed: the form already
+    // defaults to `company`, so ending there would also pass if the input were
+    // ignored entirely. Ending on `candidate` proves the SECOND value was applied.
     fixture.componentRef.setInput('initialKind', 'company');
     await fixture.whenStable();
 
@@ -354,8 +349,7 @@ describe('Waitlist', () => {
   });
 
   it('keeps a door to the privacy notice once the data actually exists (US-016)', async () => {
-    // The form already carries one, under the submit button, in the same breath as
-    // the promise that the visitor can ask for their data back whenever they want.
+    // The form already carries one, under the submit button.
     expect(el('.form__legal a')).toBeTruthy();
 
     await fillValidCompany();
@@ -363,8 +357,7 @@ describe('Waitlist', () => {
     http.expectOne(LEADS_URL).flush(OK);
     await fixture.whenStable();
 
-    // ...and that promise is only actionable from here on, so the link has to
-    // outlive the form it was written under.
+    // The link has to outlive the form it was written under.
     const link = el<HTMLAnchorElement>('.confirm__privacy');
 
     expect(link).toBeTruthy();
@@ -388,8 +381,8 @@ describe('Waitlist', () => {
     http.expectOne(LEADS_URL).flush(OK);
     await fixture.whenStable();
 
-    // A GUARD, not decoration: dressing the notice as a second button would put
-    // two equal-looking choices on a screen whose primary action is 'again'.
+    // Dressing the notice as a second button would put two equal-looking choices
+    // on a screen whose primary action is 'again'.
     expect(el('.confirm__privacy')?.className).not.toContain('tt-btn');
     expect(el('.confirm__again')).toBeTruthy();
   });
@@ -598,9 +591,8 @@ describe('Waitlist analytics', () => {
 
   const LEADS_URL = '/api/leads';
 
-  // A recorder rather than the real service: this suite is about WHEN the component
-  // reports a lead and with what, not about how AnalyticsService talks to gtag — that
-  // is covered, against gtag's own predicate, in analytics.service.spec.ts.
+  // A recorder, not the real service: this suite covers WHEN the component reports
+  // a lead, not how AnalyticsService talks to gtag (analytics.service.spec.ts).
   class AnalyticsRecorder {
     event(name: string, params: Record<string, unknown> = {}): boolean {
       sent.push({ name, params });

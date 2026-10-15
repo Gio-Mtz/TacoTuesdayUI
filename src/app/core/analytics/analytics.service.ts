@@ -47,21 +47,9 @@ export class AnalyticsService {
     return this.document.getElementById(GTAG_SCRIPT_ID) !== null;
   }
 
-  /**
-   * Sends one GA4 event, or refuses and says so.
-   *
-   * It returns a boolean instead of void on purpose: every reason to refuse here is
-   * silent at runtime — no consent, no Measurement ID, no gtag on the page — and a
-   * void method would make those four paths indistinguishable from a delivered hit,
-   * which is exactly how this file's `config` command stayed broken for three work
-   * blocks while the network tab looked fine. The caller gets a fact, and the suite
-   * can assert on it without reaching into `window`.
-   *
-   * The push goes through `view.gtag`, never through `dataLayer.push` directly: gtag.js
-   * only treats an entry as a command when it is an `arguments` object (see the comment
-   * in `load()`), and `view.gtag` is the function that wraps it. An array here would be
-   * dropped without a warning.
-   */
+  // Returns a boolean, not void: every reason to refuse is silent at runtime, so
+  // void would make a refusal indistinguishable from a delivered hit. Pushes
+  // through `view.gtag`, never `dataLayer.push` directly -- see `load()`.
   event(name: string, params: Readonly<Record<string, string | number | boolean>> = {}): boolean {
     if (!this.configured || !this.consent.granted()) {
       return false;
@@ -88,22 +76,10 @@ export class AnalyticsService {
 
     const dataLayer = (view.dataLayer ??= []);
 
-    // gtag.js only treats a dataLayer entry as a command when that entry is an
-    // `arguments` object. Its own predicate, from the container served for this
-    // Measurement ID, is:
-    //
-    //   function Qb(a) { return !!a && (Object.prototype.toString.call(a) ===
-    //     "[object Arguments]" || Object.prototype.hasOwnProperty.call(a, "callee")) }
-    //   function xE(a) { ... if (a.event) return true;
-    //     if (Qb(a)) { var b = a[0]; if (b === "config" || b === "event" ||
-    //       b === "js" || b === "get") return true } return false }
-    //
-    // An array fails `Qb`, so `xE` rejects it and the command is dropped without a
-    // warning: the tag downloads with 200, `config` never runs, and not one hit is
-    // ever sent. That is the whole reason GA4 stayed empty while the network tab
-    // showed gtag.js loading fine. This is also why the official snippet is written
-    // `function gtag(){dataLayer.push(arguments)}` and not with a rest parameter —
-    // the `arguments` object is the contract, not a style choice.
+    // gtag.js only treats a dataLayer entry as a command when it is an `arguments`
+    // object. An array is rejected and dropped with no warning: the tag loads with
+    // 200 and not one hit is ever sent. The `arguments` object is the contract --
+    // never rewrite this with a rest parameter.
     function gtag(): void {
       dataLayer.push(arguments as unknown as unknown[]);
     }

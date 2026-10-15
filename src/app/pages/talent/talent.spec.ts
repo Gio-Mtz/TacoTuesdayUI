@@ -84,14 +84,8 @@ describe('Talent', () => {
   });
 
   it('gives every section that argues its own door, not only the hero (US-015)', () => {
-    // The card in one assertion, and it is a count as much as a target. Before
-    // US-015 this page had exactly ONE door, in the hero, above the fold. The
-    // two sections under it -- the three things that change, and the three
-    // steps -- argued and then offered nothing to click, so an engineer
-    // convinced by the section written for him had to scroll back up.
-    //
-    // Reading the hrefs in DOM order is what keeps the doors where the argument
-    // ends instead of piling up in one place.
+    // A count as much as a target. Reading the hrefs in DOM order is what keeps a
+    // door where each argument ends instead of piling them up in one place.
     const doors = Array.from(
       host().querySelectorAll<HTMLAnchorElement>('a[href*="lista-de-espera"]'),
     ).map((a) => a.getAttribute('href'));
@@ -115,11 +109,9 @@ describe('Talent', () => {
   });
 
   it('opens no door through the side query parameter, because this form has no sides (US-015)', () => {
-    // The copy-paste guard. On `/` a section door has to carry `?side=` so the
-    // shared form lands on the right side (US-013/US-014). Here the form is
-    // `lockedKind="candidate"` and renders no fieldset at all, so a `side=`
-    // parameter would be a parameter nothing reads -- and the first reader to
-    // see one would reasonably conclude that this page's form has two sides.
+    // The copy-paste guard. On `/` a section door carries `?side=`; here the form
+    // is `lockedKind="candidate"` and renders no fieldset, so a `side=` parameter
+    // would be one nothing reads and would imply this form has two sides.
     expect(host().querySelectorAll('a[href*="side="]').length).toBe(0);
   });
 

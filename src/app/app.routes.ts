@@ -7,10 +7,9 @@ import { PageSocialData } from './core/seo/page-social';
 import { Privacy } from './pages/privacy/privacy';
 import { Talent } from './pages/talent/talent';
 
-// GUARD, not documentation: the three public pages are eager on purpose. As lazy
-// routes the shell painted an empty <main>, the footer landed inside the viewport,
-// and the chunk arriving pushed it 3460px down - CLS 0.333, which alone held
-// Lighthouse performance at 82. Making them lazy again brings the shift back.
+// The public pages are eager on purpose: as lazy routes the arriving chunk
+// pushed the footer 3460px down -- CLS 0.333, Lighthouse performance 82. Making
+// them lazy again brings the shift back.
 export const routes: Routes = [
   {
     path: '',
@@ -31,8 +30,7 @@ export const routes: Routes = [
     component: Privacy,
   },
   {
-    // Eager for the same reason as the three above: it is a public page, and a
-    // lazy chunk arriving after the shell is what put CLS at 0.333.
+    // Eager for the same reason as the three above.
     path: 'privacy',
     title: 'Privacy notice — Taco Tuesday',
     data: { lang: 'en', card: 'privacy' } satisfies PageLangData & PageSocialData,
@@ -45,29 +43,18 @@ export const routes: Routes = [
     loadComponent: () => import('./api/Health/health.component').then((m) => m.HealthComponent),
   },
   {
-    // US-018. A real address for the page, so the card in the manifest has a
-    // route to describe and so anything that needs to link to it has somewhere
-    // to point. Not indexable, and `dir: null` on purpose: it is not emitted as
-    // a file, because Azure never serves it by name -- every unknown URL comes
-    // through the catch-all below with the address the visitor actually typed.
+    // A real address so the card has a route to describe. `dir: null` on purpose:
+    // not emitted as a file, because Azure never serves it by name -- every
+    // unknown URL arrives through the catch-all below.
     path: '404',
     title: 'Page not found — Taco Tuesday',
     data: { lang: 'en', card: 'notfound' } satisfies PageLangData & PageSocialData,
     component: NotFound,
   },
   {
-    // US-018. This said `redirectTo: ''` until 15-oct, which meant every URL
-    // this site does not have silently BECAME the home page: the visitor was
-    // never told, and the address bar -- the one place a person looks to find
-    // their own typo -- rewrote itself. It renders a page now, at the address
-    // that was asked for.
-    //
-    // The card is what handles the other half: `indexable: false` puts
-    // `noindex, nofollow` on whatever URL this answers, instead of offering a
-    // crawler the home page's indexable content at an unlimited number of
-    // addresses.
-    //
-    // It stays LAST. A catch-all above a real route eats it.
+    // Renders a page at the address that was asked for; it must never go back to
+    // `redirectTo` -- that turned every wrong URL into the home page in silence.
+    // Stays LAST: a catch-all above a real route eats it.
     path: '**',
     title: 'Page not found — Taco Tuesday',
     data: { lang: 'en', card: 'notfound' } satisfies PageLangData & PageSocialData,

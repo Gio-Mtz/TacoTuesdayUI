@@ -79,8 +79,7 @@ describe('PageSocialMetaService', () => {
   });
 
   it('announces no translation for a page that has none', () => {
-    // Was /privacidad until US-011 gave it an English counterpart. /health is
-    // the card that genuinely has no alternate, and is noindex anyway.
+    // /health is the card that genuinely has no alternate, and is noindex anyway.
     service.apply(SOCIAL_CARDS.health);
 
     expect(document.head.querySelectorAll('link[rel="alternate"][hreflang]').length).toBe(0);
@@ -104,11 +103,9 @@ describe('PageSocialMetaService', () => {
     expect(alternates).toContainEqual(['en', absoluteUrl('/privacy')]);
   });
 
-  // The three below are the hole this spec used to have. The test above asserted
-  // the two pairs with toContainEqual and never looked at x-default, so it
-  // passed for as long as x-default pointed at `/` -- a URL outside the privacy
-  // cluster, which made every annotation on both notices non-reciprocal and
-  // voided the set. Asserting the WHOLE set, not a subset, is what closes it.
+  // Asserts the WHOLE set, not a subset: a `toContainEqual` on the pairs never
+  // looks at x-default, and an x-default outside the cluster makes every
+  // annotation non-reciprocal and voids the set.
   it('points x-default inside the cluster, not at the home page', () => {
     service.apply(SOCIAL_CARDS.privacidad);
 
@@ -138,8 +135,7 @@ describe('PageSocialMetaService', () => {
   });
 
   it('keeps the landing cluster exactly as it was, x-default included', () => {
-    // The old hardcoded x-default was accidentally RIGHT here, because `/` is
-    // this cluster's English member. The fix must not move it.
+    // `/` is this cluster's English member, so x-default must not move from it.
     service.apply(SOCIAL_CARDS.home);
 
     const alternates = Array.from(document.head.querySelectorAll('link[rel="alternate"][hreflang]'))

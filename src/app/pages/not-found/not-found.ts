@@ -26,14 +26,9 @@ export const NOT_FOUND_COPY: Readonly<Record<PageLang, NotFoundCopy>> = {
   },
 } as const;
 
-// The name of each page, written IN that page's language -- the same rule the
-// language switch follows, and for the same reason: a Spanish reader who landed
-// here by accident should not have to read English to find the way out.
-//
-// `null` is a DECISION, not an omission, and the type is what keeps it one: this
-// is an exhaustive `Record<SocialCardKey, …>`, so a card added to the manifest
-// without a line here does not compile. `/health` is an internal screen and
-// `/404` is this page; neither is a door.
+// Each page's name written IN that page's language. `null` is a decision, not an
+// omission: the record is exhaustive, so a card added to the manifest without a
+// line here does not compile.
 export const DOOR_LABEL: Readonly<Record<SocialCardKey, string | null>> = {
   home: 'For companies',
   talento: 'Para devs',
@@ -51,10 +46,8 @@ export interface NotFoundDoor {
   readonly label: string;
 }
 
-// Derived, not listed: the doors come from the manifest, filtered by the same
-// `indexable` flag that decides what goes in `sitemap.xml`. A public page added
-// later shows up here the day its card does, and a page that stops being public
-// loses its door in the same commit that makes it private.
+// Derived from the manifest, filtered by the same `indexable` flag that decides
+// what goes in `sitemap.xml`, so the doors cannot drift from the public pages.
 export function doorsFrom(
   cards: Readonly<Record<SocialCardKey, SocialCard>> = SOCIAL_CARDS,
 ): readonly NotFoundDoor[] {
@@ -63,24 +56,8 @@ export function doorsFrom(
     .map((key) => ({ route: cards[key].route, lang: cards[key].lang, label: DOOR_LABEL[key]! }));
 }
 
-// US-018. Two things were true of every address this site does not have, and
-// both of them were invisible from inside the code:
-//
-//   1. The catch-all said `redirectTo: ''`, so a wrong URL silently BECAME the
-//      home page. The visitor was never told, and the address bar quietly
-//      rewrote itself, which is the one place a person looks to find the typo.
-//   2. Azure answers those URLs with the app shell and a 200, so a crawler was
-//      being offered the home page's indexable content at an unlimited number of
-//      addresses.
-//
-// This page answers (1) by existing, and (2) with its card: `indexable: false`
-// makes `PageSocialMetaService` emit `noindex, nofollow` on whatever URL the
-// visitor actually hit.
-//
-// What it deliberately does NOT do is print that URL back. A 404 page that
-// echoes the address is a free billboard for anyone who can send a link, and
-// the visitor can already read the address bar -- which, now that the catch-all
-// no longer redirects, still holds what they asked for.
+// Does NOT print the requested URL back: a 404 that echoes the address is a free
+// billboard for anyone who can send a link, and the address bar already holds it.
 @Component({
   selector: 'ttco-not-found',
   changeDetection: ChangeDetectionStrategy.OnPush,

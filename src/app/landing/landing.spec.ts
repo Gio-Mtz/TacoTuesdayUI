@@ -17,8 +17,7 @@ describe('Landing', () => {
     await fixture.whenStable();
   });
 
-  // Navigates first and renders afterwards, which is the order a visitor
-  // arrives in when they paste a link or click a hero door.
+  // Navigates first and renders afterwards: the order a visitor arrives in.
   async function openWith(url: string): Promise<HTMLElement> {
     await TestBed.inject(Router).navigateByUrl(url);
 
@@ -51,9 +50,7 @@ describe('Landing', () => {
   });
 
   it('opens the form on the company side when nobody said otherwise', () => {
-    // The default has to stay what it has always been: the home page leads with
-    // "For teams hiring engineers", so a visitor with no parameter is treated
-    // as a company, exactly as before US-013.
+    // No parameter means company: the home page leads with the hiring side.
     const company = el().querySelector<HTMLInputElement>('input[value="company"]');
 
     expect(company?.checked).toBe(true);
@@ -65,8 +62,7 @@ describe('Landing', () => {
 
     expect(host.querySelector<HTMLInputElement>('input[value="candidate"]')?.checked).toBe(true);
 
-    // The point of the card: the engineer is not asked for the name of their
-    // company, and the field they DO have is there.
+    // The engineer is not asked for a company name, and their own field is there.
     expect(host.querySelector('#waitlist-company')).toBeNull();
     expect(host.querySelector('#waitlist-role')).not.toBeNull();
   });
@@ -94,16 +90,9 @@ describe('Landing', () => {
   });
 
   it('gives each audience a door where it is persuaded, not only in the hero (US-014)', () => {
-    // The card in one assertion, and it is a count as much as a target. Before
-    // US-014 the page had exactly TWO doors, both in the hero, above the fold.
-    // Everything after it -- the section for companies, the section for
-    // engineers, the three steps -- argued and then offered nothing to click,
-    // so a visitor convinced by the section written FOR them arrived at the
-    // form with the page having forgotten which side they said they were on.
-    //
-    // Reading the hrefs in DOM order is what catches the copy-paste: the two
-    // sections are separate components, so nothing but this test notices if the
-    // engineers section ends up carrying the hiring door.
+    // A count as much as a target. Reading the hrefs in DOM order is what catches
+    // the copy-paste: the sections are separate components, so nothing but this
+    // test notices if the engineers section carries the hiring door.
     const doors = Array.from(el().querySelectorAll<HTMLAnchorElement>('a[href*="side="]')).map(
       (a) => a.getAttribute('href'),
     );
@@ -117,8 +106,8 @@ describe('Landing', () => {
   });
 
   it('puts the engineer door inside the engineer section and the hiring door inside the hiring one (US-014)', () => {
-    // Same defect, asked the other way round: the one above would still pass if
-    // both sections' doors were right but landed in each other's section.
+    // The same defect asked in reverse: the test above still passes if the two
+    // sections' doors are swapped.
     expect(
       el().querySelector('#engineers a[href*="side=candidate"]'),
       'the engineers section must own the engineer door',
