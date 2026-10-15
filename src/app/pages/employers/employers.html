@@ -1,0 +1,86 @@
+<section id="para-empresas" class="tt-section employers-hero" aria-labelledby="employers-title">
+  <div class="tt-container employers-hero__inner">
+    <p class="tt-eyebrow">Para empresas</p>
+    <h1 id="employers-title" class="employers-hero__title">
+      Deja de quemar semanas en entrevistas<br class="employers-hero__break" />
+      que no filtran nada
+    </h1>
+    <p class="tt-lede employers-hero__lede">
+      Contratar un dev se te va en cuadrar calendarios, leer CVs que no dicen nada y justificar
+      decisiones de memoria. Esa parte te la quitamos.
+    </p>
+    <div class="employers-hero__actions">
+      <a class="tt-btn tt-btn--primary" routerLink="/empresas" fragment="lista-de-espera">
+        Quiero contratar
+      </a>
+    </div>
+    <p class="employers-hero__note">
+      Lista de espera abierta. Te escribimos cuando abra el lado de empresas.
+    </p>
+  </div>
+</section>
+<section class="tt-section" aria-labelledby="employers-value-title">
+  <div class="tt-container">
+    <p class="tt-eyebrow">Qué cambia para tu equipo</p>
+    <h2 id="employers-value-title" class="tt-title">Tres cosas, y las tres se notan</h2>
+    <ul class="tt-cards employers__cards">
+      @for (point of points; track point.title) {
+        <li class="tt-card">
+          <span class="tt-card__icon">
+            <ttco-icon [name]="point.icon" />
+          </span>
+          <h3 class="tt-card__title">{{ point.title }}</h3>
+          <p class="tt-card__body">{{ point.body }}</p>
+        </li>
+      }
+    </ul>
+
+    <div class="employers__actions">
+      <a class="tt-btn tt-btn--primary" routerLink="/empresas" fragment="lista-de-espera">
+        Quiero ver candidatos
+      </a>
+    </div>
+  </div>
+</section>
+<section
+  id="como-funciona"
+  class="tt-section tt-section--alt"
+  aria-labelledby="employers-steps-title"
+>
+  <div class="tt-container">
+    <p class="tt-eyebrow">Cómo funciona</p>
+    <h2 id="employers-steps-title" class="tt-title">Tres pasos, sin letras chiquitas</h2>
+    <ol class="tt-cards employers__cards">
+      @for (step of steps; track step.title; let i = $index) {
+        <li class="tt-card">
+          <span class="tt-card__icon">
+            <ttco-icon [name]="step.icon" />
+          </span>
+          <h3 class="tt-card__title">{{ i + 1 }}. {{ step.title }}</h3>
+          <p class="tt-card__body">{{ step.body }}</p>
+        </li>
+      }
+    </ol>
+
+    <div class="employers__actions">
+      <a class="tt-btn tt-btn--primary" routerLink="/empresas" fragment="lista-de-espera">
+        Dejar mi correo
+      </a>
+    </div>
+  </div>
+</section>
+<section class="tt-section employers-crossover" aria-labelledby="employers-crossover-title">
+  <div class="tt-container">
+    <h2 id="employers-crossover-title" class="tt-title employers-crossover__title">
+      ¿Llegaste buscando chamba?
+    </h2>
+    <p class="tt-lede">
+      Esta página es para quien contrata, y su formulario pide el nombre de la empresa. La tuya es
+      la de devs: ahí te pedimos tu puesto y no te pedimos empresa.
+    </p>
+    <div class="employers__actions">
+      <a class="tt-btn tt-btn--secondary" routerLink="/talento">Ir a Para devs</a>
+    </div>
+  </div>
+</section>
+<ttco-waitlist lockedKind="company" sectionId="lista-de-espera" />

@@ -13,6 +13,7 @@ describe('knownFirstSegments', () => {
 
   it('picks up every real page, so a page added later is covered without an edit here', () => {
     expect(known.has('talento')).toBe(true);
+    expect(known.has('empresas')).toBe(true);
     expect(known.has('privacidad')).toBe(true);
     expect(known.has('privacy')).toBe(true);
     expect(known.has('health')).toBe(true);

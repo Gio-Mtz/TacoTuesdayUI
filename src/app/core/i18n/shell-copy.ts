@@ -55,9 +55,8 @@ export const SHELL_COPY: Readonly<Record<PageLang, ShellCopy>> = {
     navLabel: 'Secciones',
 
     nav: [
+      { label: 'Para empresas', path: '/empresas', fragment: 'para-empresas' },
       { label: 'Para devs', path: '/talento', fragment: 'para-devs' },
-      { label: 'Cómo funciona', path: '/talento', fragment: 'como-funciona' },
-      { label: 'Lista de espera', path: '/talento', fragment: 'lista-de-espera' },
     ],
     crossLanguage: { label: 'For companies', path: '/', hreflang: 'en' },
     languageSwitchLabel: 'Leer esta página en',

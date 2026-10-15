@@ -32,7 +32,8 @@ export interface SocialCard {
   readonly translation: SocialCardKey | null;
 }
 
-export type SocialCardKey = 'home' | 'talento' | 'privacidad' | 'privacy' | 'notfound' | 'health';
+export type SocialCardKey =
+  'home' | 'talento' | 'empresas' | 'privacidad' | 'privacy' | 'notfound' | 'health';
 
 export interface SocialManifest {
   readonly siteName: string;

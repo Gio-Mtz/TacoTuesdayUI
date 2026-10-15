@@ -32,6 +32,7 @@ export const NOT_FOUND_COPY: Readonly<Record<PageLang, NotFoundCopy>> = {
 export const DOOR_LABEL: Readonly<Record<SocialCardKey, string | null>> = {
   home: 'For companies',
   talento: 'Para devs',
+  empresas: 'Para empresas',
   privacidad: 'Aviso de privacidad',
   privacy: 'Privacy notice',
   health: null,

@@ -59,7 +59,7 @@ describe('SiteHeader', () => {
     await fixture.whenStable();
 
     const labels = Array.from(el().querySelectorAll('nav a')).map((a) => a.textContent?.trim());
-    expect(labels).toEqual(['Para devs', 'Cómo funciona', 'Lista de espera']);
+    expect(labels).toEqual(['Para empresas', 'Para devs']);
     expect(el().querySelector('nav')!.getAttribute('aria-label')).toBe('Secciones');
   });
 
@@ -68,11 +68,7 @@ describe('SiteHeader', () => {
     await fixture.whenStable();
 
     const hrefs = Array.from(el().querySelectorAll('nav a')).map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual([
-      '/talento#para-devs',
-      '/talento#como-funciona',
-      '/talento#lista-de-espera',
-    ]);
+    expect(hrefs).toEqual(['/empresas#para-empresas', '/talento#para-devs']);
   });
 
   it('still says nothing about language on the Spanish shell', async () => {
@@ -80,7 +76,7 @@ describe('SiteHeader', () => {
     await fixture.whenStable();
 
     const flags = Array.from(el().querySelectorAll('nav a')).map((a) => a.getAttribute('hreflang'));
-    expect(flags).toEqual([null, null, null]);
+    expect(flags).toEqual(SHELL_COPY['es-MX'].nav.map(() => null));
   });
 
   it('defaults to English, which is what index.html ships', () => {
