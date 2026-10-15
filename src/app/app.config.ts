@@ -17,7 +17,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { PageHeadStrategy } from './core/i18n/page-head-strategy';
 import { ThemeService } from './core/theme/theme.service';
 import { AnalyticsService } from './core/analytics/analytics.service';
-import { TrailingSlashUrlSerializer } from './core/routing/trailing-slash';
+import { CanonicalPathUrlSerializer, knownFirstSegments } from './core/routing/canonical-path';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -35,11 +35,13 @@ export const appConfig: ApplicationConfig = {
 
     { provide: TitleStrategy, useExisting: PageHeadStrategy },
 
-    // US-018. `/talento/` parses to two segments, the second one empty, so it
-    // matched no route and fell into the catch-all. This makes the trailing
-    // slash disappear before the router ever sees it -- see the file for the
-    // measurement.
-    { provide: UrlSerializer, useClass: TrailingSlashUrlSerializer },
+    // The router matches raw path segments: a trailing slash is a second, empty
+    // segment, and `Talento` is not `talento`. Normalized here, before the
+    // router matches, or a real page falls into the catch-all.
+    {
+      provide: UrlSerializer,
+      useFactory: () => new CanonicalPathUrlSerializer(knownFirstSegments(routes)),
+    },
 
     provideAppInitializer(() => {
       inject(ThemeService);
