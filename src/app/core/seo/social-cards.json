@@ -47,9 +47,24 @@
       "image": "/og/home.png",
       "imageAlt": "Taco Tuesday. Interviews with a date, feedback in writing, and nobody left on read.",
       "indexable": true,
-      "alternate": null,
+      "alternate": "companies",
       "imageEyebrow": "For teams hiring engineers",
-      "translation": null
+      "translation": "companies"
+    },
+    "companies": {
+      "route": "/companies",
+      "dir": "companies",
+      "lang": "en",
+      "locale": "en_US",
+      "title": "Stop burning weeks on interviews that filter nothing",
+      "description": "Hiring an engineer goes into juggling calendars, reading CVs that say nothing and defending decisions from memory. We take that part off you: interviews with a date and feedback in writing.",
+      "documentTitle": "For companies — Taco Tuesday",
+      "image": "/og/home.png",
+      "imageAlt": "Taco Tuesday. Interviews with a date, feedback in writing, and nobody left on read.",
+      "indexable": true,
+      "alternate": "empresas",
+      "imageEyebrow": "For teams hiring engineers",
+      "translation": "empresas"
     },
     "privacidad": {
       "route": "/privacidad",

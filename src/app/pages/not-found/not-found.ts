@@ -30,9 +30,10 @@ export const NOT_FOUND_COPY: Readonly<Record<PageLang, NotFoundCopy>> = {
 // omission: the record is exhaustive, so a card added to the manifest without a
 // line here does not compile.
 export const DOOR_LABEL: Readonly<Record<SocialCardKey, string | null>> = {
-  home: 'For companies',
+  home: 'Home',
   talento: 'Para devs',
   empresas: 'Para empresas',
+  companies: 'For companies',
   privacidad: 'Aviso de privacidad',
   privacy: 'Privacy notice',
   health: null,

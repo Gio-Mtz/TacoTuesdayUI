@@ -33,7 +33,7 @@ export interface SocialCard {
 }
 
 export type SocialCardKey =
-  'home' | 'talento' | 'empresas' | 'privacidad' | 'privacy' | 'notfound' | 'health';
+  'home' | 'talento' | 'empresas' | 'companies' | 'privacidad' | 'privacy' | 'notfound' | 'health';
 
 export interface SocialManifest {
   readonly siteName: string;

@@ -11,6 +11,10 @@
       "rewrite": "/empresas/index.html"
     },
     {
+      "route": "/companies",
+      "rewrite": "/companies/index.html"
+    },
+    {
       "route": "/privacidad",
       "rewrite": "/privacidad/index.html"
     },

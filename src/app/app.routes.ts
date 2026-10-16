@@ -31,6 +31,12 @@ export const routes: Routes = [
     component: Employers,
   },
   {
+    path: 'companies',
+    title: 'For companies — Taco Tuesday',
+    data: { lang: 'en', card: 'companies' } satisfies PageLangData & PageSocialData,
+    component: Employers,
+  },
+  {
     path: 'privacidad',
     title: 'Aviso de privacidad — Taco Tuesday',
     data: { lang: 'es-MX', card: 'privacidad' } satisfies PageLangData & PageSocialData,

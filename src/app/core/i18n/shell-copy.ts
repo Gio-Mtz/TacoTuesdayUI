@@ -35,8 +35,8 @@ export const SHELL_COPY: Readonly<Record<PageLang, ShellCopy>> = {
     skipToContent: 'Skip to content',
     navLabel: 'Sections',
     nav: [
-      { label: 'Companies', path: '/', fragment: 'companies' },
-      { label: 'Engineers', path: '/', fragment: 'engineers' },
+      { label: 'For companies', path: '/companies', fragment: 'for-companies' },
+      { label: 'For engineers', path: '/', fragment: 'engineers' },
       { label: 'How it works', path: '/', fragment: 'how-it-works' },
     ],
 

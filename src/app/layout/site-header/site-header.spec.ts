@@ -36,10 +36,10 @@ describe('SiteHeader', () => {
     expect(el().querySelector('nav')!.getAttribute('aria-label')).toBe('Sections');
   });
 
-  it('links to every section of the landing, from any route', () => {
+  it('sends the English shell to the companies page and the landing sections', () => {
     const hrefs = Array.from(el().querySelectorAll('nav a')).map((a) => a.getAttribute('href'));
 
-    expect(hrefs).toEqual(['/#companies', '/#engineers', '/#how-it-works']);
+    expect(hrefs).toEqual(['/companies#for-companies', '/#engineers', '/#how-it-works']);
   });
 
   it('says nothing about language while the link and the page agree', () => {
