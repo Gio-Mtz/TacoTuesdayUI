@@ -7,6 +7,10 @@
       "rewrite": "/talento/index.html"
     },
     {
+      "route": "/empresas",
+      "rewrite": "/empresas/index.html"
+    },
+    {
       "route": "/privacidad",
       "rewrite": "/privacidad/index.html"
     },

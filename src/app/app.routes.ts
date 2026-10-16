@@ -5,6 +5,7 @@ import { NotFound } from './pages/not-found/not-found';
 import { PageLangData } from './core/i18n/page-lang';
 import { PageSocialData } from './core/seo/page-social';
 import { Privacy } from './pages/privacy/privacy';
+import { Employers } from './pages/employers/employers';
 import { Talent } from './pages/talent/talent';
 
 // The public pages are eager on purpose: as lazy routes the arriving chunk
@@ -22,6 +23,12 @@ export const routes: Routes = [
     title: 'Para devs — Taco Tuesday',
     data: { lang: 'es-MX', card: 'talento' } satisfies PageLangData & PageSocialData,
     component: Talent,
+  },
+  {
+    path: 'empresas',
+    title: 'Para empresas — Taco Tuesday',
+    data: { lang: 'es-MX', card: 'empresas' } satisfies PageLangData & PageSocialData,
+    component: Employers,
   },
   {
     path: 'privacidad',

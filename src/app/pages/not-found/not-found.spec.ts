@@ -48,7 +48,7 @@ describe('NotFound', () => {
       (anchor) => anchor.getAttribute('href'),
     );
 
-    expect(hrefs).toEqual(['/', '/talento', '/privacidad', '/privacy']);
+    expect(hrefs).toEqual(['/', '/talento', '/empresas', '/privacidad', '/privacy']);
   });
 
   // Why the doors are labelled one by one instead of reusing the card titles: a
@@ -63,6 +63,7 @@ describe('NotFound', () => {
     expect(labelled).toEqual([
       ['For companies', 'en'],
       ['Para devs', 'es-MX'],
+      ['Para empresas', 'es-MX'],
       ['Aviso de privacidad', 'es-MX'],
       ['Privacy notice', 'en'],
     ]);
