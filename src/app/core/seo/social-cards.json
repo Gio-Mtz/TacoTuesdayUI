@@ -34,7 +34,22 @@
       "indexable": true,
       "alternate": "home",
       "imageEyebrow": "Para devs",
-      "translation": null
+      "translation": "engineers"
+    },
+    "engineers": {
+      "route": "/engineers",
+      "dir": "engineers",
+      "lang": "en",
+      "locale": "en_US",
+      "title": "Tired of recruiters ghosting you? Let them come to you",
+      "description": "You are not sending a CV into a mailbox nobody opens. You leave your profile once and the companies that are actually hiring come to you — with a date, and with a process that ends in an answer.",
+      "documentTitle": "For engineers — Taco Tuesday",
+      "image": "/og/home.png",
+      "imageAlt": "Taco Tuesday. Interviews with a date, feedback in writing, and nobody left on read.",
+      "indexable": true,
+      "alternate": null,
+      "imageEyebrow": "For teams hiring engineers",
+      "translation": "talento"
     },
     "empresas": {
       "route": "/empresas",

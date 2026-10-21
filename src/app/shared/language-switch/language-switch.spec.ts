@@ -42,9 +42,17 @@ describe('LanguageSwitch', () => {
     expect(link()).toBeNull();
   });
 
-  it('stays hidden on /talento, which is a different audience and not a translation', async () => {
+  it('offers English on the Spanish engineers page, which US-024 gave a twin', async () => {
     await onCard('talento', 'es-MX');
-    expect(link()).toBeNull();
+
+    expect(link()!.textContent!.trim()).toBe('English');
+    expect(link()!.getAttribute('href')).toBe('/engineers');
+  });
+
+  it('offers Spanish on the English engineers page', async () => {
+    await onCard('engineers', 'en');
+
+    expect(link()!.getAttribute('href')).toBe('/talento');
   });
 
   it('offers English on the Spanish notice', async () => {

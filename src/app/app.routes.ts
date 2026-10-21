@@ -25,6 +25,12 @@ export const routes: Routes = [
     component: Talent,
   },
   {
+    path: 'engineers',
+    title: 'For engineers — Taco Tuesday',
+    data: { lang: 'en', card: 'engineers' } satisfies PageLangData & PageSocialData,
+    component: Talent,
+  },
+  {
     path: 'empresas',
     title: 'Para empresas — Taco Tuesday',
     data: { lang: 'es-MX', card: 'empresas' } satisfies PageLangData & PageSocialData,

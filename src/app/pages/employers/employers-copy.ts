@@ -104,8 +104,7 @@ export const EMPLOYERS_COPY: Readonly<Record<PageLang, EmployersCopy>> = {
     crossoverBody:
       'This page is for the side that hires, and its form asks for a company name. Yours is the engineers’ side: there we ask what you build and we never ask for a company.',
     crossoverCta: 'Go to the engineers’ side',
-    crossoverRoute: '/',
-    crossoverFragment: 'engineers',
+    crossoverRoute: '/engineers',
   },
 
   'es-MX': {
