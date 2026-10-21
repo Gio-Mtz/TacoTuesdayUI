@@ -1,29 +1,25 @@
-<section id="para-devs" class="tt-section talent-hero" aria-labelledby="talent-title">
+<section [id]="copy().heroId" class="tt-section talent-hero" aria-labelledby="talent-title">
   <div class="tt-container talent-hero__inner">
-    <p class="tt-eyebrow">Para devs</p>
+    <p class="tt-eyebrow">{{ copy().heroEyebrow }}</p>
     <h1 id="talent-title" class="talent-hero__title">
-      ¿Odias que los reclutas te ghosteen?<br class="talent-hero__break" />
-      Deja que ellos te busquen
+      {{ copy().heroTitleTop }}<br class="talent-hero__break" />
+      {{ copy().heroTitleBottom }}
     </h1>
-    <p class="tt-lede talent-hero__lede">
-      No estás mandando tu CV a un buzón que nadie abre. Dejas tu perfil una vez y las empresas que
-      de verdad están contratando llegan a ti — con fecha, y con un proceso que termina en una
-      respuesta.
-    </p>
+    <p class="tt-lede talent-hero__lede">{{ copy().heroLede }}</p>
     <div class="talent-hero__actions">
-      <a class="tt-btn tt-btn--primary" routerLink="/talento" fragment="lista-de-espera">
-        Apúntame a la lista
+      <a class="tt-btn tt-btn--primary" [routerLink]="copy().route" [fragment]="copy().waitlistId">
+        {{ copy().heroCta }}
       </a>
     </div>
-    <p class="talent-hero__note">Lista de espera abierta. Para devs siempre es gratis.</p>
+    <p class="talent-hero__note">{{ copy().heroNote }}</p>
   </div>
 </section>
 <section class="tt-section" aria-labelledby="talent-value-title">
   <div class="tt-container">
-    <p class="tt-eyebrow">Qué cambia para ti</p>
-    <h2 id="talent-value-title" class="tt-title">Tres cosas, y las tres se notan</h2>
+    <p class="tt-eyebrow">{{ copy().valueEyebrow }}</p>
+    <h2 id="talent-value-title" class="tt-title">{{ copy().valueTitle }}</h2>
     <ul class="tt-cards talent__cards">
-      @for (point of points; track point.title) {
+      @for (point of copy().points; track point.title) {
         <li class="tt-card">
           <span class="tt-card__icon">
             <ttco-icon [name]="point.icon" />
@@ -35,18 +31,22 @@
     </ul>
 
     <div class="talent__actions">
-      <a class="tt-btn tt-btn--primary" routerLink="/talento" fragment="lista-de-espera">
-        Quiero que me busquen
+      <a class="tt-btn tt-btn--primary" [routerLink]="copy().route" [fragment]="copy().waitlistId">
+        {{ copy().valueCta }}
       </a>
     </div>
   </div>
 </section>
-<section id="como-funciona" class="tt-section tt-section--alt" aria-labelledby="talent-steps-title">
+<section
+  [id]="copy().stepsId"
+  class="tt-section tt-section--alt"
+  aria-labelledby="talent-steps-title"
+>
   <div class="tt-container">
-    <p class="tt-eyebrow">Cómo funciona</p>
-    <h2 id="talent-steps-title" class="tt-title">Tres pasos, sin letras chiquitas</h2>
+    <p class="tt-eyebrow">{{ copy().stepsEyebrow }}</p>
+    <h2 id="talent-steps-title" class="tt-title">{{ copy().stepsTitle }}</h2>
     <ol class="tt-cards talent__cards">
-      @for (step of steps; track step.title; let i = $index) {
+      @for (step of copy().steps; track step.title; let i = $index) {
         <li class="tt-card">
           <span class="tt-card__icon">
             <ttco-icon [name]="step.icon" />
@@ -58,10 +58,10 @@
     </ol>
 
     <div class="talent__actions">
-      <a class="tt-btn tt-btn--primary" routerLink="/talento" fragment="lista-de-espera">
-        Dejar mi correo
+      <a class="tt-btn tt-btn--primary" [routerLink]="copy().route" [fragment]="copy().waitlistId">
+        {{ copy().stepsCta }}
       </a>
     </div>
   </div>
 </section>
-<ttco-waitlist lockedKind="candidate" sectionId="lista-de-espera" />
+<ttco-waitlist lockedKind="candidate" [sectionId]="copy().waitlistId" />

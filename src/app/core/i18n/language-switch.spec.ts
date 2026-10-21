@@ -49,9 +49,30 @@ describe('the language pairing in social-cards.json', () => {
     expect(SOCIAL_CARDS.privacy.lang).toBe('en');
   });
 
-  it('leaves / and /talento unpaired on purpose — two audiences, not two translations', () => {
+  it('leaves / unpaired on purpose — the landing is an audience, not a translation', () => {
+    // US-024 gave `/talento` the twin it never had. `/` is still not it: the
+    // landing argues both sides in English, so a switch from the engineers'
+    // page to it would hand the reader a different page, not the same one.
     expect(SOCIAL_CARDS.home.translation).toBeNull();
-    expect(SOCIAL_CARDS.talento.translation).toBeNull();
+    expect(SOCIAL_CARDS.talento.translation).not.toBe('home');
+  });
+
+  it('declares the two engineer pages as each other, which is what US-024 added', () => {
+    expect(SOCIAL_CARDS.talento.translation).toBe('engineers');
+    expect(SOCIAL_CARDS.engineers.translation).toBe('talento');
+    expect(SOCIAL_CARDS.engineers.route).toBe('/engineers');
+    expect(SOCIAL_CARDS.engineers.lang).toBe('en');
+  });
+
+  // `translation` is the control a reader clicks; `alternate` is what a crawler
+  // reads. US-024 deliberately moved only the first: `/talento`'s hreflang
+  // cluster is {/, /talento} and is indexed that way, and a third member makes
+  // every annotation in it non-reciprocal. Which pair survives is a product
+  // decision, so until it is made this page annotates nothing.
+  it('gives /engineers no hreflang cluster yet, and that is the deliberate half', () => {
+    expect(SOCIAL_CARDS.engineers.alternate).toBeNull();
+    expect(SOCIAL_CARDS.talento.alternate).toBe('home');
+    expect(SOCIAL_CARDS.home.alternate).toBe('talento');
   });
 
   it('makes the English notice the hreflang alternate of the Spanish one', () => {
@@ -69,8 +90,8 @@ describe('the language pairing in social-cards.json', () => {
 describe('languageSwitchFor', () => {
   it('offers nothing when the route has no translation', () => {
     expect(languageSwitchFor(SOCIAL_CARDS.home)).toBeNull();
-    expect(languageSwitchFor(SOCIAL_CARDS.talento)).toBeNull();
     expect(languageSwitchFor(SOCIAL_CARDS.health)).toBeNull();
+    expect(languageSwitchFor(SOCIAL_CARDS.notfound)).toBeNull();
   });
 
   it('offers nothing before the router has applied a card', () => {

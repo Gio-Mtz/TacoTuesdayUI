@@ -55,6 +55,46 @@
   margin-top: tt.space(6);
 }
 
+// TD-040. This was a full `tt-section` on a plain background sitting directly
+// above the form's own plain section, so the two paddings stacked into
+// 2 x space(9) = 192px of empty page with no change of colour to explain it.
+// It is an exit for the wrong audience, not an argument, so it is a band now,
+// and the bottom padding is 0 on purpose: the seam is the form's own space(9)
+// and nothing more.
+.employers-crossover {
+  padding-block: tt.space(6) 0;
+}
+
+.employers-crossover__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: tt.space(4);
+
+  padding: tt.space(5);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-lg);
+  background: var(--tt-bg-surface);
+
+  @include tt.up(md) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: tt.space(6);
+    padding: tt.space(5) tt.space(6);
+  }
+}
+
 .employers-crossover__title {
+  margin: 0 0 tt.space(2);
   font-size: var(--tt-text-2xl);
+}
+
+.employers-crossover__body {
+  margin: 0;
+  color: var(--tt-text-secondary);
+}
+
+.employers-crossover__out {
+  flex: none;
 }
