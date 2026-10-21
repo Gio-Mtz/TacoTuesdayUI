@@ -54,3 +54,46 @@
 .talent__actions {
   margin-top: tt.space(6);
 }
+
+.talent-faq__list {
+  margin: tt.space(6) 0 0;
+
+  display: grid;
+  gap: tt.space(5);
+
+  max-width: 68ch;
+}
+
+.talent-faq__item {
+  padding-bottom: tt.space(5);
+
+  border-bottom: 1px solid var(--tt-border);
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.talent-faq__question {
+  margin: 0 0 tt.space(2);
+
+  font-size: var(--tt-text-lg);
+  font-weight: 600;
+
+  color: var(--tt-text-primary);
+}
+
+.talent-faq__answer {
+  margin: 0;
+
+  color: var(--tt-text-secondary);
+}
+
+.talent-faq__note {
+  margin: tt.space(6) 0 0;
+
+  font-size: var(--tt-text-sm);
+
+  color: var(--tt-text-secondary);
+}

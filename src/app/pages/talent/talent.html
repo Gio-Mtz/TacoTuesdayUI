@@ -64,4 +64,23 @@
     </div>
   </div>
 </section>
+<section [id]="copy().faqId" class="tt-section talent-faq" aria-labelledby="talent-faq-title">
+  <div class="tt-container">
+    <p class="tt-eyebrow">{{ copy().faqEyebrow }}</p>
+    <h2 id="talent-faq-title" class="tt-title">{{ copy().faqTitle }}</h2>
+    <dl class="talent-faq__list">
+      @for (item of copy().faq; track item.question) {
+        <div class="talent-faq__item">
+          <dt class="talent-faq__question">{{ item.question }}</dt>
+          <dd class="talent-faq__answer">{{ item.answer }}</dd>
+        </div>
+      }
+    </dl>
+    <p class="talent-faq__note">
+      {{ copy().faqNote }}
+      <a [routerLink]="privacyRoute()">{{ copy().faqNoteLink }}</a
+      >.
+    </p>
+  </div>
+</section>
 <ttco-waitlist lockedKind="candidate" [sectionId]="copy().waitlistId" />
