@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { privacyRoute } from '../../core/i18n/language-switch';
 import { PageLangService } from '../../core/i18n/page-lang';
 import { Waitlist } from '../../landing/sections/waitlist/waitlist';
 import { Icon } from '../../shared/icon/icon';
@@ -21,4 +22,8 @@ export class Talent {
   private readonly pageLang = inject(PageLangService);
 
   protected readonly copy = computed(() => TALENT_COPY[this.pageLang.lang()]);
+
+  // Read from the card manifest, not written here: the English page must never
+  // send a reader to the Spanish notice.
+  protected readonly privacyRoute = computed(() => privacyRoute(this.pageLang.lang()));
 }

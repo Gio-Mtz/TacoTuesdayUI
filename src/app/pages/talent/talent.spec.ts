@@ -4,7 +4,9 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideRouter } from '@angular/router';
 
 import { routes } from '../../app.routes';
+import { PRIVACY_CARDS, privacyRoute } from '../../core/i18n/language-switch';
 import { PageLang, PageLangService } from '../../core/i18n/page-lang';
+import { SOCIAL_CARDS } from '../../core/seo/page-social';
 import { SHELL_COPY } from '../../core/i18n/shell-copy';
 import { WAITLIST_COPY } from '../../landing/sections/waitlist/waitlist-copy';
 import { TALENT_COPY } from './talent-copy';
@@ -48,8 +50,8 @@ describe.each<PageLang>(['en', 'es-MX'])('Talent in %s', (lang) => {
     expect(host().querySelectorAll('h1').length).toBe(1);
   });
 
-  it('renders all three section anchors of this language', () => {
-    const wanted = [copy.heroId, copy.stepsId, copy.waitlistId];
+  it('renders all four section anchors of this language', () => {
+    const wanted = [copy.heroId, copy.stepsId, copy.faqId, copy.waitlistId];
 
     expect(wanted.filter((id) => !host().querySelector(`#${id}`))).toEqual([]);
   });
@@ -127,6 +129,54 @@ describe.each<PageLang>(['en', 'es-MX'])('Talent in %s', (lang) => {
     // would be one nothing reads and would imply this form has two sides.
     expect(host().querySelectorAll('a[href*="side="]').length).toBe(0);
   });
+
+  it('answers every question it raises, as a pair a screen reader can follow (US-025)', () => {
+    const list = host().querySelector(`#${copy.faqId} dl`)!;
+    const questions = Array.from(list.querySelectorAll('dt')).map((dt) => dt.textContent?.trim());
+    const answers = Array.from(list.querySelectorAll('dd')).map((dd) => dd.textContent?.trim());
+
+    expect(questions).toEqual(copy.faq.map((item) => item.question));
+    expect(answers).toEqual(copy.faq.map((item) => item.answer));
+    expect(questions.length).toBe(answers.length);
+  });
+
+  it('sends the privacy link to the notice of ITS OWN language (US-025)', () => {
+    // The whole point of reading the route from the manifest. An English reader
+    // asking how to delete their data must not land on the Spanish notice.
+    const link = host().querySelector<HTMLAnchorElement>(`#${copy.faqId} a`)!;
+
+    expect(link.getAttribute('href')).toBe(privacyRoute(lang));
+    expect(SOCIAL_CARDS[PRIVACY_CARDS[lang]].lang).toBe(lang);
+  });
+
+  it('puts no door in the questions, because the form is the next thing on the page (US-025)', () => {
+    // Deliberate, and the reason it is written down: every other section that
+    // argues ends in a door, but this one ends two hundred pixels above a real
+    // email field, so a door here would scroll to something already in view.
+    const doors = host().querySelectorAll(`#${copy.faqId} a[href*="${copy.waitlistId}"]`);
+
+    expect(doors.length).toBe(0);
+    expect(host().querySelector(`#${copy.faqId} .talent__actions`)).toBeNull();
+  });
+
+  it('says who pays NOTHING, because the site has never said it (US-025)', () => {
+    // The guard on an OPEN product question. The site promises "always free for
+    // engineers" and no page says who covers it; answering that here would make
+    // a pricing commitment the stakeholder has not made. Asked 16-oct, still open.
+    const faq = host().querySelector(`#${copy.faqId}`)!.textContent ?? '';
+    const invented = [
+      'company pays',
+      'companies pay',
+      'the company is the one paying',
+      'paid by the company',
+      'la empresa paga',
+      'las empresas pagan',
+      'quien paga',
+      'lo paga la empresa',
+    ].filter((phrase) => faq.toLowerCase().includes(phrase));
+
+    expect(invented, `the FAQ answered the open pricing question: ${invented}`).toEqual([]);
+  });
 });
 
 describe('Talent across the two languages', () => {
@@ -193,5 +243,17 @@ describe('Talent across the two languages', () => {
     expect(en.steps.length).toBe(es.steps.length);
     expect(en.points.map((p) => p.icon)).toEqual(es.points.map((p) => p.icon));
     expect(en.steps.map((s) => s.icon)).toEqual(es.steps.map((s) => s.icon));
+  });
+
+  it('asks the same questions in both languages, and answers all of them (US-025)', () => {
+    const en = TALENT_COPY.en;
+    const es = TALENT_COPY['es-MX'];
+
+    expect(en.faq.length).toBe(es.faq.length);
+    expect(en.faq.length).toBeGreaterThan(0);
+    for (const side of [en.faq, es.faq]) {
+      expect(side.filter((item) => !item.question.trim() || !item.answer.trim())).toEqual([]);
+    }
+    expect(new Set([en.faqId, es.faqId]).size).toBe(2);
   });
 });
