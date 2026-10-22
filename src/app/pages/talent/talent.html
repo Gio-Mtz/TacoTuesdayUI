@@ -64,6 +64,23 @@
     </div>
   </div>
 </section>
+<section class="talent-crossover" aria-labelledby="talent-crossover-title">
+  <div class="tt-container">
+    <div class="talent-crossover__panel">
+      <div class="talent-crossover__copy">
+        <h2 id="talent-crossover-title" class="talent-crossover__title">
+          {{ copy().crossoverTitle }}
+        </h2>
+        <p class="talent-crossover__body">{{ copy().crossoverBody }}</p>
+      </div>
+      <a
+        class="tt-btn tt-btn--secondary talent-crossover__out"
+        [routerLink]="copy().crossoverRoute"
+        >{{ copy().crossoverCta }}</a
+      >
+    </div>
+  </div>
+</section>
 <section [id]="copy().faqId" class="tt-section talent-faq" aria-labelledby="talent-faq-title">
   <div class="tt-container">
     <p class="tt-eyebrow">{{ copy().faqEyebrow }}</p>

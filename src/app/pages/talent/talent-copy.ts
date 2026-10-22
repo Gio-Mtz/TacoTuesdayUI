@@ -40,6 +40,14 @@ export interface TalentCopy {
   readonly stepsCta: string;
   readonly steps: readonly TalentPoint[];
 
+  // The exit for the wrong audience, mirrored from the companies page. No
+  // fragment on purpose: a route ending in `#waitlist` would read as a fourth
+  // door to this page's own form.
+  readonly crossoverTitle: string;
+  readonly crossoverBody: string;
+  readonly crossoverCta: string;
+  readonly crossoverRoute: string;
+
   readonly faqId: string;
   readonly faqEyebrow: string;
   readonly faqTitle: string;
@@ -107,6 +115,12 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
         body: 'A date agreed up front, the interview, and written feedback at the end. Whether it works out or not.',
       },
     ],
+
+    crossoverTitle: 'Here to hire, not to be hired?',
+    crossoverBody:
+      'This page is for the side that gets hired: its form asks what you do and never asks for a company. Yours is the companies’ side, and there the form asks for your company name.',
+    crossoverCta: 'Go to the companies’ side',
+    crossoverRoute: '/companies',
 
     faqId: 'questions',
     faqEyebrow: 'Before you leave your email',
@@ -197,6 +211,12 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
         body: 'Fecha acordada desde el principio, entrevista, y feedback por escrito al final. Salga o no salga.',
       },
     ],
+
+    crossoverTitle: '¿Llegaste a contratar, no a que te contraten?',
+    crossoverBody:
+      'Esta página es para quien busca chamba: su formulario te pregunta a qué te dedicas y nunca te pide empresa. La tuya es la de empresas, y ahí el formulario sí pide el nombre de tu empresa.',
+    crossoverCta: 'Ir a Para empresas',
+    crossoverRoute: '/empresas',
 
     faqId: 'preguntas',
     faqEyebrow: 'Antes de dejar tu correo',

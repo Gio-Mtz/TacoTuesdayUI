@@ -9,6 +9,7 @@ import { PageLang, PageLangService } from '../../core/i18n/page-lang';
 import { SOCIAL_CARDS } from '../../core/seo/page-social';
 import { SHELL_COPY } from '../../core/i18n/shell-copy';
 import { WAITLIST_COPY } from '../../landing/sections/waitlist/waitlist-copy';
+import { EMPLOYERS_COPY } from '../employers/employers-copy';
 import { TALENT_COPY } from './talent-copy';
 import { Talent } from './talent';
 
@@ -177,6 +178,38 @@ describe.each<PageLang>(['en', 'es-MX'])('Talent in %s', (lang) => {
 
     expect(invented, `the FAQ answered the open pricing question: ${invented}`).toEqual([]);
   });
+
+  it('sends the other audience out to the companies page of ITS OWN language (US-026)', () => {
+    const out = host().querySelector<HTMLAnchorElement>('.talent-crossover a')!;
+
+    expect(out.getAttribute('href')).toBe(copy.crossoverRoute);
+    expect(out.textContent?.trim()).toBe(copy.crossoverCta);
+  });
+
+  it('exits without a fragment, so the exit is not counted as a door (US-026)', () => {
+    // `/companies#waitlist` would match the `a[href*="waitlist"]` count that
+    // keeps one door per section, and would land the wrong audience on a form
+    // instead of on the argument written for them.
+    const out = host().querySelector<HTMLAnchorElement>('.talent-crossover a')!;
+
+    expect(out.getAttribute('href')).not.toContain('#');
+  });
+
+  it('keeps the exit a band, not a section — TD-040 on this side too (US-026)', () => {
+    const crossover = host().querySelector('.talent-crossover')!;
+
+    expect(crossover.classList.contains('tt-section')).toBe(false);
+    expect(crossover.querySelector('.talent-crossover__panel')).toBeTruthy();
+  });
+
+  it('puts the exit before the questions, which are written for whoever stays (US-026)', () => {
+    const sections = Array.from(host().querySelectorAll('section'));
+    const crossover = sections.findIndex((el) => el.classList.contains('talent-crossover'));
+    const faq = sections.findIndex((el) => el.id === copy.faqId);
+
+    expect(crossover).toBeGreaterThan(-1);
+    expect(faq).toBeGreaterThan(crossover);
+  });
 });
 
 describe('Talent across the two languages', () => {
@@ -255,5 +288,19 @@ describe('Talent across the two languages', () => {
       expect(side.filter((item) => !item.question.trim() || !item.answer.trim())).toEqual([]);
     }
     expect(new Set([en.faqId, es.faqId]).size).toBe(2);
+  });
+
+  it('makes the exit between the two audiences reciprocal, in each language (US-026)', () => {
+    // The asymmetry US-026 closes: the companies page had carried this exit
+    // since it was written, and the engineer page had none. A pair that stops
+    // being reciprocal is the bug, so both directions are asserted together.
+    for (const lang of ['en', 'es-MX'] as const) {
+      expect(TALENT_COPY[lang].crossoverRoute).toBe(EMPLOYERS_COPY[lang].route);
+      expect(EMPLOYERS_COPY[lang].crossoverRoute).toBe(TALENT_COPY[lang].route);
+    }
+
+    expect(new Set([TALENT_COPY.en.crossoverRoute, TALENT_COPY['es-MX'].crossoverRoute]).size).toBe(
+      2,
+    );
   });
 });
