@@ -22,6 +22,10 @@ export interface SocialCard {
   readonly image: string;
   readonly imageAlt: string;
 
+  // Drawn into the card PNG by tools/make-og-images.mjs, never written to a
+  // meta tag: it is the page's own eyebrow, so the card names its audience.
+  readonly imageEyebrow: string;
+
   readonly indexable: boolean;
 
   readonly alternate: SocialCardKey | null;

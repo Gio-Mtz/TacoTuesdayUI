@@ -12,12 +12,58 @@ const SCRATCH = join(REPO, 'tools/og/.render.html');
 const manifest = JSON.parse(readFileSync(MANIFEST, 'utf8'));
 const template = readFileSync(TEMPLATE, 'utf8');
 
+// Prettier rewrites `{{key}}` as `{{ key }}` in the template, so a literal
+// replace stops matching and the card renders the placeholder itself.
+const PLACEHOLDER = /\{\{\s*(\w+)\s*\}\}/g;
+
+function fill(values) {
+  const missing = new Set();
+  const html = template.replace(PLACEHOLDER, (match, key) => {
+    if (!(key in values)) {
+      missing.add(key);
+      return match;
+    }
+    return values[key];
+  });
+  if (missing.size) {
+    console.error(
+      `::error::the template asks for ${[...missing].join(', ')}, which no card supplies`,
+    );
+    process.exit(1);
+  }
+  return html;
+}
+
+// Named cards only. Re-rendering a card that did not change rewrites its PNG
+// with whatever the local Chromium draws today, which is a binary diff nobody
+// asked for.
+const only = new Set(process.argv.slice(2));
+const unknown = [...only].filter((key) => !(key in manifest.cards));
+if (unknown.length) {
+  console.error(`::error::the manifest has no card named ${unknown.join(', ')}`);
+  process.exit(1);
+}
+
 const targets = new Map();
-for (const card of Object.values(manifest.cards)) {
+for (const [key, card] of Object.entries(manifest.cards)) {
+  if (only.size && !only.has(key)) {
+    continue;
+  }
   if (!targets.has(card.image)) {
     targets.set(card.image, card);
   }
 }
+
+const jobs = [...targets].map(([imagePath, card]) => ({
+  imagePath,
+  card,
+  html: fill({
+    lang: card.lang,
+    eyebrow: card.imageEyebrow,
+    headline: card.title,
+    headlineClass: card.title.length > 55 ? 'long' : '',
+  }),
+}));
 
 let chromium;
 try {
@@ -33,13 +79,7 @@ const page = await browser.newPage({
   deviceScaleFactor: 1,
 });
 
-for (const [imagePath, card] of targets) {
-  const html = template
-    .replace('{{lang}}', card.lang)
-    .replace('{{eyebrow}}', card.imageEyebrow)
-    .replace('{{headline}}', card.title)
-    .replace('{{headlineClass}}', card.title.length > 55 ? 'long' : '');
-
+for (const { imagePath, card, html } of jobs) {
   writeFileSync(SCRATCH, html, 'utf8');
   await page.goto(`file://${SCRATCH}`, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);

@@ -256,6 +256,17 @@ function main() {
     die(2, `cannot read ${MANIFEST_PATH}: ${error.message}`);
   }
 
+  // Nothing fails when a card's image file is missing: the tags still emit and
+  // the preview just comes up blank. `public/` is copied to the root of dist.
+  const images = [...new Set(Object.values(manifest.cards).map((card) => card.image))];
+  const absent = images.filter((image) => !existsSync(join(dist, image.replace(/^\//, ''))));
+  if (absent.length) {
+    die(
+      1,
+      `the build ships no ${absent.join(', ')} — every card names an image public/ must carry`,
+    );
+  }
+
   const rootPath = join(dist, 'index.html');
   const template = preloadFonts(readFileSync(rootPath, 'utf8'), dist);
   const written = [];

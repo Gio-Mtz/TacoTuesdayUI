@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
+import { EMPLOYERS_COPY } from '../../pages/employers/employers-copy';
+import { TALENT_COPY } from '../../pages/talent/talent-copy';
 import {
   PageSocialMetaService,
   SOCIAL,
@@ -221,7 +223,48 @@ describe('the social card manifest', () => {
 
   it('names an image that the build actually ships', () => {
     for (const card of cards) {
+      // The pattern is all a spec can check: that the file is really in the
+      // build is measured by tools/emit-route-cards.mjs, which runs postbuild.
       expect(card.image).toMatch(/^\/og\/[a-z-]+\.png$/);
+    }
+  });
+});
+
+// The pages a visitor is sent to, read from the copy each page renders -- not
+// from the manifest, so a card that drifted from its page is what fails.
+const AUDIENCE_PAGES = [...Object.values(TALENT_COPY), ...Object.values(EMPLOYERS_COPY)];
+
+describe('the share card of an audience page', () => {
+  const cards = Object.values(SOCIAL_CARDS) as SocialCard[];
+
+  function cardFor(route: string): SocialCard {
+    const card = cards.find((candidate) => candidate.route === route);
+    expect(card, `no social card for ${route}`).toBeDefined();
+    return card as SocialCard;
+  }
+
+  it('is its own, not the house card every other page falls back to (US-027)', () => {
+    const images = AUDIENCE_PAGES.map((copy) => cardFor(copy.route).image);
+
+    expect(images).not.toContain(SOCIAL_CARDS.home.image);
+    expect(new Set(images).size, images.join(' ')).toBe(images.length);
+  });
+
+  it('repeats the words the page itself opens with (US-027)', () => {
+    for (const copy of AUDIENCE_PAGES) {
+      const card = cardFor(copy.route);
+
+      expect(card.imageEyebrow, copy.route).toBe(copy.heroEyebrow);
+      expect(card.title, copy.route).toBe(`${copy.heroTitleTop} ${copy.heroTitleBottom}`);
+    }
+  });
+
+  it('describes itself with its own headline, never another page one (US-027)', () => {
+    for (const copy of AUDIENCE_PAGES) {
+      const card = cardFor(copy.route);
+      const headline = `${copy.heroTitleTop} ${copy.heroTitleBottom}`;
+
+      expect(card.imageAlt, copy.route).toBe(`${SOCIAL.siteName}. ${headline}.`);
     }
   });
 });
