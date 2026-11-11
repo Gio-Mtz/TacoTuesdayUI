@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
 import { routes } from '../app.routes';
+import { EMPLOYERS_COPY } from '../pages/employers/employers-copy';
+import { TALENT_COPY } from '../pages/talent/talent-copy';
 import { Landing } from './landing';
 
 describe('Landing', () => {
@@ -119,5 +121,42 @@ describe('Landing', () => {
       'the companies section must own the hiring door',
     ).not.toBeNull();
     expect(el().querySelector('#companies a[href*="side=candidate"]')).toBeNull();
+  });
+
+  it('reaches both audience pages without the header nav, which a phone never shows (US-028)', () => {
+    // Measured before it was written: at 390px the home page reached `/`,
+    // `/privacy` and `/talento` only -- `.site-header__nav` is `display: none`
+    // below `md` and there is no other menu, so these two pages existed and
+    // nothing on a phone could get to them.
+    const reachable = new Set(
+      Array.from(el().querySelectorAll<HTMLAnchorElement>('a[href]')).map(
+        (a) => a.getAttribute('href')!.split(/[?#]/)[0],
+      ),
+    );
+
+    expect(reachable.has(EMPLOYERS_COPY.en.route)).toBe(true);
+    expect(reachable.has(TALENT_COPY.en.route)).toBe(true);
+  });
+
+  it('puts each page link inside the section that argued for it (US-028)', () => {
+    // The same defect asked in reverse, and the one a copy-paste between twin
+    // sections produces: both links present, both in the wrong section.
+    expect(el().querySelector(`#companies a[href="${EMPLOYERS_COPY.en.route}"]`)).not.toBeNull();
+    expect(el().querySelector(`#companies a[href="${TALENT_COPY.en.route}"]`)).toBeNull();
+
+    expect(el().querySelector(`#engineers a[href="${TALENT_COPY.en.route}"]`)).not.toBeNull();
+    expect(el().querySelector(`#engineers a[href="${EMPLOYERS_COPY.en.route}"]`)).toBeNull();
+  });
+
+  it('leaves the four side doors exactly as US-014 left them (US-028)', () => {
+    // The new links carry no `side=` and no fragment on purpose. This is the
+    // guard that says so from the page's side, not the section's.
+    const doors = Array.from(el().querySelectorAll<HTMLAnchorElement>('a[href*="side="]')).length;
+    const waitlistDoors = Array.from(
+      el().querySelectorAll<HTMLAnchorElement>('a[href*="waitlist"]'),
+    ).length;
+
+    expect(doors).toBe(4);
+    expect(waitlistDoors).toBe(4);
   });
 });

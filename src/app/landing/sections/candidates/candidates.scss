@@ -14,4 +14,18 @@
 
 .candidates__actions {
   margin-top: tt.space(6);
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: tt.space(3);
+
+  > * {
+    flex: 1 1 14rem;
+  }
+
+  @include tt.up(sm) {
+    > * {
+      flex: 0 0 auto;
+    }
+  }
 }

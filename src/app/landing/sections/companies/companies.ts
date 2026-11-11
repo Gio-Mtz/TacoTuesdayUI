@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { EMPLOYERS_COPY } from '../../../pages/employers/employers-copy';
 import { Icon } from '../../../shared/icon/icon';
 import { waitlistSideQuery } from '../waitlist/waitlist-side';
 
@@ -21,6 +22,11 @@ export class Companies {
   // Built from the helper and not typed into the template, for the same reason
   // as the hero's: the name of the parameter lives in exactly one file.
   protected readonly hiringQuery = waitlistSideQuery('company');
+
+  // Read from the page's own manifest, not typed here, so renaming the route
+  // cannot leave this link behind. `en` and not the page language: `/` is
+  // English-only and has no Spanish twin.
+  protected readonly employersRoute = EMPLOYERS_COPY.en.route;
 
   protected readonly points: readonly CompanyValuePoint[] = [
     {
