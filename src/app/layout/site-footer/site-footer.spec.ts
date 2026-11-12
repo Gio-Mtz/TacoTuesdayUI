@@ -2,9 +2,16 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { routes } from '../../app.routes';
-import { PageLangService } from '../../core/i18n/page-lang';
+import { LANGUAGE_ENDONYM } from '../../core/i18n/language-switch';
+import { PageLang, PageLangService } from '../../core/i18n/page-lang';
+import { PageSocialMetaService, SOCIAL_CARDS, SocialCardKey } from '../../core/seo/page-social';
 import { SITE_INFO } from '../../core/site/site-info';
 import { SiteFooter } from './site-footer';
+
+const SHELL_LABEL: Readonly<Record<PageLang, string>> = {
+  en: 'Read this page in',
+  'es-MX': 'Leer esta página en',
+};
 
 describe('SiteFooter', () => {
   let fixture: ComponentFixture<SiteFooter>;
@@ -21,6 +28,20 @@ describe('SiteFooter', () => {
 
   function el(): HTMLElement {
     return fixture.nativeElement as HTMLElement;
+  }
+
+  function twin(): HTMLAnchorElement | null {
+    return el().querySelector('a.site-footer__twin');
+  }
+
+  function words(node: Element | null): string {
+    return (node?.textContent ?? '').replace(/\s+/g, ' ').trim();
+  }
+
+  async function onCard(key: SocialCardKey, lang: PageLang): Promise<void> {
+    TestBed.inject(PageLangService).set(lang);
+    TestBed.inject(PageSocialMetaService).apply(SOCIAL_CARDS[key]);
+    await fixture.whenStable();
   }
 
   it('is a contentinfo landmark', () => {
@@ -65,6 +86,10 @@ describe('SiteFooter', () => {
     );
   });
 
+  // US-029 narrowed these two. They used to assert the hand-written link on
+  // EVERY page, which is how the footer kept offering `/talento` to a reader of
+  // `/companies` for 26 days. The door itself is still right where it is the
+  // only thing on offer: before a navigation, and on a route with no twin.
   it('carries the door to the other audience, labelled in its own language', () => {
     const cross = el().querySelector('a[href="/talento"]')!;
     expect(cross).toBeTruthy();
@@ -82,6 +107,57 @@ describe('SiteFooter', () => {
     const cross = el().querySelector('nav a[hreflang="en"]')!;
     expect(cross.getAttribute('href')).toBe('/');
     expect(cross.textContent?.trim()).toBe('For companies');
+  });
+
+  it('keeps that door on the home page, the one route with no twin to offer', async () => {
+    await onCard('home', 'en');
+
+    expect(twin()).toBeNull();
+    expect(el().querySelector('a[href="/talento"]')!.textContent?.trim()).toBe('Para devs');
+  });
+
+  // The route comes from the manifest's own `translation` pointer, not from a
+  // literal: a card that loses its twin takes this link with it.
+  describe.each([
+    ['talento', 'es-MX'],
+    ['engineers', 'en'],
+    ['empresas', 'es-MX'],
+    ['companies', 'en'],
+    ['privacy', 'en'],
+    ['privacidad', 'es-MX'],
+  ] as const)('on %s', (key, lang) => {
+    it('offers the same page in the other language, never another audience', async () => {
+      await onCard(key, lang);
+
+      const other = SOCIAL_CARDS[SOCIAL_CARDS[key].translation!];
+      const link = twin()!;
+
+      expect(link.getAttribute('href')).toBe(other.route);
+      expect(link.getAttribute('hreflang')).toBe(other.lang);
+      expect(words(link)).toBe(`${SHELL_LABEL[lang]} ${LANGUAGE_ENDONYM[other.lang]}`);
+    });
+
+    it('names the other language in that language, so a screen reader switches voice', async () => {
+      await onCard(key, lang);
+
+      const endonym = twin()!.querySelector('span')!;
+      const other = SOCIAL_CARDS[SOCIAL_CARDS[key].translation!];
+
+      expect(endonym.getAttribute('lang')).toBe(other.lang);
+      expect(endonym.textContent?.trim()).toBe(LANGUAGE_ENDONYM[other.lang]);
+    });
+
+    it('stops offering the hand-written door once the page has a twin', async () => {
+      await onCard(key, lang);
+
+      // Not by href: on /engineers the twin IS /talento, the same address the
+      // hand-written door used. The label is what tells the two apart.
+      const labels = [...el().querySelectorAll('nav a')].map((link) => words(link));
+
+      expect(labels).toHaveLength(3);
+      expect(labels).not.toContain('Para devs');
+      expect(labels).not.toContain('For companies');
+    });
   });
 
   it('says where it was made in both languages, because that is the brand', () => {

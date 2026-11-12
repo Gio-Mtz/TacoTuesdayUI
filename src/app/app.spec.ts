@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { App } from './app';
 import { routes } from './app.routes';
+import { PageLang, PageLangService } from './core/i18n/page-lang';
+import { PageSocialMetaService, SOCIAL_CARDS, SocialCardKey } from './core/seo/page-social';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -67,6 +69,35 @@ describe('App', () => {
 
     expect(compiled.querySelector('.cookie-banner')).toBeNull();
   });
+
+  // US-029: the header switch and the footer link are two components reading
+  // the same card. This is the only place both are mounted, so it is the only
+  // place the agreement can be measured.
+  it.each([
+    ['talento', 'es-MX'],
+    ['engineers', 'en'],
+    ['empresas', 'es-MX'],
+    ['companies', 'en'],
+    ['privacy', 'en'],
+    ['privacidad', 'es-MX'],
+  ] as const)(
+    'never lets the header and the footer disagree about the other language on %s',
+    async (key: SocialCardKey, lang: PageLang) => {
+      const fixture = TestBed.createComponent(App);
+      await fixture.whenStable();
+
+      TestBed.inject(PageLangService).set(lang);
+      TestBed.inject(PageSocialMetaService).apply(SOCIAL_CARDS[key]);
+      await fixture.whenStable();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      const header = compiled.querySelector('header a.language-switch')!;
+      const footer = compiled.querySelector('footer a.site-footer__twin')!;
+
+      expect(header.getAttribute('href')).toBe(footer.getAttribute('href'));
+      expect(header.getAttribute('href')).toBe(SOCIAL_CARDS[SOCIAL_CARDS[key].translation!].route);
+    },
+  );
 
   it('opens the tab order with a skip link that targets that main', async () => {
     const fixture = TestBed.createComponent(App);

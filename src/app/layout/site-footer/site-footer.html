@@ -8,11 +8,18 @@
       <h2 class="site-footer__heading">{{ copy().footerContact }}</h2>
       <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a>
       <a [routerLink]="privacyLink()" [attr.hreflang]="privacyLang()">{{ copy().footerPrivacy }}</a>
-      <a
-        [routerLink]="copy().crossLanguage.path"
-        [attr.hreflang]="copy().crossLanguage.hreflang ?? null"
-        >{{ copy().crossLanguage.label }}</a
-      >
+      @if (twin(); as to) {
+        <a class="site-footer__twin" [routerLink]="to.route" [attr.hreflang]="to.lang">
+          {{ copy().languageSwitchLabel }}
+          <span [attr.lang]="to.lang">{{ to.label }}</span>
+        </a>
+      } @else {
+        <a
+          [routerLink]="copy().crossLanguage.path"
+          [attr.hreflang]="copy().crossLanguage.hreflang ?? null"
+          >{{ copy().crossLanguage.label }}</a
+        >
+      }
     </nav>
   </div>
   <div class="tt-container">
