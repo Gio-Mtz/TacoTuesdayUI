@@ -169,4 +169,46 @@ describe('SiteFooter', () => {
       String(new Date().getFullYear()),
     );
   });
+  // US-030. On /privacy and /privacidad this link is the page it sits on: no
+  // fragment, same address, nothing happens on the click.
+  it('marks the privacy link when the visitor is already on the notice', async () => {
+    for (const [key, lang] of [
+      ['privacy', 'en'],
+      ['privacidad', 'es-MX'],
+    ] as [SocialCardKey, PageLang][]) {
+      await onCard(key, lang);
+
+      const hit = el().querySelector('nav a[aria-current="page"]')!;
+      expect(hit.getAttribute('href')).toBe(SOCIAL_CARDS[key].route);
+      expect(hit.classList.contains('site-footer__link--current')).toBe(true);
+    }
+  });
+
+  it('leaves the privacy link unmarked on every page that is not the notice', async () => {
+    for (const [key, lang] of [
+      ['home', 'en'],
+      ['talento', 'es-MX'],
+      ['engineers', 'en'],
+      ['empresas', 'es-MX'],
+      ['companies', 'en'],
+    ] as [SocialCardKey, PageLang][]) {
+      await onCard(key, lang);
+      expect(el().querySelectorAll('nav a[aria-current]').length).toBe(0);
+    }
+  });
+
+  // The twin and the crossLanguage fallback both lead to a DIFFERENT page by
+  // definition, so neither can ever be the page the visitor is on.
+  it('never marks the language door, on any route', async () => {
+    for (const key of Object.keys(SOCIAL_CARDS) as SocialCardKey[]) {
+      await onCard(key, SOCIAL_CARDS[key].lang);
+
+      expect(twin()?.getAttribute('aria-current') ?? null).toBeNull();
+      expect(el().querySelector('a.site-footer__twin[aria-current]')).toBeNull();
+    }
+  });
+
+  it('marks nothing before the router has applied a card', () => {
+    expect(el().querySelectorAll('nav a[aria-current]').length).toBe(0);
+  });
 });

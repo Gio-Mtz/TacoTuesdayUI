@@ -5,11 +5,13 @@
       <span class="site-header__name">{{ site.name }}</span>
     </a>
     <nav class="site-header__nav" [attr.aria-label]="copy().navLabel">
-      @for (link of copy().nav; track link.path + link.fragment) {
+      @for (link of nav(); track link.path + link.fragment) {
         <a
           [routerLink]="link.path"
           [fragment]="link.fragment"
           [attr.hreflang]="link.hreflang ?? null"
+          [attr.aria-current]="link.current ? 'page' : null"
+          [class.site-header__link--current]="link.current"
           >{{ link.label }}</a
         >
       }

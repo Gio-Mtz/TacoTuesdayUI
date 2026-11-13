@@ -7,7 +7,13 @@
     <nav class="site-footer__block" [attr.aria-label]="copy().footerNavLabel">
       <h2 class="site-footer__heading">{{ copy().footerContact }}</h2>
       <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a>
-      <a [routerLink]="privacyLink()" [attr.hreflang]="privacyLang()">{{ copy().footerPrivacy }}</a>
+      <a
+        [routerLink]="privacyLink()"
+        [attr.hreflang]="privacyLang()"
+        [attr.aria-current]="privacyIsCurrent() ? 'page' : null"
+        [class.site-footer__link--current]="privacyIsCurrent()"
+        >{{ copy().footerPrivacy }}</a
+      >
       @if (twin(); as to) {
         <a class="site-footer__twin" [routerLink]="to.route" [attr.hreflang]="to.lang">
           {{ copy().languageSwitchLabel }}

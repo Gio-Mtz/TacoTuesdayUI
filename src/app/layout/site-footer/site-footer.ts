@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { languageSwitchFor, privacyRoute } from '../../core/i18n/language-switch';
 import { PageLangService } from '../../core/i18n/page-lang';
 import { SHELL_COPY } from '../../core/i18n/shell-copy';
+import { leadsToCurrentPage } from '../../core/routing/current-page';
 import { PageSocialMetaService } from '../../core/seo/page-social';
 import { SITE_INFO } from '../../core/site/site-info';
 
@@ -26,6 +27,12 @@ export class SiteFooter {
   protected readonly privacyLink = computed(() => privacyRoute(this.pageLang.lang()));
 
   protected readonly privacyLang = this.pageLang.lang;
+
+  // On /privacy and /privacidad this link is the page it sits on, so it leads
+  // nowhere: the mark is what tells the visitor that before the click.
+  protected readonly privacyIsCurrent = computed(() =>
+    leadsToCurrentPage(this.privacyLink(), this.social.card()),
+  );
 
   // The SAME page in the other language, from the card the router applied -- the
   // same source the header switch reads, so the two can never name different
