@@ -55,3 +55,40 @@
 .privacy__theme-state:last-child {
   margin-bottom: 0;
 }
+
+// One row per field, so the list reads as the form does instead of as a
+// sentence a reader has to parse to find out whether a field is theirs.
+.privacy__collected {
+  margin: 0 0 tt.space(4);
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: tt.space(2);
+    align-items: baseline;
+    padding: tt.space(3) 0;
+    border-bottom: 1px solid var(--tt-border);
+    color: var(--tt-text-secondary);
+    line-height: var(--tt-leading-relaxed);
+  }
+
+  li:first-child {
+    border-top: 1px solid var(--tt-border);
+  }
+}
+
+.privacy__collected-field {
+  font-weight: 600;
+  color: var(--tt-text-primary);
+}
+
+.privacy__collected-optional,
+.privacy__collected-when {
+  font-size: var(--tt-text-sm);
+}
+
+.privacy__collected-when {
+  margin-left: auto;
+}

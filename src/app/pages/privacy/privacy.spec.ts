@@ -6,7 +6,9 @@ import { PageLang, PageLangService } from '../../core/i18n/page-lang';
 import { SITE_INFO } from '../../core/site/site-info';
 import { THEME_COPY } from '../../core/theme/theme-copy';
 import { THEME_STORAGE_KEY, ThemeService } from '../../core/theme/theme.service';
-import { Privacy, formatUpdatedOn } from './privacy';
+import { collectedFields } from '../../landing/sections/waitlist/collected-fields';
+import { WAITLIST_COPY } from '../../landing/sections/waitlist/waitlist-copy';
+import { PRIVACY_CHROME, Privacy, formatUpdatedOn, whenAsked } from './privacy';
 
 describe('Privacy', () => {
   let fixture: ComponentFixture<Privacy>;
@@ -125,6 +127,69 @@ describe('Privacy', () => {
       expect(el().querySelector('.privacy__consent-state')!.textContent!.trim()).toBe(
         CONSENT_COPY.en.manageUnset,
       );
+    });
+  });
+
+  // US-031. The section used to promise three fields the form never asked for:
+  // how much you hire per year, your main stack, your years of experience.
+  describe('what we collect', () => {
+    function rows(): HTMLElement[] {
+      return Array.from(el().querySelectorAll('.privacy__collected li'));
+    }
+
+    (['en', 'es-MX'] as PageLang[]).forEach((lang) => {
+      describe(`in ${lang}`, () => {
+        beforeEach(async () => {
+          await inLang(lang);
+        });
+
+        it('lists one row per field the waitlist stores, and no more', () => {
+          expect(rows().length).toBe(collectedFields(lang).length);
+        });
+
+        it('calls each field what the form calls it', () => {
+          const named = rows().map((row) =>
+            row.querySelector('.privacy__collected-field')!.textContent!.trim(),
+          );
+          expect(named).toEqual(collectedFields(lang).map((field) => field.label));
+        });
+
+        it('says which side is asked for a field that is not asked of everyone', () => {
+          const chrome = PRIVACY_CHROME[lang];
+          const said = rows().map((row) =>
+            row.querySelector('.privacy__collected-when')!.textContent!.trim(),
+          );
+          expect(said).toEqual(collectedFields(lang).map((field) => whenAsked(field, chrome)));
+          expect(said).toContain(chrome.collectedCompanyOnly);
+          expect(said).toContain(chrome.collectedCandidateOnly);
+        });
+
+        it("carries the form's own optional marker on the one field that has it", () => {
+          const marked = rows().filter((row) => row.querySelector('.privacy__collected-optional'));
+          expect(marked.length).toBe(collectedFields(lang).filter((f) => !f.required).length);
+          marked.forEach((row) =>
+            expect(row.querySelector('.privacy__collected-optional')!.textContent!.trim()).toBe(
+              WAITLIST_COPY[lang].roleOptional,
+            ),
+          );
+        });
+      });
+    });
+
+    it('no longer describes fields the form never asks for', async () => {
+      for (const lang of ['en', 'es-MX'] as PageLang[]) {
+        await inLang(lang);
+        const text = el().textContent!;
+        [
+          'how much you hire per year',
+          'your main stack',
+          'years of experience',
+          'cuanto contratas al',
+          'cu\u00e1nto contratas al',
+          'stack principal',
+          'a\u00f1os de experiencia',
+        ].forEach((phrase) => expect(text).not.toContain(phrase));
+      }
     });
   });
 

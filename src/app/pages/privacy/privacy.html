@@ -11,15 +11,31 @@
         escribirnos a <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a> para
         cualquier cosa relacionada con ellos.
       </p>
-
-      <h2>Qué recogemos</h2>
+    } @else {
+      <h2>Who receives it</h2>
       <p>
-        Sólo lo que escribes tú en el formulario de la lista de espera: tu correo, tu nombre y,
-        según si entras como empresa o como candidato, el nombre de tu empresa y cuánto contratas al
-        año, o tu stack principal y tus años de experiencia. Nada más — no pedimos documentos, ni
-        teléfono, ni dirección.
+        {{ site.legalName }} is responsible for the data you leave on this page. You can write to us
+        at <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a> about anything to
+        do with it.
       </p>
+    }
 
+    <h2>{{ chrome().collectedTitle }}</h2>
+    <p>{{ chrome().collectedLede }}</p>
+    <ul class="privacy__collected">
+      @for (field of collected(); track field.field) {
+        <li>
+          <span class="privacy__collected-field">{{ field.label }}</span>
+          @if (field.optional; as mark) {
+            <span class="privacy__collected-optional">{{ mark }}</span>
+          }
+          <span class="privacy__collected-when">{{ field.when }}</span>
+        </li>
+      }
+    </ul>
+    <p>{{ chrome().collectedNothingElse }}</p>
+
+    @if (isSpanish()) {
       <h2>Para qué</h2>
       <p>
         Para avisarte cuando la plataforma abra y, si lo pediste como empresa, para contactarte
@@ -60,21 +76,6 @@
         se guarda si elegiste el tema claro u oscuro y cuál fue tu decisión sobre estas cookies.
       </p>
     } @else {
-      <h2>Who receives it</h2>
-      <p>
-        {{ site.legalName }} is responsible for the data you leave on this page. You can write to us
-        at <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a> about anything to
-        do with it.
-      </p>
-
-      <h2>What we collect</h2>
-      <p>
-        Only what you type into the waitlist form: your email, your name and, depending on whether
-        you join as a company or as a candidate, your company name and how much you hire per year,
-        or your main stack and your years of experience. Nothing else — we do not ask for documents,
-        a phone number or an address.
-      </p>
-
       <h2>What for</h2>
       <p>
         To tell you when the platform opens and, if you asked as a company, to contact you about the
