@@ -11,11 +11,25 @@ import { SHELL_COPY } from '../../core/i18n/shell-copy';
 import { WAITLIST_COPY } from '../../landing/sections/waitlist/waitlist-copy';
 import { EMPLOYERS_COPY } from '../employers/employers-copy';
 import { TALENT_COPY } from './talent-copy';
+import { askedFieldLabels, askedFieldsPhrase } from '../../landing/sections/waitlist/asked-fields';
 import { Talent } from './talent';
 
 // One component serves `/engineers` and `/talento`, so every structural claim is
 // made against BOTH languages: a page that only holds together in Spanish is
 // the bug US-024 exists to prevent.
+const INVENTED_FIELD_WORDINGS: readonly string[] = [
+  'what you are working on',
+  'en qu\u00e9 andas',
+  'what you do',
+  'a qu\u00e9 te dedicas',
+  'what you build',
+  'qu\u00e9 construyes',
+  'tu puesto y',
+  'your company name',
+  'el nombre de tu empresa',
+  'el nombre de la empresa',
+];
+
 describe.each<PageLang>(['en', 'es-MX'])('Talent in %s', (lang) => {
   const copy = TALENT_COPY[lang];
 
@@ -137,8 +151,67 @@ describe.each<PageLang>(['en', 'es-MX'])('Talent in %s', (lang) => {
     const answers = Array.from(list.querySelectorAll('dd')).map((dd) => dd.textContent?.trim());
 
     expect(questions).toEqual(copy.faq.map((item) => item.question));
-    expect(answers).toEqual(copy.faq.map((item) => item.answer));
     expect(questions.length).toBe(answers.length);
+
+    // The answer that names the form's fields is rendered as its copy plus the
+    // derived list, so this measures the pairing and the lede. That the list
+    // agrees with the form is measured in `asked-fields.spec.ts`, which mounts
+    // the form and reads the labels it renders.
+    copy.faq.forEach((item, i) => {
+      if (item.asksFields) {
+        expect(answers[i]).toMatch(
+          new RegExp(`^${item.answer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} .+\\.$`),
+        );
+      } else {
+        expect(answers[i]).toBe(item.answer);
+      }
+    });
+  });
+
+  // US-032. Every surface here that names the form's fields now reads them from
+  // the form. The wordings below are the eight this page and its sibling used to
+  // carry by hand, one of them for a field the form has never had.
+  it('names the fields its OWN form asks for where the steps end (US-032)', () => {
+    const step = copy.steps.find((item) => item.asksFields)!;
+    const rendered = Array.from(host().querySelectorAll('.tt-card__body'))
+      .map((node) => (node.textContent ?? '').replace(/\s+/g, ' ').trim())
+      .find((body) => body.startsWith(step.body))!;
+
+    expect(rendered).toBe(`${step.body} ${askedFieldsPhrase(lang, 'candidate')}.`);
+    for (const label of askedFieldLabels(lang, 'candidate')) {
+      expect(rendered).toContain(label);
+    }
+  });
+
+  it('tells a dev in the PROSE that the role field may be left blank (US-032)', () => {
+    // Measured on the step card, not on the page: the form is rendered further
+    // down and carries its own marker, so `text()` would pass this whether the
+    // prose said it or not.
+    const step = copy.steps.find((item) => item.asksFields)!;
+    const rendered = Array.from(host().querySelectorAll('.tt-card__body'))
+      .map((node) => (node.textContent ?? '').replace(/\s+/g, ' ').trim())
+      .find((body) => body.startsWith(step.body))!;
+
+    expect(rendered).toContain(WAITLIST_COPY[lang].labelRole);
+    expect(rendered).toContain(WAITLIST_COPY[lang].roleOptional);
+  });
+
+  it('names the COMPANY fields in the exit, not its own (US-032)', () => {
+    const body = host()
+      .querySelector('.talent-crossover__body')!
+      .textContent!.replace(/\s+/g, ' ')
+      .trim();
+
+    expect(body).toBe(`${copy.crossoverBody} ${askedFieldsPhrase(lang, 'company')}.`);
+    expect(body).toContain(WAITLIST_COPY[lang].labelCompany);
+    expect(body).not.toContain(WAITLIST_COPY[lang].labelRole);
+  });
+
+  it('writes no field of the form by hand, in either language (US-032)', () => {
+    const page = text().toLowerCase();
+    for (const wording of INVENTED_FIELD_WORDINGS) {
+      expect(page).not.toContain(wording);
+    }
   });
 
   it('sends the privacy link to the notice of ITS OWN language (US-025)', () => {

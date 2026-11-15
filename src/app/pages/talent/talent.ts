@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 
 import { privacyRoute } from '../../core/i18n/language-switch';
 import { PageLangService } from '../../core/i18n/page-lang';
+import { askedFieldsPhrase } from '../../landing/sections/waitlist/asked-fields';
 import { Waitlist } from '../../landing/sections/waitlist/waitlist';
 import { Icon } from '../../shared/icon/icon';
 import { TALENT_COPY } from './talent-copy';
@@ -26,4 +27,24 @@ export class Talent {
   // Read from the card manifest, not written here: the English page must never
   // send a reader to the Spanish notice.
   protected readonly privacyRoute = computed(() => privacyRoute(this.pageLang.lang()));
+
+  // This page's own form is the candidate side; the exit leads to the company
+  // one, so the two phrases name different field sets on purpose.
+  private readonly ownFields = computed(() => askedFieldsPhrase(this.pageLang.lang(), 'candidate'));
+
+  protected readonly steps = computed(() =>
+    this.copy().steps.map((step) =>
+      step.asksFields ? { ...step, body: `${step.body} ${this.ownFields()}.` } : step,
+    ),
+  );
+
+  protected readonly faq = computed(() =>
+    this.copy().faq.map((item) =>
+      item.asksFields ? { ...item, answer: `${item.answer} ${this.ownFields()}.` } : item,
+    ),
+  );
+
+  protected readonly crossoverBody = computed(
+    () => `${this.copy().crossoverBody} ${askedFieldsPhrase(this.pageLang.lang(), 'company')}.`,
+  );
 }

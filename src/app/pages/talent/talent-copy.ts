@@ -4,6 +4,10 @@ export interface TalentPoint {
   readonly icon: string;
   readonly title: string;
   readonly body: string;
+
+  // Set where the body ends by naming the form's fields: the page appends them
+  // from `askedFieldsPhrase`, so no wording of a field is written here.
+  readonly asksFields?: boolean;
 }
 
 // A question a visitor already has and an answer the site already owes them.
@@ -12,6 +16,10 @@ export interface TalentPoint {
 export interface TalentQuestion {
   readonly question: string;
   readonly answer: string;
+
+  // Same contract as `TalentPoint.asksFields`: the answer stops at a colon and
+  // the page names the fields.
+  readonly asksFields?: boolean;
 }
 
 export interface TalentCopy {
@@ -102,7 +110,8 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
       {
         icon: 'mail',
         title: 'Leave us your email',
-        body: 'Just your name, your email and what you are working on. It takes under a minute and we do not ask for a CV yet.',
+        body: 'It takes under a minute and we do not ask for a CV yet. The form asks you for:',
+        asksFields: true,
       },
       {
         icon: 'search',
@@ -118,7 +127,7 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
 
     crossoverTitle: 'Here to hire, not to be hired?',
     crossoverBody:
-      'This page is for the side that gets hired: its form asks what you do and never asks for a company. Yours is the companies’ side, and there the form asks for your company name.',
+      'This page is for the side that gets hired. Yours is the companies’ side, and there the form asks you for:',
     crossoverCta: 'Go to the companies’ side',
     crossoverRoute: '/companies',
 
@@ -133,7 +142,8 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
       {
         question: 'Do I have to send a CV?',
         answer:
-          'Not to get on the list. Your name, your email and what you are working on is all we ask for, and it takes under a minute.',
+          'Not to get on the list, and never a CV to leave your email — it takes under a minute. The form asks you for:',
+        asksFields: true,
       },
       {
         question: 'When do I find out the date of the interview?',
@@ -198,7 +208,8 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
       {
         icon: 'mail',
         title: 'Déjanos tu correo',
-        body: 'Nada más tu nombre, tu correo y en qué andas. Te toma menos de un minuto y no te pedimos CV todavía.',
+        body: 'Te toma menos de un minuto y no te pedimos CV todavía. El formulario te pide:',
+        asksFields: true,
       },
       {
         icon: 'search',
@@ -214,7 +225,7 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
 
     crossoverTitle: '¿Llegaste a contratar, no a que te contraten?',
     crossoverBody:
-      'Esta página es para quien busca chamba: su formulario te pregunta a qué te dedicas y nunca te pide empresa. La tuya es la de empresas, y ahí el formulario sí pide el nombre de tu empresa.',
+      'Esta página es para quien busca chamba. La tuya es la de empresas, y ahí el formulario te pide:',
     crossoverCta: 'Ir a Para empresas',
     crossoverRoute: '/empresas',
 
@@ -229,7 +240,8 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
       {
         question: '¿Tengo que mandar CV?',
         answer:
-          'Para entrar a la lista, no. Tu nombre, tu correo y en qué andas es todo lo que te pedimos, y te toma menos de un minuto.',
+          'Para entrar a la lista, no, y nunca un CV para dejar tu correo — te toma menos de un minuto. El formulario te pide:',
+        asksFields: true,
       },
       {
         question: '¿Cuándo me entero de la fecha de la entrevista?',

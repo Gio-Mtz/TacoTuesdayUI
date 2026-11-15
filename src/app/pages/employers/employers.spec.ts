@@ -8,11 +8,25 @@ import { PageLang, PageLangService } from '../../core/i18n/page-lang';
 import { SHELL_COPY } from '../../core/i18n/shell-copy';
 import { WAITLIST_COPY } from '../../landing/sections/waitlist/waitlist-copy';
 import { EMPLOYERS_COPY } from './employers-copy';
+import { askedFieldLabels, askedFieldsPhrase } from '../../landing/sections/waitlist/asked-fields';
 import { Employers } from './employers';
 
 // One component serves `/companies` and `/empresas`, so every structural claim
 // is made against BOTH languages: a page that only holds together in Spanish is
 // the bug US-022 exists to prevent.
+const INVENTED_FIELD_WORDINGS: readonly string[] = [
+  'what you are working on',
+  'en qu\u00e9 andas',
+  'what you do',
+  'a qu\u00e9 te dedicas',
+  'what you build',
+  'qu\u00e9 construyes',
+  'tu puesto y',
+  'your company name',
+  'el nombre de tu empresa',
+  'el nombre de la empresa',
+];
+
 describe.each<PageLang>(['en', 'es-MX'])('Employers in %s', (lang) => {
   const copy = EMPLOYERS_COPY[lang];
 
@@ -124,6 +138,48 @@ describe.each<PageLang>(['en', 'es-MX'])('Employers in %s', (lang) => {
     // being sent to the form.
     expect(crossover.classList.contains('tt-section')).toBe(false);
     expect(crossover.querySelector('.employers-crossover__panel')).toBeTruthy();
+  });
+
+  // US-032. The company side's claim was the only accurate one of the five, and
+  // it was still written by hand; now both surfaces read the form.
+  it('names the fields its OWN form asks for where the steps end (US-032)', () => {
+    const step = copy.steps.find((item) => item.asksFields)!;
+    const rendered = Array.from(host().querySelectorAll('.tt-card__body'))
+      .map((node) => (node.textContent ?? '').replace(/\s+/g, ' ').trim())
+      .find((body) => body.startsWith(step.body))!;
+
+    expect(rendered).toBe(`${step.body} ${askedFieldsPhrase(lang, 'company')}.`);
+    for (const label of askedFieldLabels(lang, 'company')) {
+      expect(rendered).toContain(label);
+    }
+  });
+
+  it('leaves the optional marker OUT of its own fields, because none of them is (US-032)', () => {
+    const step = copy.steps.find((item) => item.asksFields)!;
+    const rendered = Array.from(host().querySelectorAll('.tt-card__body'))
+      .map((node) => (node.textContent ?? '').replace(/\s+/g, ' ').trim())
+      .find((body) => body.startsWith(step.body))!;
+
+    expect(rendered).not.toContain(WAITLIST_COPY[lang].roleOptional);
+  });
+
+  it('names the CANDIDATE fields in the exit, not its own (US-032)', () => {
+    const body = host()
+      .querySelector('.employers-crossover__body')!
+      .textContent!.replace(/\s+/g, ' ')
+      .trim();
+
+    expect(body).toBe(`${copy.crossoverBody} ${askedFieldsPhrase(lang, 'candidate')}.`);
+    expect(body).toContain(WAITLIST_COPY[lang].labelRole);
+    expect(body).toContain(WAITLIST_COPY[lang].roleOptional);
+    expect(body).not.toContain(WAITLIST_COPY[lang].labelCompany);
+  });
+
+  it('writes no field of the form by hand, in either language (US-032)', () => {
+    const page = text().toLowerCase();
+    for (const wording of INVENTED_FIELD_WORDINGS) {
+      expect(page).not.toContain(wording);
+    }
   });
 });
 

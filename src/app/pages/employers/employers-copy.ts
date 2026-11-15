@@ -4,6 +4,10 @@ export interface EmployersPoint {
   readonly icon: string;
   readonly title: string;
   readonly body: string;
+
+  // Set where the body ends by naming the form's fields: the page appends them
+  // from `askedFieldsPhrase`, so no wording of a field is written here.
+  readonly asksFields?: boolean;
 }
 
 export interface EmployersCopy {
@@ -86,7 +90,8 @@ export const EMPLOYERS_COPY: Readonly<Record<PageLang, EmployersCopy>> = {
       {
         icon: 'mail',
         title: 'Leave us your email',
-        body: 'Your name, your email and your company name. It takes under a minute and we ask for nothing else yet.',
+        body: 'It takes under a minute and we ask for nothing else yet. The form asks you for:',
+        asksFields: true,
       },
       {
         icon: 'search',
@@ -102,7 +107,7 @@ export const EMPLOYERS_COPY: Readonly<Record<PageLang, EmployersCopy>> = {
 
     crossoverTitle: 'Here looking for work?',
     crossoverBody:
-      'This page is for the side that hires, and its form asks for a company name. Yours is the engineers’ side: there we ask what you build and we never ask for a company.',
+      'This page is for the side that hires. Yours is the engineers’ side, and there the form asks you for:',
     crossoverCta: 'Go to the engineers’ side',
     crossoverRoute: '/engineers',
   },
@@ -150,7 +155,8 @@ export const EMPLOYERS_COPY: Readonly<Record<PageLang, EmployersCopy>> = {
       {
         icon: 'mail',
         title: 'Déjanos tu correo',
-        body: 'Tu nombre, tu correo y el nombre de tu empresa. Te toma menos de un minuto y no te pedimos nada más todavía.',
+        body: 'Te toma menos de un minuto y no te pedimos nada más todavía. El formulario te pide:',
+        asksFields: true,
       },
       {
         icon: 'search',
@@ -166,7 +172,7 @@ export const EMPLOYERS_COPY: Readonly<Record<PageLang, EmployersCopy>> = {
 
     crossoverTitle: '¿Llegaste buscando chamba?',
     crossoverBody:
-      'Esta página es para quien contrata, y su formulario pide el nombre de la empresa. La tuya es la de devs: ahí te pedimos tu puesto y no te pedimos empresa.',
+      'Esta página es para quien contrata. La tuya es la de devs, y ahí el formulario te pide:',
     crossoverCta: 'Ir a Para devs',
     crossoverRoute: '/talento',
   },

@@ -46,7 +46,7 @@
     <p class="tt-eyebrow">{{ copy().stepsEyebrow }}</p>
     <h2 id="employers-steps-title" class="tt-title">{{ copy().stepsTitle }}</h2>
     <ol class="tt-cards employers__cards">
-      @for (step of copy().steps; track step.title; let i = $index) {
+      @for (step of steps(); track step.title; let i = $index) {
         <li class="tt-card">
           <span class="tt-card__icon">
             <ttco-icon [name]="step.icon" />
@@ -71,7 +71,7 @@
         <h2 id="employers-crossover-title" class="employers-crossover__title">
           {{ copy().crossoverTitle }}
         </h2>
-        <p class="employers-crossover__body">{{ copy().crossoverBody }}</p>
+        <p class="employers-crossover__body">{{ crossoverBody() }}</p>
       </div>
       <a
         class="tt-btn tt-btn--secondary employers-crossover__out"
