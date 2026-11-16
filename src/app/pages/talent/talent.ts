@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { RouterLink } from '@angular/router';
 
 import { privacyRoute } from '../../core/i18n/language-switch';
+import { SITE_INFO } from '../../core/site/site-info';
 import { PageLangService } from '../../core/i18n/page-lang';
 import { askedFieldsPhrase } from '../../landing/sections/waitlist/asked-fields';
 import { Waitlist } from '../../landing/sections/waitlist/waitlist';
@@ -27,6 +28,11 @@ export class Talent {
   // Read from the card manifest, not written here: the English page must never
   // send a reader to the Spanish notice.
   protected readonly privacyRoute = computed(() => privacyRoute(this.pageLang.lang()));
+
+  // The same source the footer and the notice read. The answer that promises
+  // deletion names the mechanism, so it has to hand over the address too, and
+  // it may not carry a second copy of it.
+  protected readonly site = SITE_INFO;
 
   // This page's own form is the candidate side; the exit leads to the company
   // one, so the two phrases name different field sets on purpose.

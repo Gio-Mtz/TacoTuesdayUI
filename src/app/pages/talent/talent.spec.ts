@@ -7,6 +7,7 @@ import { routes } from '../../app.routes';
 import { PRIVACY_CARDS, privacyRoute } from '../../core/i18n/language-switch';
 import { PageLang, PageLangService } from '../../core/i18n/page-lang';
 import { SOCIAL_CARDS } from '../../core/seo/page-social';
+import { SITE_INFO } from '../../core/site/site-info';
 import { SHELL_COPY } from '../../core/i18n/shell-copy';
 import { WAITLIST_COPY } from '../../landing/sections/waitlist/waitlist-copy';
 import { EMPLOYERS_COPY } from '../employers/employers-copy';
@@ -162,6 +163,13 @@ describe.each<PageLang>(['en', 'es-MX'])('Talent in %s', (lang) => {
         expect(answers[i]).toMatch(
           new RegExp(`^${item.answer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} .+\\.$`),
         );
+      } else if (item.answerAfter) {
+        // US-033: cut around the address, so the pair is the lede, the address
+        // and the rest. That the address is the one the site owns is measured
+        // below, against `SITE_INFO`.
+        expect(answers[i]?.replace(/\s+/g, ' ')).toBe(
+          `${item.answer} ${SITE_INFO.contactEmail} ${item.answerAfter}`,
+        );
       } else {
         expect(answers[i]).toBe(item.answer);
       }
@@ -214,10 +222,49 @@ describe.each<PageLang>(['en', 'es-MX'])('Talent in %s', (lang) => {
     }
   });
 
+  // US-033. Four surfaces send a reader to the same address: the footer, the two
+  // places the notice names it, and this answer. The first three read it from
+  // `SITE_INFO`; this one promised the mechanism and handed over nothing.
+  it('hands the deletion answer the address it tells you to write to (US-033)', () => {
+    const i = copy.faq.findIndex((item) => item.answerAfter);
+    const answer = Array.from(host().querySelectorAll(`#${copy.faqId} dd`))[i];
+
+    // Scoped to the ANSWER, not to the page: the footer renders this same
+    // address on every route, so a page-wide `text()` here would pass whatever
+    // this answer said. That is #147, and it is the trap this test is shaped
+    // against.
+    const link = answer.querySelector<HTMLAnchorElement>('a')!;
+
+    expect(link.getAttribute('href')).toBe(`mailto:${SITE_INFO.contactEmail}`);
+    expect(link.textContent?.trim()).toBe(SITE_INFO.contactEmail);
+    expect(answer.textContent).toContain(SITE_INFO.contactEmail);
+  });
+
+  it('writes no address by hand in the prose of this page (US-033)', () => {
+    // The regression: anybody can retype the address into the answer and it
+    // would read correctly for exactly as long as the address does not change.
+    const written = JSON.stringify(copy);
+
+    expect(written).not.toContain('@');
+    expect(text()).toContain(SITE_INFO.contactEmail);
+  });
+
+  it('cuts exactly one answer around the address, and it is the deletion one (US-033)', () => {
+    const cut = copy.faq.filter((item) => item.answerAfter);
+
+    expect(cut.length).toBe(1);
+    // The answer stops mid-sentence on purpose, so neither half may end in a
+    // full stop: that is what tells a reviewer the address belongs between them.
+    expect(cut[0].answer.endsWith('.')).toBe(false);
+    expect(cut[0].answerAfter!.startsWith('.')).toBe(false);
+  });
+
   it('sends the privacy link to the notice of ITS OWN language (US-025)', () => {
     // The whole point of reading the route from the manifest. An English reader
     // asking how to delete their data must not land on the Spanish notice.
-    const link = host().querySelector<HTMLAnchorElement>(`#${copy.faqId} a`)!;
+    // Scoped to the note since US-033: the deletion answer now carries a
+    // `mailto:` anchor, which comes first in document order inside this section.
+    const link = host().querySelector<HTMLAnchorElement>('.talent-faq__note a')!;
 
     expect(link.getAttribute('href')).toBe(privacyRoute(lang));
     expect(SOCIAL_CARDS[PRIVACY_CARDS[lang]].lang).toBe(lang);

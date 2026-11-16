@@ -20,6 +20,14 @@ export interface TalentQuestion {
   // Same contract as `TalentPoint.asksFields`: the answer stops at a colon and
   // the page names the fields.
   readonly asksFields?: boolean;
+
+  // Set on the answer whose mechanism IS an address: the answer stops where the
+  // address goes, the page reads it from `SITE_INFO` and renders it as a link
+  // you can click, and this is the rest of the sentence. The address itself is
+  // never written here -- the footer and the notice already read it from the one
+  // place that owns it, and this answer was the only surface that promised the
+  // mechanism without handing over the means.
+  readonly answerAfter?: string;
 }
 
 export interface TalentCopy {
@@ -157,8 +165,9 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
       },
       {
         question: 'Can I have my data deleted?',
-        answer:
-          'Yes. You write to us from the same address you signed up with and we remove it. There is no form to fill in and you do not have to explain yourself.',
+        answer: 'Yes. You write to us at',
+        answerAfter:
+          'from the same address you signed up with and we remove it. There is no form to fill in and you do not have to explain yourself.',
       },
     ],
     faqNote: 'What we keep, and for how long, is written out in the',
@@ -255,8 +264,9 @@ export const TALENT_COPY: Readonly<Record<PageLang, TalentCopy>> = {
       },
       {
         question: '¿Puedo pedir que borren mis datos?',
-        answer:
-          'Sí. Nos escribes desde el mismo correo con el que te registraste y lo borramos. No hay formulario que llenar y no tienes que explicarte.',
+        answer: 'Sí. Nos escribes a',
+        answerAfter:
+          'desde el mismo correo con el que te registraste y lo borramos. No hay formulario que llenar y no tienes que explicarte.',
       },
     ],
     faqNote: 'Qué guardamos, y por cuánto tiempo, está escrito en el',

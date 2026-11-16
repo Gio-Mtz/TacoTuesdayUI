@@ -89,7 +89,15 @@
       @for (item of faq(); track item.question) {
         <div class="talent-faq__item">
           <dt class="talent-faq__question">{{ item.question }}</dt>
-          <dd class="talent-faq__answer">{{ item.answer }}</dd>
+          <dd class="talent-faq__answer">
+            @if (item.answerAfter) {
+              {{ item.answer }}
+              <a [href]="'mailto:' + site.contactEmail">{{ site.contactEmail }}</a>
+              {{ item.answerAfter }}
+            } @else {
+              {{ item.answer }}
+            }
+          </dd>
         </div>
       }
     </dl>
