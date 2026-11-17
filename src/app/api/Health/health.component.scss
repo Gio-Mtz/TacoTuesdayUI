@@ -1,0 +1,34 @@
+@use '../../../styles/tokens' as tt;
+
+.health__inner {
+  max-width: 70ch;
+}
+
+.health__message {
+  margin: 0 0 tt.space(5);
+}
+
+.health__facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: tt.space(2) tt.space(4);
+  padding: tt.space(5);
+  background: var(--tt-bg-subtle);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-lg);
+}
+
+.health__facts dt {
+  margin: 0;
+  font-family: tt.$font-mono;
+  font-size: var(--tt-text-sm);
+  letter-spacing: var(--tt-tracking-wide);
+  text-transform: uppercase;
+  color: var(--tt-text-secondary);
+}
+
+.health__facts dd {
+  margin: 0;
+  font-size: var(--tt-text-base);
+}

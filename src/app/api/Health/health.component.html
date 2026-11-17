@@ -1,10 +1,18 @@
-<main>
-  <h1>Taco Tuesday Consulting</h1>
-  @if (ping(); as response) {
-    <p>{{ response.message }}</p>
-    <p>Module: {{ response.module }}</p>
-    <p>Server Time (UTC): {{ response.serverTimeUtc }}</p>
-  } @else {
-    <p>Talking to the API...</p>
-  }
-</main>
+<section class="tt-section health" aria-labelledby="health-title">
+  <div class="tt-container health__inner">
+    <p class="tt-eyebrow">{{ copy().eyebrow }}</p>
+    <h1 id="health-title" class="tt-title">{{ copy().title }}</h1>
+
+    @if (ping(); as response) {
+      <p class="tt-lede health__message">{{ response.message }}</p>
+      <dl class="health__facts">
+        <dt>{{ copy().moduleLabel }}</dt>
+        <dd class="health__module">{{ response.module }}</dd>
+        <dt>{{ copy().serverTimeLabel }}</dt>
+        <dd class="health__time">{{ response.serverTimeUtc }}</dd>
+      </dl>
+    } @else {
+      <p class="tt-lede health__waiting">{{ copy().waiting }}</p>
+    }
+  </div>
+</section>
